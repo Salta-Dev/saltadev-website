@@ -15,10 +15,17 @@
         <a class="text-sm font-medium text-white hover:text-white transition-colors" href="/reglamento/">Reglamento</a>
       </nav>
       <div class="flex items-center gap-4">
+        {% if user.is_authenticated %}
+        <a class="hidden md:flex bg-primary hover:bg-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-lg shadow-primary/20 transition-all items-center gap-2" href="/dashboard/">
+          <span>Volver al dashboard</span>
+          <span class="material-symbols-outlined text-[18px]">dashboard</span>
+        </a>
+        {% else %}
         <a class="hidden md:flex bg-primary hover:bg-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-lg shadow-primary/20 transition-all items-center gap-2" href="/login/">
           <span>Iniciar sesión</span>
           <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
         </a>
+        {% endif %}
         <button class="md:hidden text-white p-2" type="button" id="mobileMenuToggle" aria-label="Abrir menu" aria-expanded="false">
           <span class="material-symbols-outlined">menu</span>
         </button>
@@ -34,10 +41,17 @@
       <a class="text-sm font-medium text-white py-3 border-b border-border-dark" href="/eventos/">Eventos</a>
       <a class="text-sm font-medium text-white py-3 border-b border-border-dark" href="/reglamento/">Reglamento</a>
       <div class="pt-4">
+        {% if user.is_authenticated %}
+        <a class="bg-primary hover:bg-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-lg shadow-primary/20 transition-all inline-flex items-center gap-2 justify-center" href="/dashboard/">
+          <span>Volver al dashboard</span>
+          <span class="material-symbols-outlined text-[18px]">dashboard</span>
+        </a>
+        {% else %}
         <a class="bg-primary hover:bg-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-lg shadow-primary/20 transition-all inline-flex items-center gap-2 justify-center" href="/login/">
           <span>Iniciar sesión</span>
           <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
         </a>
+        {% endif %}
       </div>
     </div>
   </div>

@@ -1,6 +1,5 @@
 """Login view with rate limiting and email verification."""
 
-from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpRequest, HttpResponse
@@ -17,20 +16,12 @@ from users.ratelimit import (
     is_blocked,
     reset,
 )
+from users.utils import get_lockout_message
 
 logger = get_logger()
 
 # Template constant to avoid duplication
 TEMPLATE_LOGIN = "auth_login/index.html"
-
-
-def _get_lockout_message() -> str:
-    """Get the lockout message from settings or use default."""
-    return getattr(
-        settings,
-        "AXES_LOCKOUT_MESSAGE",
-        "Demasiados intentos fallidos. Intentá nuevamente más tarde.",
-    )
 
 
 def _render_login_blocked(
@@ -48,7 +39,7 @@ def _render_login_blocked(
             "form": form,
             "email_not_verified": False,
             "email_value": email_value,
-            "blocked_message": _get_lockout_message(),
+            "blocked_message": get_lockout_message(),
         },
     )
     return attach_fingerprint_cookie(response, fingerprint, should_set_cookie)

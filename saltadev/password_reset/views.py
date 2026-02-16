@@ -1,6 +1,5 @@
 from typing import Optional
 
-from django.conf import settings
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -20,6 +19,7 @@ from users.ratelimit import (
 )
 from users.utils import (
     create_password_reset_token,
+    get_lockout_message,
     hash_token,
     send_password_reset,
 )
@@ -36,11 +36,6 @@ def request_reset_view(request: HttpRequest) -> HttpResponse:
     fingerprint, should_set_cookie = get_fingerprint(request)
     email_value = request.POST.get("email") if request.method == "POST" else None
     keys = build_keys("password_reset_request", ip_address, email_value, fingerprint)
-    lockout_message = getattr(
-        settings,
-        "AXES_LOCKOUT_MESSAGE",
-        "Demasiados intentos fallidos. Intentá nuevamente más tarde.",
-    )
 
     if is_blocked(keys, PASSWORD_RESET_REQUEST_LIMIT):
         logger.warning(
@@ -53,7 +48,7 @@ def request_reset_view(request: HttpRequest) -> HttpResponse:
             "password_reset/request.html",
             {
                 "form": form,
-                "blocked_message": lockout_message,
+                "blocked_message": get_lockout_message(),
             },
         )
         return attach_fingerprint_cookie(response, fingerprint, should_set_cookie)
@@ -109,11 +104,6 @@ def confirm_reset_view(request: HttpRequest) -> HttpResponse:
         else request.POST.get("token", "")
     )
     keys = build_keys("password_reset_confirm", ip_address, token_value, fingerprint)
-    lockout_message = getattr(
-        settings,
-        "AXES_LOCKOUT_MESSAGE",
-        "Demasiados intentos fallidos. Intentá nuevamente más tarde.",
-    )
 
     token_record = _get_token_record(str(token_value))
     if not token_record:
@@ -137,7 +127,7 @@ def confirm_reset_view(request: HttpRequest) -> HttpResponse:
             {
                 "form": form,
                 "token": token_value,
-                "blocked_message": lockout_message,
+                "blocked_message": get_lockout_message(),
             },
         )
         return attach_fingerprint_cookie(response, fingerprint, should_set_cookie)

@@ -1,0 +1,49 @@
+.poncho-bg {
+  background-color: #241f1e;
+  background-image:
+    linear-gradient(
+      45deg,
+      rgba(148, 65, 61, 0.03) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(148, 65, 61, 0.03) 75%,
+      rgba(148, 65, 61, 0.03)
+    ),
+    linear-gradient(
+      45deg,
+      rgba(148, 65, 61, 0.03) 25%,
+      transparent 25%,
+      transparent 75%,
+      rgba(148, 65, 61, 0.03) 75%,
+      rgba(148, 65, 61, 0.03)
+    );
+  background-position:
+    0 0,
+    20px 20px;
+  background-size: 40px 40px;
+}
+
+.poncho-accent {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(148, 65, 61, 0.1) 0px,
+    rgba(148, 65, 61, 0.1) 2px,
+    transparent 2px,
+    transparent 12px
+  );
+}
+
+@keyframes zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-in {
+  animation: zoom-in 0.2s ease-out forwards;
+}

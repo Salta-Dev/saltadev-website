@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaltaDev - {{ benefit.title }}</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex overflow-x-hidden selection:bg-primary selection:text-white font-display">
+
+  {% include "dashboard/includes/sidebar.html" %}
+  {% include "dashboard/includes/mobile_menu.html" %}
+
+  <main class="flex-1 lg:ml-72 flex flex-col min-h-screen overflow-y-auto relative bg-background-dark">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-background-dark/80 backdrop-blur-xl border-b border-[#342d2d] px-6 lg:px-8 py-4 lg:py-6 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="{% url 'benefits_list' %}" class="p-2 rounded-lg hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-colors">
+          <span class="material-symbols-outlined leading-none">arrow_back</span>
+        </a>
+        <div class="flex flex-col gap-1">
+          <h2 class="text-xl lg:text-2xl font-bold text-white tracking-tight line-clamp-1">{{ benefit.title }}</h2>
+          <p class="text-[#8e8584] text-sm font-medium hidden sm:block">Detalle del beneficio</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        {% if can_edit %}
+          <a href="{% url 'benefit_edit' pk=benefit.pk %}" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2a2424] hover:bg-[#3d3434] text-white text-sm font-medium transition-colors border border-[#3d2f2f]">
+            <span class="material-symbols-outlined text-lg">edit</span>
+            Editar
+          </a>
+        {% endif %}
+        <button class="lg:hidden size-10 rounded-lg bg-[#1d1919] text-[#8e8584] hover:text-white hover:bg-[#2a2424] transition-all border border-[#2a2424] flex items-center justify-center" onclick="openMobileMenu()">
+          <span class="material-symbols-outlined text-xl leading-none">menu</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="p-4 lg:p-8 max-w-4xl mx-auto w-full pb-20">
+
+      {% if messages %}
+        <div class="mb-6 space-y-2">
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-400">check_circle</span>
+                {{ message }}
+              </div>
+            {% elif message.tags == 'error' %}
+              <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-400">error</span>
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Main Card -->
+      <div class="bg-surface-dark rounded-2xl border border-[#342d2d] overflow-hidden">
+        <!-- Image -->
+        {% if benefit.image %}
+          <div class="aspect-video bg-[#1d1919] relative">
+            <img src="{{ benefit.image }}" alt="{{ benefit.title }}" class="w-full h-full object-cover"/>
+
+            <!-- Badges -->
+            <div class="absolute top-4 left-4 flex gap-2">
+              {% if benefit.benefit_type == 'discount' %}
+                <span class="px-4 py-2 rounded-full bg-green-600 text-white text-sm font-bold shadow-lg">
+                  {{ benefit.discount_percentage }}% OFF
+                </span>
+              {% else %}
+                <span class="px-4 py-2 rounded-full bg-blue-600 text-white text-sm font-bold shadow-lg">
+                  Canjeable{% if benefit.redemption_limit %} ({{ benefit.remaining_redemptions }} restantes){% endif %}
+                </span>
+              {% endif %}
+            </div>
+
+            <div class="absolute top-4 right-4 flex gap-2">
+              {% if benefit.modality == 'virtual' %}
+                <span class="px-3 py-1.5 rounded-full bg-purple-600 text-white text-sm font-bold shadow-lg">Virtual</span>
+              {% elif benefit.modality == 'in_person' %}
+                <span class="px-3 py-1.5 rounded-full bg-amber-600 text-white text-sm font-bold shadow-lg">Presencial</span>
+              {% elif benefit.modality == 'both' %}
+                <span class="px-3 py-1.5 rounded-full bg-indigo-600 text-white text-sm font-bold shadow-lg">Virtual y Presencial</span>
+              {% endif %}
+
+              {% if not benefit.is_active %}
+                <span class="px-3 py-1.5 rounded-full bg-gray-600 text-white text-sm font-bold shadow-lg">Inactivo</span>
+              {% elif benefit.is_expired %}
+                <span class="px-3 py-1.5 rounded-full bg-red-600 text-white text-sm font-bold shadow-lg">Expirado</span>
+              {% elif benefit.is_fully_redeemed %}
+                <span class="px-3 py-1.5 rounded-full bg-orange-600 text-white text-sm font-bold shadow-lg">Agotado</span>
+              {% else %}
+                <span class="px-3 py-1.5 rounded-full bg-green-600 text-white text-sm font-bold shadow-lg">Disponible</span>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Content -->
+        <div class="p-6 lg:p-8">
+          <!-- Title and badges if no image -->
+          {% if not benefit.image %}
+            <div class="flex flex-wrap gap-2 mb-4">
+              {% if benefit.benefit_type == 'discount' %}
+                <span class="px-3 py-1 rounded-full bg-green-600 text-white text-sm font-bold shadow-md">
+                  {{ benefit.discount_percentage }}% OFF
+                </span>
+              {% else %}
+                <span class="px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-bold shadow-md">
+                  Canjeable{% if benefit.redemption_limit %} ({{ benefit.remaining_redemptions }} restantes){% endif %}
+                </span>
+              {% endif %}
+
+              {% if benefit.modality == 'virtual' %}
+                <span class="px-3 py-1 rounded-full bg-purple-600 text-white text-sm font-bold shadow-md">Virtual</span>
+              {% elif benefit.modality == 'in_person' %}
+                <span class="px-3 py-1 rounded-full bg-amber-600 text-white text-sm font-bold shadow-md">Presencial</span>
+              {% elif benefit.modality == 'both' %}
+                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-sm font-bold shadow-md">Virtual y Presencial</span>
+              {% endif %}
+
+              {% if not benefit.is_active %}
+                <span class="px-3 py-1 rounded-full bg-gray-600 text-white text-sm font-bold shadow-md">Inactivo</span>
+              {% elif benefit.is_expired %}
+                <span class="px-3 py-1 rounded-full bg-red-600 text-white text-sm font-bold shadow-md">Expirado</span>
+              {% elif benefit.is_fully_redeemed %}
+                <span class="px-3 py-1 rounded-full bg-orange-600 text-white text-sm font-bold shadow-md">Agotado</span>
+              {% else %}
+                <span class="px-3 py-1 rounded-full bg-green-600 text-white text-sm font-bold shadow-md">Disponible</span>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <h1 class="text-2xl lg:text-3xl font-bold text-white mb-4">{{ benefit.title }}</h1>
+
+          <p class="text-[#b2a5a4] text-lg leading-relaxed mb-6">{{ benefit.description }}</p>
+
+          <!-- Info Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <!-- Modality -->
+            <div class="bg-[#1d1919] rounded-xl p-4 border border-[#2a2424]">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary">
+                  {% if benefit.modality == 'virtual' %}videocam{% elif benefit.modality == 'in_person' %}location_on{% else %}public{% endif %}
+                </span>
+                <div>
+                  <p class="text-xs text-[#6b605f] uppercase tracking-wider">Modalidad</p>
+                  <p class="text-white font-medium">{{ benefit.get_modality_display }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expiration -->
+            {% if benefit.expiration_date %}
+              <div class="bg-[#1d1919] rounded-xl p-4 border border-[#2a2424]">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-primary">event</span>
+                  <div>
+                    <p class="text-xs text-[#6b605f] uppercase tracking-wider">Válido hasta</p>
+                    <p class="text-white font-medium">{{ benefit.expiration_date|date:"d/m/Y" }}</p>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+
+            <!-- Location -->
+            {% if benefit.location %}
+              <div class="bg-[#1d1919] rounded-xl p-4 border border-[#2a2424] sm:col-span-2">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-primary">place</span>
+                  <div>
+                    <p class="text-xs text-[#6b605f] uppercase tracking-wider">Ubicación</p>
+                    <p class="text-white font-medium">{{ benefit.location }}</p>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Discount Codes -->
+          {% if benefit.discount_codes %}
+            <div class="bg-[#1d1919] rounded-xl p-4 border border-[#2a2424] mb-6">
+              <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">confirmation_number</span>
+                Códigos de descuento
+              </h3>
+              <div class="flex flex-wrap gap-2">
+                {% for code in benefit.get_discount_codes_list %}
+                  <button onclick="copyCode('{{ code }}')" class="px-4 py-2 bg-[#2a2424] hover:bg-primary rounded-lg text-white font-mono text-sm transition-colors flex items-center gap-2 group">
+                    {{ code }}
+                    <span class="material-symbols-outlined text-sm text-[#6b605f] group-hover:text-white">content_copy</span>
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Contact Info -->
+          <div class="bg-[#1d1919] rounded-xl p-4 border border-[#2a2424] mb-6">
+            <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">contact_page</span>
+              Contacto
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {% if benefit.get_contact_phone %}
+                <a href="tel:{{ benefit.get_contact_phone }}" class="flex items-center gap-2 text-[#8e8584] hover:text-white transition-colors">
+                  <span class="material-symbols-outlined">phone</span>
+                  <span class="text-sm">{{ benefit.get_contact_phone }}</span>
+                </a>
+              {% endif %}
+              {% if benefit.get_contact_email %}
+                <a href="mailto:{{ benefit.get_contact_email }}" class="flex items-center gap-2 text-[#8e8584] hover:text-white transition-colors">
+                  <span class="material-symbols-outlined">mail</span>
+                  <span class="text-sm truncate">{{ benefit.get_contact_email }}</span>
+                </a>
+              {% endif %}
+              {% if benefit.get_contact_website %}
+                <a href="{{ benefit.get_contact_website }}" target="_blank" class="flex items-center gap-2 text-[#8e8584] hover:text-white transition-colors">
+                  <span class="material-symbols-outlined">language</span>
+                  <span class="text-sm truncate">Sitio web</span>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Creator Info -->
+          <div class="flex items-center justify-between pt-4 border-t border-[#2a2424]">
+            <div class="flex items-center gap-3">
+              {% if benefit.creator.profile.avatar_url %}
+                <img src="{{ benefit.creator.profile.avatar_url }}" alt="{{ benefit.creator.first_name }}" class="w-10 h-10 rounded-full object-cover"/>
+              {% else %}
+                <div class="w-10 h-10 rounded-full bg-[#2a2424] flex items-center justify-center">
+                  <span class="material-symbols-outlined text-primary">person</span>
+                </div>
+              {% endif %}
+              <div>
+                <p class="text-white font-medium">{{ benefit.creator.first_name }} {{ benefit.creator.last_name }}</p>
+                <p class="text-xs text-[#6b605f]">Publicado el {{ benefit.created_at|date:"d/m/Y" }}</p>
+              </div>
+            </div>
+
+            {% if can_edit %}
+              <div class="flex items-center gap-2">
+                <form method="post" action="{% url 'benefit_toggle_active' pk=benefit.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="p-2 rounded-lg hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-colors" title="{% if benefit.is_active %}Desactivar{% else %}Activar{% endif %}">
+                    <span class="material-symbols-outlined">{% if benefit.is_active %}visibility_off{% else %}visibility{% endif %}</span>
+                  </button>
+                </form>
+                <a href="{% url 'benefit_edit' pk=benefit.pk %}" class="p-2 rounded-lg hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-colors sm:hidden" title="Editar">
+                  <span class="material-symbols-outlined">edit</span>
+                </a>
+                {% if can_delete %}
+                  <a href="{% url 'benefit_delete' pk=benefit.pk %}" class="p-2 rounded-lg hover:bg-red-500/10 text-[#8e8584] hover:text-red-400 transition-colors" title="Eliminar">
+                    <span class="material-symbols-outlined">delete</span>
+                  </a>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function copyCode(code) {
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Código copiado: ' + code);
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,6 +1,5 @@
 """Email verification views with rate limiting."""
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.core.exceptions import ObjectDoesNotExist
@@ -21,21 +20,12 @@ from .ratelimit import (
     is_blocked,
     reset,
 )
-from .utils import send_verification_code, verify_code
+from .utils import get_lockout_message, send_verification_code, verify_code
 
 logger = get_logger()
 
 # Template constant to avoid duplication
 TEMPLATE_VERIFY = "users/verificar.html"
-
-
-def _get_lockout_message() -> str:
-    """Get the lockout message from settings or use default."""
-    return getattr(
-        settings,
-        "AXES_LOCKOUT_MESSAGE",
-        "Demasiados intentos fallidos. Intentá nuevamente más tarde.",
-    )
 
 
 def _render_verify_page(
@@ -66,7 +56,7 @@ def _handle_resend_blocked(
         extra={"ip": ip_address, "email": email},
     )
     return _render_verify_page(
-        request, email, fingerprint, should_set_cookie, _get_lockout_message()
+        request, email, fingerprint, should_set_cookie, get_lockout_message()
     )
 
 
@@ -109,7 +99,7 @@ def _handle_verify_blocked(
         extra={"ip": ip_address, "email": email},
     )
     return _render_verify_page(
-        request, email, fingerprint, should_set_cookie, _get_lockout_message()
+        request, email, fingerprint, should_set_cookie, get_lockout_message()
     )
 
 

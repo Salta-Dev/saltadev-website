@@ -229,5 +229,14 @@ saltadev/media
 
 # Backups
 backups/
-*.sql.gzsonar-project.properties
+*.sql.gz
+sonar-project.properties
 .scannerwork/
+
+# Claude Code
+.claude/
+.agents/
+
+# Database backups
+*.backup-*
+db.sqlite3.backup-*

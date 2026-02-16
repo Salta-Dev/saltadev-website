@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from saltadev.logging import get_logger
@@ -14,6 +13,7 @@ from users.ratelimit import (
     is_blocked,
     reset,
 )
+from users.utils import get_lockout_message
 
 logger = get_logger()
 
@@ -24,11 +24,6 @@ def register_view(request: HttpRequest) -> HttpResponse:
     fingerprint, should_set_cookie = get_fingerprint(request)
     email = str(request.POST.get("email")) if request.method == "POST" else None
     keys = build_keys("register", ip_address, email, fingerprint)
-    lockout_message = getattr(
-        settings,
-        "AXES_LOCKOUT_MESSAGE",
-        "Demasiados intentos fallidos. Intentá nuevamente más tarde.",
-    )
 
     if is_blocked(keys, REGISTER_LIMIT):
         logger.warning(
@@ -40,7 +35,7 @@ def register_view(request: HttpRequest) -> HttpResponse:
             "auth_register/index.html",
             {
                 "form": RegisterForm(request.POST or None),
-                "blocked_message": lockout_message,
+                "blocked_message": get_lockout_message(),
             },
         )
         return attach_fingerprint_cookie(response, fingerprint, should_set_cookie)

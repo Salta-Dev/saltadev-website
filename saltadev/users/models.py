@@ -153,10 +153,37 @@ class Profile(models.Model):
         max_length=20, choices=TechnicalRole.choices, blank=True
     )
     bio = models.TextField(blank=True)
-    github = models.URLField(blank=True)
-    linkedin = models.URLField(blank=True)
-    twitter = models.CharField(max_length=100, blank=True)
-    website = models.URLField(blank=True)
+    github = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="GitHub",
+        help_text="Solo el nombre de usuario (ej: facundopadilla)",
+    )
+    linkedin = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="LinkedIn",
+        help_text="Solo el nombre de usuario (ej: facundopadilla)",
+    )
+    twitter = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Twitter/X",
+        help_text="Solo el nombre de usuario (ej: facundopadilla)",
+    )
+    instagram = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Instagram",
+        help_text="Solo el nombre de usuario (ej: facundopadilla)",
+    )
+    discord = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Discord",
+        help_text="Tu ID de usuario de Discord (ej: 123456789012345678)",
+    )
+    website = models.URLField(blank=True, verbose_name="Sitio web")
     avatar_url = models.URLField(blank=True, default="")
     avatar_delete_url = models.URLField(blank=True, default="")
     location = models.CharField(max_length=150, blank=True)
@@ -167,6 +194,55 @@ class Profile(models.Model):
 
     def __str__(self) -> str:
         return f"Profile for {self.user.email}"
+
+    @property
+    def github_url(self) -> str:
+        """Return the full GitHub profile URL."""
+        if self.github:
+            return f"https://github.com/{self.github}"
+        return ""
+
+    @property
+    def linkedin_url(self) -> str:
+        """Return the full LinkedIn profile URL."""
+        if self.linkedin:
+            return f"https://linkedin.com/in/{self.linkedin}"
+        return ""
+
+    @property
+    def twitter_url(self) -> str:
+        """Return the full Twitter/X profile URL."""
+        if self.twitter:
+            return f"https://x.com/{self.twitter}"
+        return ""
+
+    @property
+    def instagram_url(self) -> str:
+        """Return the full Instagram profile URL."""
+        if self.instagram:
+            return f"https://instagram.com/{self.instagram}"
+        return ""
+
+    @property
+    def discord_url(self) -> str:
+        """Return the full Discord user URL."""
+        if self.discord:
+            return f"https://discord.com/users/{self.discord}"
+        return ""
+
+    @property
+    def has_social_links(self) -> bool:
+        """Check if any social link is set."""
+        return any(
+            [
+                self.github,
+                self.linkedin,
+                self.twitter,
+                self.instagram,
+                self.discord and self.discord.strip(),
+                self.website,
+            ]
+        )
 
 
 class EmailVerificationCode(models.Model):

@@ -2,22 +2,14 @@ from typing import Any
 
 from django import forms
 from django.contrib.auth import password_validation
-from django_recaptcha.fields import ReCaptchaField
-from django_recaptcha.widgets import ReCaptchaV2Checkbox
+from users.forms import create_recaptcha_field
 
 
 class PasswordResetRequestForm(forms.Form):
     """Form for requesting a password reset email."""
 
     email = forms.EmailField()
-    captcha = ReCaptchaField(
-        widget=ReCaptchaV2Checkbox(
-            attrs={
-                "data-theme": "dark",
-                "data-size": "normal",
-            }
-        )
-    )
+    captcha = create_recaptcha_field()
 
     def clean_email(self) -> str:
         return (self.cleaned_data.get("email") or "").strip().lower()
@@ -28,14 +20,7 @@ class PasswordResetConfirmForm(forms.Form):
 
     new_password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
-    captcha = ReCaptchaField(
-        widget=ReCaptchaV2Checkbox(
-            attrs={
-                "data-theme": "dark",
-                "data-size": "normal",
-            }
-        )
-    )
+    captcha = create_recaptcha_field()
 
     def __init__(self, *args: Any, **kwargs: Any):
         self.user = kwargs.pop("user", None)
