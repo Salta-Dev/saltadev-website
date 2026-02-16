@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  {% load static %}
+  <title>{% block title %}SaltaDev - Comunidad de Desarrolladores{% endblock %}</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+  {% block page_css %}{% endblock %}
+</head>
+<body class="bg-background-light dark:bg-background-dark text-white font-display transition-colors duration-300 antialiased overflow-x-hidden animated-bg">
+  {% include "includes/nav.html" %}
+  {% block content %}{% endblock %}
+  {% include "includes/footer.html" %}
+  {% block page_js %}{% endblock %}
+  <script src="{% static 'assets/js/fingerprint.js' %}"></script>
+</body>
+</html>

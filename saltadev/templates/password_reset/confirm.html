@@ -1,0 +1,79 @@
+{% extends "auth/base_auth.html" %}
+{% load static %}
+
+{% block title %}SaltaDev - Nueva contraseña{% endblock %}
+
+{% block brand_icon %}
+  {% include "includes/auth_brand_logo.html" %}
+{% endblock %}
+
+{% block form %}
+<div class="flex w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark p-6 lg:w-1/2">
+  <div class="w-full max-w-md space-y-8">
+    {% include "includes/auth_mobile_logo.html" %}
+    <div class="text-center lg:text-left">
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Crear nueva contraseña</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        Ingresá tu nueva contraseña y confirmala para restablecer el acceso.
+      </p>
+    </div>
+
+    {% include "includes/auth_blocked_message.html" %}
+
+    <form class="mt-8 space-y-6" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="token" value="{{ token }}">
+      <div class="space-y-5">
+        <div>
+          <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_new_password">Nueva contraseña</label>
+          <div class="mt-2 relative rounded-lg shadow-sm">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span class="material-symbols-outlined text-gray-400 text-[20px]">lock_reset</span>
+            </div>
+            <input
+              type="password"
+              name="new_password"
+              id="id_new_password"
+              autocomplete="new-password"
+              placeholder="••••••••"
+              class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6"
+              required
+              {% if blocked_message %}disabled{% endif %}
+            />
+          </div>
+          {% if form.new_password.errors %}
+            <p class="mt-1 text-xs text-red-400">{{ form.new_password.errors|striptags }}</p>
+          {% endif %}
+        </div>
+        <div>
+          <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_confirm_password">Confirmar contraseña</label>
+          <div class="mt-2 relative rounded-lg shadow-sm">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span class="material-symbols-outlined text-gray-400 text-[20px]">lock</span>
+            </div>
+            <input
+              type="password"
+              name="confirm_password"
+              id="id_confirm_password"
+              autocomplete="new-password"
+              placeholder="••••••••"
+              class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6"
+              required
+              {% if blocked_message %}disabled{% endif %}
+            />
+          </div>
+          {% if form.confirm_password.errors %}
+            <p class="mt-1 text-xs text-red-400">{{ form.confirm_password.errors|striptags }}</p>
+          {% endif %}
+        </div>
+        {% include "includes/auth_recaptcha.html" %}
+      </div>
+      <div>
+        <button class="flex w-full justify-center rounded-lg bg-primary px-3 py-3.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-200 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" type="submit" {% if blocked_message %}disabled{% endif %}>
+          Restablecer contraseña
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

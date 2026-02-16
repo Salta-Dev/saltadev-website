@@ -1,0 +1,148 @@
+{% extends "auth/base_auth.html" %}
+{% load static %}
+
+{% block title %}SaltaDev - Verificar correo{% endblock %}
+
+{% block body_class %}bg-background-light dark:bg-background-dark font-body text-slate-900 dark:text-white antialiased selection:bg-primary selection:text-white{% endblock %}
+
+{% block left_panel_class %}relative hidden lg:flex lg:w-1/2 flex-col justify-between overflow-hidden poncho-pattern group/design-root h-screen sticky top-0{% endblock %}
+
+{% block brand_icon %}
+  {% include "includes/auth_brand_logo.html" %}
+{% endblock %}
+
+{% block form %}
+<div class="flex w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark p-6 lg:w-1/2 custom-scrollbar lg:h-screen lg:overflow-y-auto">
+  <div class="w-full max-w-md space-y-8 py-8">
+    {% include "includes/auth_mobile_logo.html" %}
+    <div class="text-center">
+      <div class="mb-6 flex justify-center">
+        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <span class="material-symbols-outlined text-[32px]">mark_email_read</span>
+        </div>
+      </div>
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white font-display">Verificá tu correo</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        Ingresá el código de 6 dígitos que enviamos a tu email
+      </p>
+    </div>
+
+    {% include "includes/auth_blocked_message.html" %}
+    {% if not blocked_message and messages %}
+      <div class="space-y-2">
+        {% for message in messages %}
+          {% if 'error' in message.tags %}
+            <div class="rounded-lg border border-alert-red/30 bg-alert-red/10 p-3 text-sm text-alert-red">
+              {{ message }}
+            </div>
+          {% elif 'success' in message.tags %}
+            <div class="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">
+              {{ message }}
+            </div>
+          {% else %}
+            <div class="rounded-lg border border-gray-300/40 bg-gray-100/60 p-3 text-sm text-gray-700 dark:border-border-dark dark:bg-surface-dark dark:text-gray-300">
+              {{ message }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form class="mt-8 space-y-8" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="email" value="{{ email|default:'' }}" />
+      <div class="flex justify-between gap-2">
+        <input autofocus class="w-12 h-14 text-center text-2xl font-bold rounded-lg border-gray-300 dark:border-border-dark bg-white dark:bg-surface-dark text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-primary dark:focus:ring-primary transition-all outline-none ring-1 ring-inset dark:ring-border-dark ring-gray-300 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" maxlength="1" type="number" name="digit-1" inputmode="numeric" {% if blocked_message %}disabled{% endif %} />
+        <input class="w-12 h-14 text-center text-2xl font-bold rounded-lg border-gray-300 dark:border-border-dark bg-white dark:bg-surface-dark text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-primary dark:focus:ring-primary transition-all outline-none ring-1 ring-inset dark:ring-border-dark ring-gray-300 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" maxlength="1" type="number" name="digit-2" inputmode="numeric" {% if blocked_message %}disabled{% endif %} />
+        <input class="w-12 h-14 text-center text-2xl font-bold rounded-lg border-gray-300 dark:border-border-dark bg-white dark:bg-surface-dark text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-primary dark:focus:ring-primary transition-all outline-none ring-1 ring-inset dark:ring-border-dark ring-gray-300 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" maxlength="1" type="number" name="digit-3" inputmode="numeric" {% if blocked_message %}disabled{% endif %} />
+        <input class="w-12 h-14 text-center text-2xl font-bold rounded-lg border-gray-300 dark:border-border-dark bg-white dark:bg-surface-dark text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-primary dark:focus:ring-primary transition-all outline-none ring-1 ring-inset dark:ring-border-dark ring-gray-300 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" maxlength="1" type="number" name="digit-4" inputmode="numeric" {% if blocked_message %}disabled{% endif %} />
+        <input class="w-12 h-14 text-center text-2xl font-bold rounded-lg border-gray-300 dark:border-border-dark bg-white dark:bg-surface-dark text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-primary dark:focus:ring-primary transition-all outline-none ring-1 ring-inset dark:ring-border-dark ring-gray-300 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" maxlength="1" type="number" name="digit-5" inputmode="numeric" {% if blocked_message %}disabled{% endif %} />
+        <input class="w-12 h-14 text-center text-2xl font-bold rounded-lg border-gray-300 dark:border-border-dark bg-white dark:bg-surface-dark text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary dark:focus:border-primary dark:focus:ring-primary transition-all outline-none ring-1 ring-inset dark:ring-border-dark ring-gray-300 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" maxlength="1" type="number" name="digit-6" inputmode="numeric" {% if blocked_message %}disabled{% endif %} />
+      </div>
+      <input type="hidden" name="code" id="code" value="" />
+      <div class="text-center">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          ¿No recibiste el código?
+          <button class="text-primary hover:text-primary-hover font-medium ml-1 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" type="submit" name="action" value="resend" id="resend-code" {% if blocked_message %}disabled{% endif %}>Reenviar en 00:30</button>
+        </p>
+      </div>
+      <div>
+        <button class="flex w-full justify-center rounded-lg bg-primary px-3 py-3.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-200 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" type="submit" {% if blocked_message %}disabled{% endif %}>
+          Verificar código
+        </button>
+      </div>
+    </form>
+    <div class="mt-8 flex flex-col items-center space-y-4">
+      <a class="flex items-center gap-2 text-sm text-gray-500 hover:text-slate-900 dark:text-gray-400 dark:hover:text-white transition-colors" href="/register/">
+        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+        Volver al registro
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+  const codeInputs = Array.from(document.querySelectorAll('input[name^="digit-"]'));
+  const codeInput = document.getElementById('code');
+
+  const syncCodigo = () => {
+    const code = codeInputs.map((input) => input.value || '').join('');
+    codeInput.value = code;
+  };
+
+  codeInputs.forEach((input, index) => {
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/\D/g, '').slice(0, 1);
+      syncCodigo();
+      if (input.value && index < codeInputs.length - 1) {
+        codeInputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Backspace' && !input.value && index > 0) {
+        codeInputs[index - 1].focus();
+      }
+    });
+  });
+
+  syncCodigo();
+
+  const resendButton = document.getElementById('resend-code');
+  const resendDelaySeconds = 30;
+  let resendRemaining = resendDelaySeconds;
+
+  const formatTime = (seconds) => {
+    const clamped = Math.max(0, seconds);
+    const mins = String(Math.floor(clamped / 60)).padStart(2, '0');
+    const secs = String(clamped % 60).padStart(2, '0');
+    return `${mins}:${secs}`;
+  };
+
+  const updateResendLabel = () => {
+    if (!resendButton) return;
+    if (resendRemaining > 0) {
+      resendButton.textContent = `Reenviar en ${formatTime(resendRemaining)}`;
+      resendButton.disabled = true;
+      resendButton.classList.add('opacity-60', 'cursor-not-allowed');
+    } else {
+      resendButton.textContent = 'Reenviar ahora';
+      resendButton.disabled = false;
+      resendButton.classList.remove('opacity-60', 'cursor-not-allowed');
+    }
+  };
+
+  if (resendButton) {
+    updateResendLabel();
+    const timer = setInterval(() => {
+      resendRemaining -= 1;
+      updateResendLabel();
+      if (resendRemaining <= 0) {
+        clearInterval(timer);
+      }
+    }, 1000);
+  }
+</script>
+{% endblock %}

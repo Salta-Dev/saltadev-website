@@ -1,0 +1,13 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./saltadev:/app/saltadev
+    env_file:
+      - saltadev/.env.local
+    environment:
+      - DJANGO_SETTINGS_MODULE=saltadev.settings.local

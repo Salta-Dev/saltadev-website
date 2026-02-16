@@ -1,0 +1,5 @@
+.env.local
+.env.dev
+.env.staging
+.env.production
+db.sqlite3

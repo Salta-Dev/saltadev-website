@@ -1,0 +1,43 @@
+{% load static %}
+<aside class="hidden lg:flex w-72 flex-col bg-sidebar-dark border-r border-[#342d2d] h-screen fixed left-0 top-0 z-50">
+  <div class="p-8 pb-6">
+    <a href="{% url 'home' %}" class="flex items-center gap-4 group">
+      <img src="{% static 'assets/img/logo.webp' %}" alt="SaltaDev" class="size-12 object-contain group-hover:scale-105 transition-transform duration-300"/>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-white">SaltaDev</h1>
+        <p class="text-[#b2a5a4] text-xs font-medium uppercase tracking-wider">Comunidad Tech</p>
+      </div>
+    </a>
+  </div>
+
+  <nav class="flex-1 px-4 py-6 flex flex-col gap-2">
+    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl bg-[#2a2424] border border-[#3d2f2f] text-white shadow-lg shadow-black/20 transition-all duration-200 relative overflow-hidden" href="{% url 'dashboard' %}">
+      <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+      <span class="material-symbols-outlined text-primary">dashboard</span>
+      <span class="font-medium tracking-wide">Dashboard</span>
+    </a>
+    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-all duration-200" href="#">
+      <span class="material-symbols-outlined group-hover:text-primary transition-colors">card_membership</span>
+      <span class="font-medium tracking-wide">Membresía</span>
+    </a>
+    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-all duration-200" href="{% url 'events' %}">
+      <span class="material-symbols-outlined group-hover:text-primary transition-colors">calendar_month</span>
+      <span class="font-medium tracking-wide">Eventos</span>
+    </a>
+    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-all duration-200" href="{% url 'profile_edit' %}">
+      <span class="material-symbols-outlined group-hover:text-primary transition-colors">person</span>
+      <span class="font-medium tracking-wide">Perfil</span>
+    </a>
+    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-all duration-200" href="#">
+      <span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+      <span class="font-medium tracking-wide">Ajustes</span>
+    </a>
+  </nav>
+
+  <div class="p-6 border-t border-[#342d2d]">
+    <a href="{% url 'logout' %}" class="w-full flex items-center justify-center gap-3 rounded-xl h-12 bg-[#2a2424] hover:bg-primary text-white text-sm font-bold transition-all duration-300 group shadow-lg hover:shadow-glow border border-[#3d2f2f] hover:border-primary">
+      <span class="material-symbols-outlined text-[20px] group-hover:-translate-x-1 transition-transform duration-300">logout</span>
+      <span>Cerrar sesión</span>
+    </a>
+  </div>
+</aside>

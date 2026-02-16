@@ -1,0 +1,222 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaltaDev - Editar Perfil</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex overflow-x-hidden selection:bg-primary selection:text-white font-display">
+
+  {% include "dashboard/includes/sidebar.html" %}
+  {% include "dashboard/includes/mobile_menu.html" %}
+
+  <main class="flex-1 lg:ml-72 flex flex-col min-h-screen overflow-y-auto relative bg-background-dark">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-background-dark/80 backdrop-blur-xl border-b border-[#342d2d] px-6 lg:px-8 py-4 lg:py-6 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="{% url 'dashboard' %}" class="p-2 rounded-lg hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-colors">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div class="flex flex-col gap-1">
+          <h2 class="text-2xl lg:text-3xl font-bold text-white tracking-tight">Editar Perfil</h2>
+          <p class="text-[#8e8584] text-sm font-medium hidden sm:block">Actualizá tu información personal y profesional.</p>
+        </div>
+      </div>
+      <button class="lg:hidden p-3 rounded-xl bg-[#241f1e] text-white border border-[#342d2d]" onclick="openMobileMenu()">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </header>
+
+    <div class="p-4 lg:p-8 max-w-4xl mx-auto w-full pb-20">
+
+      {% if messages %}
+        <div class="mb-6 space-y-2">
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-400">check_circle</span>
+                {{ message }}
+              </div>
+            {% elif message.tags == 'error' %}
+              <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-400">error</span>
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+
+        <!-- Avatar Section -->
+        <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
+          <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">account_circle</span>
+            Foto de Perfil
+          </h3>
+          <div class="flex items-center gap-6">
+            <div class="size-24 rounded-xl bg-gradient-to-tr from-primary via-[#5a2321] to-[#241f1e] p-0.5 shadow-glow">
+              {% if profile.avatar_url %}
+                <img src="{{ profile.avatar_url }}" alt="Avatar" class="w-full h-full rounded-xl object-cover"/>
+              {% else %}
+                <div class="w-full h-full rounded-xl bg-[#2a2424] flex items-center justify-center">
+                  <span class="material-symbols-outlined text-primary text-4xl">person</span>
+                </div>
+              {% endif %}
+            </div>
+            <div class="flex-1">
+              <label class="block">
+                <span class="sr-only">Elegir foto</span>
+                <input type="file" name="avatar_file" accept="image/*" class="block w-full text-sm text-[#8e8584] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover file:cursor-pointer file:transition-colors"/>
+              </label>
+              <p class="mt-2 text-xs text-[#6b605f]">JPG, PNG o GIF. Máximo 2MB.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
+          <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">person</span>
+            Información Personal
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- DNI -->
+            <div>
+              <label for="id_dni" class="block text-sm font-medium text-white mb-2">DNI</label>
+              <input type="text" name="dni" id="id_dni" value="{{ form.dni.value|default:'' }}" placeholder="12345678" class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 px-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all"/>
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <label for="id_phone" class="block text-sm font-medium text-white mb-2">Teléfono</label>
+              <input type="tel" name="phone" id="id_phone" value="{{ form.phone.value|default:'' }}" placeholder="+54 9 387 555 1234" class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 px-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional Info -->
+        <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
+          <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">work</span>
+            Información Profesional
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Technical Role -->
+            <div>
+              <label for="id_technical_role" class="block text-sm font-medium text-white mb-2">Rol Técnico</label>
+              <select name="technical_role" id="id_technical_role" class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 px-4 ring-1 ring-inset ring-[#342d2d] focus:ring-2 focus:ring-primary transition-all">
+                <option value="">Seleccionar rol</option>
+                {% for value, label in form.fields.technical_role.choices %}
+                  {% if value %}
+                    <option value="{{ value }}" {% if form.technical_role.value == value %}selected{% endif %}>{{ label }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Company -->
+            <div>
+              <label for="id_company" class="block text-sm font-medium text-white mb-2">Empresa</label>
+              <input type="text" name="company" id="id_company" value="{{ form.company.value|default:'' }}" placeholder="Ej: Google, Mercado Libre..." class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 px-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all"/>
+            </div>
+
+            <!-- Position -->
+            <div>
+              <label for="id_position" class="block text-sm font-medium text-white mb-2">Posición</label>
+              <input type="text" name="position" id="id_position" value="{{ form.position.value|default:'' }}" placeholder="Ej: Senior Developer, Tech Lead..." class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 px-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all"/>
+            </div>
+          </div>
+
+          <!-- Technologies -->
+          <div class="mt-6">
+            <label for="id_technologies_input" class="block text-sm font-medium text-white mb-2">Tecnologías</label>
+            <input type="text" name="technologies_input" id="id_technologies_input" value="{{ form.technologies_input.value|default:'' }}" placeholder="Python, Django, JavaScript, React..." class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 px-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all"/>
+            <p class="mt-2 text-xs text-[#6b605f]">Separar con comas</p>
+          </div>
+
+          <!-- Bio -->
+          <div class="mt-6">
+            <label for="id_bio" class="block text-sm font-medium text-white mb-2">Biografía</label>
+            <textarea name="bio" id="id_bio" rows="4" placeholder="Contanos un poco sobre vos, tus intereses y experiencia..." class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 px-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all resize-none">{{ form.bio.value|default:'' }}</textarea>
+          </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
+          <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">link</span>
+            Redes y Enlaces
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- GitHub -->
+            <div>
+              <label for="id_github" class="block text-sm font-medium text-white mb-2">GitHub</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-[#6b605f]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                </div>
+                <input type="url" name="github" id="id_github" value="{{ form.github.value|default:'' }}" placeholder="https://github.com/usuario" class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 pl-12 pr-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all"/>
+              </div>
+            </div>
+
+            <!-- LinkedIn -->
+            <div>
+              <label for="id_linkedin" class="block text-sm font-medium text-white mb-2">LinkedIn</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-[#6b605f]" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </div>
+                <input type="url" name="linkedin" id="id_linkedin" value="{{ form.linkedin.value|default:'' }}" placeholder="https://linkedin.com/in/usuario" class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 pl-12 pr-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all"/>
+              </div>
+            </div>
+
+            <!-- Twitter/X -->
+            <div>
+              <label for="id_twitter" class="block text-sm font-medium text-white mb-2">Twitter / X</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-[#6b605f]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </div>
+                <input type="text" name="twitter" id="id_twitter" value="{{ form.twitter.value|default:'' }}" placeholder="@usuario" class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 pl-12 pr-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all"/>
+              </div>
+            </div>
+
+            <!-- Website -->
+            <div>
+              <label for="id_website" class="block text-sm font-medium text-white mb-2">Sitio Web</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <span class="material-symbols-outlined text-[#6b605f] text-xl">language</span>
+                </div>
+                <input type="url" name="website" id="id_website" value="{{ form.website.value|default:'' }}" placeholder="https://tusitio.com" class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 pl-12 pr-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-end">
+          <a href="{% url 'dashboard' %}" class="px-6 py-3 rounded-xl bg-[#2a2424] hover:bg-[#3d3434] text-white text-sm font-bold transition-all border border-[#3d2f2f] hover:border-[#4a4040] text-center">
+            Cancelar
+          </a>
+          <button type="submit" class="px-8 py-3 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-all shadow-lg hover:shadow-glow flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-xl">save</span>
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+</body>
+</html>

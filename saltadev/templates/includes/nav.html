@@ -1,0 +1,72 @@
+{% load static %}
+<header class="fixed top-0 left-0 right-0 z-50 border-b border-border-dark glass transition-all duration-300">
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20">
+      <div class="flex items-center gap-3">
+        <img alt="Logo SaltaDev" class="h-9 w-auto" src="{% static 'assets/img/logo.webp' %}">
+        <span class="text-2xl font-bold tracking-tight text-white">SaltaDev</span>
+      </div>
+      <nav class="hidden md:flex items-center gap-8">
+        <a class="text-sm font-medium text-white hover:text-white transition-colors" href="/">Inicio</a>
+        <a class="text-sm font-medium text-white hover:text-white transition-colors" href="/#partners">Colaboradores</a>
+        <a class="text-sm font-medium text-white hover:text-white transition-colors" href="/#staff">Staff</a>
+        <a class="text-sm font-medium text-white hover:text-white transition-colors" href="/#community">Comunidad</a>
+        <a class="text-sm font-medium text-white hover:text-white transition-colors" href="/eventos/">Eventos</a>
+        <a class="text-sm font-medium text-white hover:text-white transition-colors" href="/reglamento/">Reglamento</a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <a class="hidden md:flex bg-primary hover:bg-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-lg shadow-primary/20 transition-all items-center gap-2" href="/login/">
+          <span>Iniciar sesión</span>
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </a>
+        <button class="md:hidden text-white p-2" type="button" id="mobileMenuToggle" aria-label="Abrir menu" aria-expanded="false">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="md:hidden absolute top-full left-0 right-0 bg-background-dark border-b border-border-dark overflow-hidden transition-all duration-200 ease-out max-h-0 opacity-0 -translate-y-2 pointer-events-none" id="mobileMenu">
+    <div class="px-6 py-4 flex flex-col text-center">
+      <a class="text-sm font-medium text-white py-3 border-b border-border-dark" href="/">Inicio</a>
+      <a class="text-sm font-medium text-white py-3 border-b border-border-dark" href="/#partners">Colaboradores</a>
+      <a class="text-sm font-medium text-white py-3 border-b border-border-dark" href="/#staff">Staff</a>
+      <a class="text-sm font-medium text-white py-3 border-b border-border-dark" href="/#community">Comunidad</a>
+      <a class="text-sm font-medium text-white py-3 border-b border-border-dark" href="/eventos/">Eventos</a>
+      <a class="text-sm font-medium text-white py-3 border-b border-border-dark" href="/reglamento/">Reglamento</a>
+      <div class="pt-4">
+        <a class="bg-primary hover:bg-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-lg shadow-primary/20 transition-all inline-flex items-center gap-2 justify-center" href="/login/">
+          <span>Iniciar sesión</span>
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  const mobileToggle = document.getElementById('mobileMenuToggle');
+  const mobileMenu = document.getElementById('mobileMenu');
+
+  if (mobileToggle && mobileMenu) {
+    mobileToggle.addEventListener('click', () => {
+      const isOpen = mobileToggle.getAttribute('aria-expanded') === 'true';
+      mobileToggle.setAttribute('aria-expanded', String(!isOpen));
+      mobileMenu.classList.toggle('max-h-0', isOpen);
+      mobileMenu.classList.toggle('opacity-0', isOpen);
+      mobileMenu.classList.toggle('-translate-y-2', isOpen);
+      mobileMenu.classList.toggle('pointer-events-none', isOpen);
+      mobileMenu.classList.toggle('max-h-96', !isOpen);
+      mobileMenu.classList.toggle('opacity-100', !isOpen);
+      mobileMenu.classList.toggle('translate-y-0', !isOpen);
+      mobileMenu.classList.toggle('pointer-events-auto', !isOpen);
+    });
+
+    mobileMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('max-h-0', 'opacity-0', '-translate-y-2', 'pointer-events-none');
+        mobileMenu.classList.remove('max-h-96', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+        mobileToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+</script>

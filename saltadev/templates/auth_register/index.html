@@ -1,0 +1,328 @@
+{% extends "auth/base_auth.html" %}
+{% load static %}
+
+{% block title %}SaltaDev - Registro{% endblock %}
+
+{% block page_css %}
+<style>
+  /* Date picker dark theme styling */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.6);
+    cursor: pointer;
+  }
+
+  /* Dark theme for date picker popup (WebKit browsers) */
+  ::-webkit-datetime-edit-fields-wrapper {
+    color: inherit;
+  }
+
+  ::-webkit-datetime-edit-text {
+    color: #9ca3af;
+    padding: 0 0.2em;
+  }
+
+  ::-webkit-datetime-edit-month-field,
+  ::-webkit-datetime-edit-day-field,
+  ::-webkit-datetime-edit-year-field {
+    color: inherit;
+  }
+
+  /* Firefox date picker styling */
+  input[type="date"] {
+    color-scheme: dark;
+  }
+
+  /* Style for select dropdown arrow area */
+  select {
+    background-image: none;
+  }
+</style>
+{% endblock %}
+
+{% block left_panel_class %}relative hidden lg:flex lg:w-1/2 flex-col justify-between overflow-hidden poncho-pattern group/design-root h-screen sticky top-0{% endblock %}
+
+{% block brand_icon %}
+  {% include "includes/auth_brand_logo.html" %}
+{% endblock %}
+
+{% block form %}
+<div class="flex w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark p-6 pt-32 lg:w-1/2 custom-scrollbar lg:h-screen lg:overflow-y-auto">
+  <div class="w-full max-w-md space-y-8 py-8">
+    {% include "includes/auth_mobile_logo.html" %}
+    <div class="text-center lg:text-left">
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Crear cuenta</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        Unite a la mayor comunidad tech del norte
+      </p>
+    </div>
+
+    {% include "includes/auth_blocked_message.html" %}
+
+    <form class="mt-8 space-y-5" method="post">
+      {% csrf_token %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_first_name">Nombre/s</label>
+          <div class="mt-2 relative rounded-lg shadow-sm">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span class="material-symbols-outlined text-gray-400 text-[20px]">person</span>
+            </div>
+            <input
+              autocomplete="given-name"
+              class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6 transition-all"
+              id="id_first_name"
+              name="first_name"
+              placeholder="Juan"
+              required
+              type="text"
+              value="{{ form.first_name.value|default_if_none:'' }}"
+              {% if blocked_message %}disabled{% endif %}
+            />
+          </div>
+          {% if form.first_name.errors %}
+            <p class="mt-1 text-xs text-red-400">{{ form.first_name.errors|striptags }}</p>
+          {% endif %}
+        </div>
+        <div>
+          <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_last_name">Apellido/s</label>
+          <div class="mt-2 relative rounded-lg shadow-sm">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span class="material-symbols-outlined text-gray-400 text-[20px]">badge</span>
+            </div>
+            <input
+              autocomplete="family-name"
+              class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6 transition-all"
+              id="id_last_name"
+              name="last_name"
+              placeholder="Pérez"
+              required
+              type="text"
+              value="{{ form.last_name.value|default_if_none:'' }}"
+              {% if blocked_message %}disabled{% endif %}
+            />
+          </div>
+          {% if form.last_name.errors %}
+            <p class="mt-1 text-xs text-red-400">{{ form.last_name.errors|striptags }}</p>
+          {% endif %}
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_email">Correo electrónico</label>
+        <div class="mt-2 relative rounded-lg shadow-sm">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <span class="material-symbols-outlined text-gray-400 text-[20px]">mail</span>
+          </div>
+          <input
+            autocomplete="email"
+            class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6 transition-all"
+            id="id_email"
+            name="email"
+            placeholder="nombre@ejemplo.com"
+            required
+            type="email"
+            value="{{ form.email.value|default_if_none:'' }}"
+            {% if blocked_message %}disabled{% endif %}
+          />
+        </div>
+        {% if form.email.errors %}
+          <p class="mt-1 text-xs text-red-400">{{ form.email.errors|striptags }}</p>
+        {% endif %}
+      </div>
+      <div>
+        <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_birth_date">Fecha de nacimiento</label>
+        <div class="mt-2 relative rounded-lg shadow-sm">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <span class="material-symbols-outlined text-gray-400 text-[20px]">calendar_month</span>
+          </div>
+          <input
+            class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6 transition-all"
+            id="id_birth_date"
+            name="birth_date"
+            required
+            type="date"
+            value="{{ form.birth_date.value|default_if_none:'' }}"
+            {% if blocked_message %}disabled{% endif %}
+          />
+        </div>
+        {% if form.birth_date.errors %}
+          <p class="mt-1 text-xs text-red-400">{{ form.birth_date.errors|striptags }}</p>
+        {% endif %}
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_country">País</label>
+          <div class="mt-2 relative rounded-lg shadow-sm">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span class="material-symbols-outlined text-gray-400 text-[20px]">public</span>
+            </div>
+            <select
+              class="block w-full rounded-lg border-0 py-3 pl-10 pr-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark sm:text-sm sm:leading-6 transition-all appearance-none cursor-pointer"
+              id="id_country"
+              name="country"
+              required
+              {% if blocked_message %}disabled{% endif %}
+            >
+              {% for country in form.country.field.queryset %}
+                <option value="{{ country.code }}" {% if form.country.value == country.code or form.country.value == country.pk %}selected{% elif not form.country.value and country.code == "AR" %}selected{% endif %}>{{ country.name }}</option>
+              {% endfor %}
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <span class="material-symbols-outlined text-gray-400 text-[20px]">expand_more</span>
+            </div>
+          </div>
+          {% if form.country.errors %}
+            <p class="mt-1 text-xs text-red-400">{{ form.country.errors|striptags }}</p>
+          {% endif %}
+        </div>
+        <div>
+          <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_province">Provincia / Estado</label>
+          <div class="mt-2 relative rounded-lg shadow-sm">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span class="material-symbols-outlined text-gray-400 text-[20px]">location_on</span>
+            </div>
+            <select
+              class="block w-full rounded-lg border-0 py-3 pl-10 pr-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark sm:text-sm sm:leading-6 transition-all appearance-none cursor-pointer"
+              id="id_province"
+              name="province"
+              required
+              {% if blocked_message %}disabled{% endif %}
+            >
+              <option value="">Seleccionar provincia</option>
+              {% for province in form.province.field.queryset %}
+                <option value="{{ province.id }}" {% if form.province.value|stringformat:"s" == province.id|stringformat:"s" %}selected{% elif not form.province.value and province.id == 1 %}selected{% endif %}>{{ province.name }}</option>
+              {% endfor %}
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <span class="material-symbols-outlined text-gray-400 text-[20px]">expand_more</span>
+            </div>
+          </div>
+          {% if form.province.errors %}
+            <p class="mt-1 text-xs text-red-400">{{ form.province.errors|striptags }}</p>
+          {% endif %}
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_password1">Contraseña</label>
+        <div class="mt-2 relative rounded-lg shadow-sm">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <span class="material-symbols-outlined text-gray-400 text-[20px]">lock</span>
+          </div>
+          <input
+            autocomplete="new-password"
+            class="block w-full rounded-lg border-0 py-3 pl-10 pr-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6 transition-all"
+            id="id_password1"
+            name="password1"
+            placeholder="••••••••"
+            required
+            type="password"
+            {% if blocked_message %}disabled{% endif %}
+          />
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer group">
+            <span class="material-symbols-outlined text-gray-400 group-hover:text-gray-300 text-[20px]">visibility</span>
+          </div>
+        </div>
+        {% if form.password1.errors %}
+          <p class="mt-1 text-xs text-red-400">{{ form.password1.errors|striptags }}</p>
+        {% endif %}
+      </div>
+      <div>
+        <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_password2">Confirmar contraseña</label>
+        <div class="mt-2 relative rounded-lg shadow-sm">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <span class="material-symbols-outlined text-gray-400 text-[20px]">lock_reset</span>
+          </div>
+          <input
+            autocomplete="new-password"
+            class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6 transition-all"
+            id="id_password2"
+            name="password2"
+            placeholder="••••••••"
+            required
+            type="password"
+            {% if blocked_message %}disabled{% endif %}
+          />
+        </div>
+        {% if form.password2.errors %}
+          <p class="mt-1 text-xs text-red-400">{{ form.password2.errors|striptags }}</p>
+        {% endif %}
+      </div>
+      {% include "includes/auth_recaptcha.html" %}
+      <div class="space-y-4">
+        <div class="flex items-start">
+          <div class="flex h-6 items-center">
+            <input class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-border-dark dark:bg-surface-dark dark:checked:bg-primary" id="id_terms" name="terms" required type="checkbox" {% if form.terms.value %}checked{% endif %} {% if blocked_message %}disabled{% endif %}/>
+          </div>
+          <div class="ml-3 text-sm leading-6">
+            <label class="font-medium text-slate-900 dark:text-white" for="id_terms">
+              Acepto los <a class="text-primary hover:text-primary-hover hover:underline" href="/reglamento/">términos y condiciones</a>
+            </label>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <div class="flex h-6 items-center">
+            <input class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-border-dark dark:bg-surface-dark dark:checked:bg-primary" id="promotional" name="promotional" type="checkbox" {% if blocked_message %}disabled{% endif %} />
+          </div>
+          <div class="ml-3 text-sm leading-6">
+            <label class="text-gray-600 dark:text-gray-400" for="promotional">
+              Deseo recibir correos promocionales sobre eventos, descuentos y ofertas laborales
+            </label>
+          </div>
+        </div>
+        {% if form.terms.errors %}
+          <p class="text-xs text-red-400">{{ form.terms.errors|striptags }}</p>
+        {% endif %}
+      </div>
+      <div>
+        <button class="flex w-full justify-center rounded-lg bg-primary px-3 py-3.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-200 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" type="submit" {% if blocked_message %}disabled{% endif %}>
+          Crear cuenta
+        </button>
+      </div>
+    </form>
+
+    <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
+      ¿Ya tenés cuenta?
+      <a class="font-semibold leading-6 text-primary hover:text-primary-hover hover:underline" href="/login/">Iniciar sesión</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+  const countrySelect = document.getElementById('id_country');
+  const provinceSelect = document.getElementById('id_province');
+
+  if (countrySelect && provinceSelect) {
+    countrySelect.addEventListener('change', async () => {
+      const countryCode = countrySelect.value;
+      provinceSelect.innerHTML = '<option value="">Cargando...</option>';
+      provinceSelect.disabled = true;
+
+      try {
+        const response = await fetch(`/locations/api/provinces/${countryCode}/`);
+        const provinces = await response.json();
+
+        provinceSelect.innerHTML = '<option value="">Seleccionar provincia</option>';
+        provinces.forEach((province) => {
+          const option = document.createElement('option');
+          option.value = province.id;
+          option.textContent = province.name;
+          provinceSelect.appendChild(option);
+        });
+
+        // Select Salta by default if Argentina
+        if (countryCode === 'AR') {
+          const saltaOption = Array.from(provinceSelect.options).find(
+            (opt) => opt.textContent === 'Salta'
+          );
+          if (saltaOption) saltaOption.selected = true;
+        }
+      } catch (error) {
+        provinceSelect.innerHTML = '<option value="">Error al cargar</option>';
+      }
+
+      provinceSelect.disabled = false;
+    });
+  }
+</script>
+{% endblock %}

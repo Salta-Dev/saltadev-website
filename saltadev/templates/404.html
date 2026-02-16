@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  {% load static %}
+  <title>SaltaDev - Página no encontrada</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-white font-display transition-colors duration-300 antialiased overflow-x-hidden">
+  {% include "includes/nav.html" %}
+
+  <main class="min-h-screen flex items-center justify-center px-6 py-24">
+    <div class="text-center max-w-lg">
+      <div class="mb-8">
+        <span class="text-9xl font-bold text-primary">404</span>
+      </div>
+
+      <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">
+        Página no encontrada
+      </h1>
+
+      <p class="text-gray-600 dark:text-gray-400 mb-8">
+        La página que buscás no existe o fue movida.
+        Serás redirigido a la página principal en <span id="countdown" class="font-bold text-primary">15</span> segundos.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-200">
+          <span class="material-symbols-outlined text-[20px]">home</span>
+          Ir al inicio
+        </a>
+        <button onclick="history.back()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-surface-dark px-6 py-3 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-border-dark hover:bg-[#2e2827] transition-all duration-200">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+          Volver atrás
+        </button>
+      </div>
+
+      <div class="mt-12">
+        <div class="w-full bg-gray-700 rounded-full h-1.5">
+          <div id="progress" class="bg-primary h-1.5 rounded-full transition-all duration-1000" style="width: 100%"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  {% include "includes/footer.html" %}
+
+  <script>
+    const countdownEl = document.getElementById('countdown');
+    const progressEl = document.getElementById('progress');
+    let seconds = 15;
+
+    const timer = setInterval(() => {
+      seconds--;
+      countdownEl.textContent = seconds;
+      progressEl.style.width = `${(seconds / 15) * 100}%`;
+
+      if (seconds <= 0) {
+        clearInterval(timer);
+        window.location.href = '/';
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

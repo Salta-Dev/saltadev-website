@@ -1,0 +1,56 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.1
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+        files: ^saltadev/
+      - id: ruff-format
+        files: ^saltadev/
+
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v2.3.15
+    hooks:
+      - id: biome-format
+        files: ^saltadev/.*\.(js|css|html)$
+      - id: biome-lint
+        files: ^saltadev/.*\.(js|css)$
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.3
+    hooks:
+      - id: bandit
+        args: ["-r", "saltadev", "-ll"]
+        pass_filenames: false
+        files: ^saltadev/.*\.py$
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args:
+          [
+            "--baseline",
+            ".secrets.baseline",
+            "--exclude-files",
+            '^saltadev/\.env\..*|^saltadev/.*/tests/.*',
+          ]
+        files: ^saltadev/
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        args: ["--config-file", "mypy.ini"]
+        additional_dependencies:
+          [
+            "django-stubs==5.2.2",
+            "django-stubs-ext==5.2.2",
+            "Django==5.2.11",
+            "django-recaptcha==4.1.0",
+            "django-axes==8.0.0",
+            "loguru==0.7.2",
+            "types-python-dateutil==2.9.0.20240906",
+            "python-dotenv==1.2.1",
+          ]
+        files: ^saltadev/.*\.py$

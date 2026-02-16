@@ -1,0 +1,47 @@
+{% extends "auth/base_auth.html" %}
+{% load static %}
+
+{% block title %}SaltaDev - Acceso bloqueado{% endblock %}
+
+{% block body_class %}bg-background-light dark:bg-background-dark font-body text-slate-900 dark:text-white antialiased selection:bg-primary selection:text-white{% endblock %}
+
+{% block left_panel_class %}relative hidden lg:flex lg:w-1/2 flex-col justify-between overflow-hidden poncho-pattern group/design-root h-screen sticky top-0{% endblock %}
+
+{% block brand_icon %}
+  <img alt="Logo SaltaDev" class="h-6 w-6" src="{% static 'assets/img/logo.webp' %}">
+{% endblock %}
+
+{% block form %}
+<div class="flex w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark p-6 lg:w-1/2 custom-scrollbar lg:h-screen lg:overflow-y-auto">
+  <div class="w-full max-w-md py-8">
+    <div class="flex justify-center lg:hidden mb-6">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-white">
+        <img alt="Logo SaltaDev" class="h-7 w-7" src="{% static 'assets/img/logo.webp' %}">
+      </div>
+    </div>
+    <div class="rounded-xl bg-white dark:bg-surface-dark border border-alert-red/30 shadow-[0_0_15px_rgba(255,68,68,0.15)] p-8 text-center">
+      <div class="mb-6 flex justify-center">
+        <div class="flex h-20 w-20 items-center justify-center rounded-full bg-alert-red/10 text-alert-red animate-pulse">
+          <span class="material-symbols-outlined text-[40px]">lock_clock</span>
+        </div>
+      </div>
+      <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-display mb-3 text-alert-red">
+        Acceso bloqueado temporalmente
+      </h2>
+      <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+        Demasiados intentos fallidos. Fuiste bloqueado por 1 hora después de 5 intentos. Intentá nuevamente más tarde.
+      </p>
+      <div class="mt-8 space-y-4">
+        <a class="flex w-full justify-center rounded-lg border border-gray-300 dark:border-border-dark bg-transparent px-3 py-3.5 text-sm font-semibold leading-6 text-slate-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-border-dark/50 transition-all duration-200" href="/">
+          Volver al inicio
+        </a>
+      </div>
+    </div>
+    <div class="mt-8 flex flex-col items-center space-y-4">
+      <p class="text-xs text-gray-400">
+        Si crees que esto es un error, <a class="text-primary hover:underline" href="/">contactá soporte</a>.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

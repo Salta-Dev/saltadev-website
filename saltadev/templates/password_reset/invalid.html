@@ -1,0 +1,28 @@
+{% extends "auth/base_auth.html" %}
+{% load static %}
+
+{% block title %}SaltaDev - Enlace inválido{% endblock %}
+
+{% block brand_icon %}
+  {% include "includes/auth_brand_logo.html" %}
+{% endblock %}
+
+{% block form %}
+<div class="flex w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark p-6 lg:w-1/2">
+  <div class="w-full max-w-md space-y-8">
+    {% include "includes/auth_mobile_logo.html" %}
+    <div class="text-center lg:text-left">
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Enlace inválido o vencido</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        El enlace de recuperación es inválido o expiró. Podés solicitar uno nuevo.
+      </p>
+    </div>
+    <a class="inline-flex w-full items-center justify-center rounded-lg bg-primary px-3 py-3.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-200" href="/password-reset/">
+      Solicitar nuevo enlace
+    </a>
+    <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+      <a class="font-semibold leading-6 text-primary hover:text-primary-hover hover:underline" href="/login/">Volver al inicio de sesión</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

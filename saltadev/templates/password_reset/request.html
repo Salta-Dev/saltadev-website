@@ -1,0 +1,71 @@
+{% extends "auth/base_auth.html" %}
+{% load static %}
+
+{% block title %}SaltaDev - Recuperar contraseña{% endblock %}
+
+{% block brand_icon %}
+  {% include "includes/auth_brand_logo.html" %}
+{% endblock %}
+
+{% block form %}
+<div class="flex w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark p-6 lg:w-1/2">
+  <div class="w-full max-w-md space-y-8">
+    {% include "includes/auth_mobile_logo.html" %}
+    <div class="text-center lg:text-left">
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Recuperar contraseña</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        Ingresá tu correo electrónico y te enviaremos las instrucciones para restablecer tu contraseña.
+      </p>
+    </div>
+
+    {% include "includes/auth_blocked_message.html" %}
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-3 text-sm text-green-200">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form class="mt-8 space-y-6" method="post">
+      {% csrf_token %}
+      <div class="space-y-5">
+        <div>
+          <label class="block text-sm font-medium leading-6 text-slate-900 dark:text-white" for="id_email">Correo electrónico</label>
+          <div class="mt-2 relative rounded-lg shadow-sm">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span class="material-symbols-outlined text-gray-400 text-[20px]">mail</span>
+            </div>
+            <input
+              type="email"
+              name="email"
+              id="id_email"
+              autocomplete="email"
+              placeholder="nombre@ejemplo.com"
+              value="{{ form.email.value|default_if_none:email_value|default:'' }}"
+              class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6"
+              required
+              {% if blocked_message %}disabled{% endif %}
+            />
+          </div>
+          {% if form.email.errors %}
+            <p class="mt-1 text-xs text-red-400">{{ form.email.errors|striptags }}</p>
+          {% endif %}
+        </div>
+        {% include "includes/auth_recaptcha.html" %}
+      </div>
+      <div>
+        <button class="flex w-full justify-center rounded-lg bg-primary px-3 py-3.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-200 {% if blocked_message %}opacity-60 cursor-not-allowed{% endif %}" type="submit" {% if blocked_message %}disabled{% endif %}>
+          Enviar instrucciones
+        </button>
+      </div>
+    </form>
+
+    <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+      ¿Recordaste tu contraseña?
+      <a class="font-semibold leading-6 text-primary hover:text-primary-hover hover:underline" href="/login/">Volver al inicio de sesión</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

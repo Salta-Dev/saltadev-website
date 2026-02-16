@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}SaltaDev - Eventos{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{% static 'assets/css/events.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="pt-24 pb-16">
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div id="currentEventDate" style="display: none;">{% if latest_event %}{{ latest_event.event_start_date }}{% endif %}</div>
+
+    <section class="py-8 lg:py-14">
+      <div class="grid lg:grid-cols-12 gap-10 items-start">
+        <div class="lg:col-span-7">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-dark border border-border-dark mb-6">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-xs font-medium text-white uppercase tracking-wide">Agenda SaltaDev</span>
+          </div>
+
+          <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight {% if not latest_event %}hidden{% endif %}" id="originalTitle">EL PRÓXIMO EVENTO COMIENZA EN</h1>
+
+          <div id="noEventTitle" class="mt-6 {% if latest_event %}hidden{% endif %}">
+            <h2 class="text-2xl md:text-3xl font-bold text-white">No hay eventos disponibles actualmente</h2>
+            <p class="text-white mt-3 leading-relaxed">
+              Estamos preparando nuevas experiencias para la comunidad. Si tenés una propuesta, escribinos y la sumamos al calendario.
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3">
+              <a class="bg-primary hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-primary/20 transition-all" href="mailto:comusaltadev@gmail.com">Contactar al equipo</a>
+              <a class="border border-white/60 text-white font-bold px-6 py-3 rounded-lg hover:border-primary hover:text-primary transition-all" href="/whatsapp/">Unirse al grupo</a>
+            </div>
+          </div>
+
+          <section class="mt-8 {% if not latest_event %}hidden{% endif %}" id="wrapper">
+            <section id="countdown-container" class="countdown-container">
+              <article id="js-countdown" class="countdown-grid">
+                <section id="js-days" class="countdown-number"></section>
+                <section id="js-hours" class="countdown-number"></section>
+                <section id="js-minutes" class="countdown-number"></section>
+                <section id="js-seconds" class="countdown-number"></section>
+              </article>
+            </section>
+          </section>
+
+          <div class="mt-8 flex flex-col gap-4 {% if not latest_event %}hidden{% endif %}" id="buttonsHead">
+            <div class="flex items-center gap-2 text-white text-sm font-bold uppercase tracking-wider">
+              <span class="material-symbols-outlined text-base">calendar_today</span>
+              {% if latest_event %}
+                <span>{{ latest_event.event_date_display }} · {{ latest_event.event_time_display }}</span>
+              {% endif %}
+            </div>
+            <h2 class="text-2xl md:text-3xl font-bold text-white">{% if latest_event %}{{ latest_event.title }}{% endif %}</h2>
+            <p class="text-white leading-relaxed">{% if latest_event %}{{ latest_event.description }}{% endif %}</p>
+            {% if latest_event %}
+              <div class="flex flex-wrap gap-3">
+                <a class="bg-primary hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-primary/20 transition-all" href="{{ latest_event.link }}" target="_blank">Inscribirse</a>
+                <a class="border border-white/60 text-white font-bold px-6 py-3 rounded-lg hover:border-primary hover:text-primary transition-all" href="#events-grid">Ver más eventos</a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if latest_event %}
+          <div class="lg:col-span-5">
+            <div class="group relative rounded-2xl bg-surface-dark border border-border-dark overflow-hidden shadow-2xl hover:border-primary/50 transition-all duration-300">
+              <div class="absolute top-0 right-0 w-36 h-36 bg-primary/20 blur-[70px] rounded-full pointer-events-none"></div>
+              <div class="h-56 bg-cover bg-center relative" style="background-image: url('{% if latest_event.photo|slice:":4" == "http" %}{{ latest_event.photo }}{% else %}{% static latest_event.photo %}{% endif %}');">
+                <div class="absolute inset-0 bg-gradient-to-t from-surface-dark via-transparent to-transparent"></div>
+                <div class="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">Featured</div>
+              </div>
+              <div class="p-6 md:p-7 flex flex-col gap-4">
+                <div class="flex items-center gap-2 text-white text-sm">
+                  <span class="material-symbols-outlined text-base">location_on</span>
+                  <span>{{ latest_event.location }}</span>
+                </div>
+                <h3 class="text-2xl font-bold text-white group-hover:text-primary transition-colors">{{ latest_event.title }}</h3>
+                <p class="text-white leading-relaxed">{{ latest_event.description }}</p>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="py-12 border-t border-border-dark" id="events-grid">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
+        <div>
+          <h2 class="text-3xl md:text-4xl font-bold text-white">Calendario de eventos</h2>
+          <p class="text-white mt-2">Explorá workshops, charlas y encuentros para la comunidad.</p>
+        </div>
+        <a class="text-primary hover:text-primary font-bold flex items-center gap-2" href="/whatsapp/">
+          Recibir novedades
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+      </div>
+
+      {% if events|length == 0 %}
+        <div class="bg-surface-dark border border-dashed border-border-dark rounded-2xl p-10 text-center">
+          <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-background-dark border border-border-dark mb-4">
+            <span class="material-symbols-outlined text-3xl text-text-muted">event_busy</span>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-2">No hay eventos programados</h3>
+          <p class="text-white mb-6">Sumate a nuestra comunidad y enterate cuando publiquemos el próximo encuentro.</p>
+          <a class="bg-primary hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-primary/20 transition-all" href="/whatsapp/">Unirme al canal</a>
+        </div>
+      {% else %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 {% if events|length > 6 %}events-collapsed{% endif %}" id="eventsList">
+          {% for event in events %}
+            <article class="group flex flex-col bg-surface-dark border border-border-dark rounded-xl overflow-hidden hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1">
+              <div class="relative h-48 overflow-hidden">
+                {% if event.photo %}
+                  {% if event.photo|slice:":4" == "http" %}
+                    <img alt="{{ event.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="{{ event.photo }}">
+                  {% else %}
+                    <img alt="{{ event.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="{% static event.photo %}">
+                  {% endif %}
+                {% else %}
+                  <img alt="{{ event.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="{% static 'assets/img/seed-latam-salta.jpg' %}">
+                {% endif %}
+                <div class="absolute top-3 left-3 bg-background-dark/80 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-border-dark">{{ event.event_date_display }}</div>
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center gap-2 text-white text-xs font-bold uppercase tracking-wider mb-2">
+                  <span class="material-symbols-outlined text-sm">schedule</span>
+                  <span>{{ event.event_time_display }}</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2 leading-tight group-hover:text-primary transition-colors">{{ event.title }}</h3>
+                <p class="text-white text-sm mb-4">{{ event.description }}</p>
+                <div class="mt-auto pt-4 border-t border-border-dark/50 flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-1.5 text-white text-xs">
+                    <span class="material-symbols-outlined text-base">location_on</span>
+                    <span>{{ event.location }}</span>
+                  </div>
+                  <a class="text-white text-sm font-bold hover:text-primary transition-colors flex items-center gap-1" href="{{ event.link }}" target="_blank">
+                    Ver más
+                    <span class="material-symbols-outlined text-base">chevron_right</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+        {% if events|length > 6 %}
+          <div class="flex justify-center mt-8">
+            <button class="text-white hover:text-primary text-sm font-bold flex items-center gap-2 transition-colors" id="toggleEvents" type="button" aria-expanded="false">
+              <span id="toggleEventsLabel">Cargar eventos anteriores</span>
+              <span class="material-symbols-outlined text-base">expand_more</span>
+            </button>
+          </div>
+        {% endif %}
+      {% endif %}
+    </section>
+
+    <section class="py-12 border-t border-border-dark">
+      <div class="bg-surface-dark border border-border-dark rounded-2xl p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+          <h3 class="text-2xl font-bold text-white">¿Querés proponer un evento?</h3>
+          <p class="text-white mt-2">Contanos tu idea y la sumamos al calendario.</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <a class="bg-primary hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-primary/20 transition-all" href="mailto:comusaltadev@gmail.com">Escribir propuesta</a>
+          <a class="border border-white/60 text-white font-bold px-6 py-3 rounded-lg hover:border-primary hover:text-primary transition-all" href="/whatsapp/">Hablar por WhatsApp</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+{% endblock %}
+
+{% block page_js %}
+  <script src="{% static 'assets/js/events.js' %}"></script>
+{% endblock %}
