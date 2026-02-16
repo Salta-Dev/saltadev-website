@@ -1,4 +1,4 @@
-Fdatabases:
+databases:
   - name: saltadev-db
     plan: free
     databaseName: saltadev
