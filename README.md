@@ -36,6 +36,7 @@
   <a href="#configuración">Configuración</a> •
   <a href="#arquitectura">Arquitectura</a> •
   <a href="#seguridad">Seguridad</a> •
+  <a href="#seo">SEO</a> •
   <a href="#desarrollo">Desarrollo</a>
 </p>
 
@@ -295,6 +296,40 @@ Protección contra ataques de fuerza bruta:
 - Bloqueo después de 5 intentos fallidos
 - Bloqueo por IP y por nombre de usuario
 - Desbloqueo automático después de 1 hora
+
+## SEO
+
+### Optimizaciones Implementadas
+
+| Característica | Descripción |
+|----------------|-------------|
+| **robots.txt** | Control de crawlers con reglas Disallow para áreas privadas |
+| **sitemap.xml** | Sitemap generado dinámicamente con `django.contrib.sitemaps` |
+| **JSON-LD** | Schema Organization en la homepage para rich snippets |
+| **Meta descriptions** | Descripciones únicas y optimizadas por página |
+| **Canonical URLs** | URLs canónicas en todas las páginas públicas |
+| **Open Graph** | Meta tags para compartir en Facebook y LinkedIn |
+| **Twitter Cards** | Meta tags para compartir en Twitter/X |
+| **Redirects 301** | Links sociales con redirect permanente para tracking |
+
+### Archivos Clave
+
+```
+saltadev/
+├── saltadev/
+│   ├── sitemaps.py              # Configuración de sitemap.xml
+│   └── urls.py                  # Rutas de robots.txt y sitemap
+│
+├── templates/
+│   ├── robots.txt               # Template de robots.txt
+│   └── includes/
+│       ├── head.html            # Meta tags, OG y Twitter Cards
+│       └── structured_data/
+│           └── organization.html # JSON-LD Organization schema
+│
+└── content/
+    └── redirects.py             # Redirects 301 para redes sociales
+```
 
 ## Desarrollo
 

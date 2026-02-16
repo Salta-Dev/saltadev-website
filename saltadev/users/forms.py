@@ -1,10 +1,12 @@
 """User forms for registration."""
 
 from datetime import date
+from typing import cast
 
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.forms import ModelChoiceField
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
 from locations.models import Country, Province
@@ -12,10 +14,9 @@ from locations.models import Country, Province
 from .models import Profile, User
 
 
-class RegisterForm(UserCreationForm):
-    """Registration form with separate name fields, location, age validation, and reCAPTCHA."""
-
-    captcha = ReCaptchaField(
+def create_recaptcha_field() -> ReCaptchaField:
+    """Create a reCAPTCHA field with dark theme and normal size."""
+    return ReCaptchaField(
         widget=ReCaptchaV2Checkbox(
             attrs={
                 "data-theme": "dark",
@@ -23,6 +24,12 @@ class RegisterForm(UserCreationForm):
             }
         )
     )
+
+
+class RegisterForm(UserCreationForm):
+    """Registration form with separate name fields, location, age validation, and reCAPTCHA."""
+
+    captcha = create_recaptcha_field()
     terms = forms.BooleanField(required=True, label="Acepto los términos y condiciones")
 
     country = forms.ModelChoiceField(
@@ -56,7 +63,8 @@ class RegisterForm(UserCreationForm):
         if self.data.get("country"):
             try:
                 country_code = self.data.get("country")
-                self.fields["province"].queryset = Province.objects.filter(
+                province_field = cast(ModelChoiceField, self.fields["province"])
+                province_field.queryset = Province.objects.filter(
                     country_id=country_code
                 )
             except (ValueError, TypeError):
@@ -106,13 +114,6 @@ class RegisterForm(UserCreationForm):
                     "Ya tienes una cuenta registrada. Por favor verifica tu email desde la página de login."
                 )
         return email
-
-    def clean_role(self):
-        """Ensure role is always 'miembro' for new registrations."""
-        role = self.cleaned_data.get("role")
-        if role and role != "miembro":
-            raise forms.ValidationError("No puedes registrarte con ese rol.")
-        return "miembro"
 
     def save(self, commit: bool = True) -> User:
         """Save user with default role and send verification email."""

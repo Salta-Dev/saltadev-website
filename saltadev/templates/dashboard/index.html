@@ -7,32 +7,7 @@
   <title>SaltaDev - Dashboard</title>
   {% include "includes/head.html" %}
   <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
-  <style>
-    .poncho-bg {
-      background-color: #241f1e;
-      background-image:
-        linear-gradient(45deg, rgba(148, 65, 61, 0.03) 25%, transparent 25%, transparent 75%, rgba(148, 65, 61, 0.03) 75%, rgba(148, 65, 61, 0.03)),
-        linear-gradient(45deg, rgba(148, 65, 61, 0.03) 25%, transparent 25%, transparent 75%, rgba(148, 65, 61, 0.03) 75%, rgba(148, 65, 61, 0.03));
-      background-position: 0 0, 20px 20px;
-      background-size: 40px 40px;
-    }
-    .poncho-accent {
-      background-image: repeating-linear-gradient(
-        -45deg,
-        rgba(148, 65, 61, 0.1) 0px,
-        rgba(148, 65, 61, 0.1) 2px,
-        transparent 2px,
-        transparent 12px
-      );
-    }
-    @keyframes zoom-in {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .animate-in {
-      animation: zoom-in 0.2s ease-out forwards;
-    }
-  </style>
+  <link rel="stylesheet" href="{% static 'assets/css/dashboard.css' %}">
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex overflow-x-hidden selection:bg-primary selection:text-white font-display">
 
@@ -51,9 +26,9 @@
         <div class="xl:col-span-2 relative overflow-hidden rounded-2xl bg-surface-dark border border-[#2a2424] group">
           <div class="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full blur-[100px] opacity-5 pointer-events-none"></div>
 
-          <div class="relative z-10 p-5 lg:p-6 flex flex-col md:flex-row items-start gap-5 lg:gap-6">
+          <div class="relative z-10 p-5 lg:p-6 flex flex-col md:flex-row items-center md:items-start gap-5 lg:gap-6">
             <!-- Avatar & Social Links -->
-            <div class="flex-shrink-0 flex flex-col items-center gap-3">
+            <div class="flex-shrink-0 flex flex-col items-center gap-3 w-full md:w-auto">
               <div class="group-hover:scale-[1.02] transition-transform duration-500">
                 <div class="size-24 md:size-28 lg:size-36 rounded-2xl p-1 bg-gradient-to-tr from-primary via-[#5a2321] to-[#241f1e] shadow-glow">
                   {% if profile.avatar_url %}
@@ -68,18 +43,28 @@
               <!-- Social Links -->
               <div class="flex items-center gap-2">
                 {% if profile.github %}
-                  <a href="{{ profile.github }}" target="_blank" rel="noopener noreferrer" class="size-8 rounded-lg bg-[#1d1919] border border-[#2a2424] flex items-center justify-center text-[#6b605f] hover:text-white hover:border-primary/50 hover:bg-[#2a2424] transition-all" title="GitHub">
+                  <a href="{{ profile.github_url }}" target="_blank" rel="noopener noreferrer" class="size-8 rounded-lg bg-[#1d1919] border border-[#2a2424] flex items-center justify-center text-[#6b605f] hover:text-white hover:border-primary/50 hover:bg-[#2a2424] transition-all" title="GitHub">
                     <svg class="size-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                   </a>
                 {% endif %}
                 {% if profile.linkedin %}
-                  <a href="{{ profile.linkedin }}" target="_blank" rel="noopener noreferrer" class="size-8 rounded-lg bg-[#1d1919] border border-[#2a2424] flex items-center justify-center text-[#6b605f] hover:text-[#0077b5] hover:border-[#0077b5]/50 hover:bg-[#2a2424] transition-all" title="LinkedIn">
+                  <a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="size-8 rounded-lg bg-[#1d1919] border border-[#2a2424] flex items-center justify-center text-[#6b605f] hover:text-[#0077b5] hover:border-[#0077b5]/50 hover:bg-[#2a2424] transition-all" title="LinkedIn">
                     <svg class="size-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                   </a>
                 {% endif %}
                 {% if profile.twitter %}
-                  <a href="https://x.com/{{ profile.twitter }}" target="_blank" rel="noopener noreferrer" class="size-8 rounded-lg bg-[#1d1919] border border-[#2a2424] flex items-center justify-center text-[#6b605f] hover:text-white hover:border-primary/50 hover:bg-[#2a2424] transition-all" title="X (Twitter)">
+                  <a href="{{ profile.twitter_url }}" target="_blank" rel="noopener noreferrer" class="size-8 rounded-lg bg-[#1d1919] border border-[#2a2424] flex items-center justify-center text-[#6b605f] hover:text-white hover:border-primary/50 hover:bg-[#2a2424] transition-all" title="X (Twitter)">
                     <svg class="size-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  </a>
+                {% endif %}
+                {% if profile.instagram %}
+                  <a href="{{ profile.instagram_url }}" target="_blank" rel="noopener noreferrer" class="size-8 rounded-lg bg-[#1d1919] border border-[#2a2424] flex items-center justify-center text-[#6b605f] hover:text-[#E4405F] hover:border-[#E4405F]/50 hover:bg-[#2a2424] transition-all" title="Instagram">
+                    <svg class="size-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                  </a>
+                {% endif %}
+                {% if profile.discord %}
+                  <a href="{{ profile.discord_url }}" target="_blank" rel="noopener noreferrer" class="size-8 rounded-lg bg-[#1d1919] border border-[#2a2424] flex items-center justify-center text-[#6b605f] hover:text-[#5865F2] hover:border-[#5865F2]/50 hover:bg-[#2a2424] transition-all" title="Discord">
+                    <svg class="size-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"/></svg>
                   </a>
                 {% endif %}
                 {% if profile.website %}
@@ -87,7 +72,7 @@
                     <span class="material-symbols-outlined text-base">language</span>
                   </a>
                 {% endif %}
-                {% if not profile.github and not profile.linkedin and not profile.twitter and not profile.website %}
+                {% if not profile.has_social_links %}
                   <a href="{% url 'profile_edit' %}" class="text-[#5a5050] text-xs hover:text-primary transition-colors">+ Redes</a>
                 {% endif %}
               </div>
@@ -135,8 +120,8 @@
                     </div>
                   </div>
                   <a href="{% url 'profile_edit' %}" class="flex items-center gap-2 px-4 py-2 bg-[#2a2424] hover:bg-primary/20 text-white rounded-lg text-sm font-medium transition-all border border-[#3d2f2f] hover:border-primary group">
-                    <span class="material-symbols-outlined text-lg text-[#8e8584] group-hover:text-primary transition-colors">edit</span>
-                    <span class="hidden sm:inline">Editar</span>
+                    <span class="material-symbols-outlined text-lg text-[#8e8584] group-hover:text-primary transition-colors leading-none">edit</span>
+                    <span>Editar perfil</span>
                   </a>
                 </div>
                 {% if profile.bio %}
@@ -211,16 +196,13 @@
           </div>
 
           <div class="relative z-20 bg-black/20 backdrop-blur-md border-t border-white/10 px-6 py-3 flex items-center justify-between">
-            <span class="text-[10px] font-medium text-white/60 uppercase tracking-wide">Descargar</span>
+            <span class="text-[10px] font-medium text-white/60 uppercase tracking-wide">Acciones</span>
             <div class="flex items-center gap-2">
-              <button class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white" title="Descargar JPG">
-                <span class="material-symbols-outlined text-[20px]">image</span>
-              </button>
-              <button class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white" title="Descargar PDF">
-                <span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+              <button onclick="openCredentialModal(); setTimeout(downloadCredential, 500);" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white" title="Descargar PNG">
+                <span class="material-symbols-outlined text-[20px]">download</span>
               </button>
               <div class="h-4 w-px bg-white/20 mx-1"></div>
-              <button class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white" title="Compartir">
+              <button onclick="shareCredential()" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white" title="Compartir">
                 <span class="material-symbols-outlined text-[20px]">share</span>
               </button>
             </div>
@@ -231,25 +213,71 @@
       <!-- Benefits & Events Section -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
 
-        <!-- Benefits (placeholder for now) -->
+        <!-- Benefits -->
         <div class="lg:col-span-2 flex flex-col gap-4 lg:gap-6">
           <div class="flex items-center justify-between px-1 border-l-4 border-primary pl-4">
             <h3 class="text-xl lg:text-2xl font-bold text-white flex items-center gap-2">
               Beneficios Exclusivos
             </h3>
-            <a class="flex items-center gap-1 text-sm text-primary hover:text-primary-hover font-bold transition-colors group" href="#">
+            <a class="flex items-center gap-1 text-sm text-primary hover:text-primary-hover font-bold transition-colors group" href="{% url 'benefits_list' %}">
               Ver todos
               <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </a>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-5">
-            <!-- Placeholder: No benefits yet -->
-            <div class="sm:col-span-2 xl:col-span-3 bg-[#241f1e] border border-[#342d2d] rounded-2xl p-8 text-center">
-              <span class="material-symbols-outlined text-[#6b605f] text-5xl mb-4">card_giftcard</span>
-              <h4 class="text-lg font-bold text-white mb-2">Próximamente</h4>
-              <p class="text-sm text-[#8e8584]">Estamos trabajando en beneficios exclusivos para miembros de la comunidad.</p>
-            </div>
+            {% if benefits %}
+              {% for benefit in benefits %}
+                <a href="{% url 'benefit_detail' pk=benefit.pk %}" class="group bg-surface-dark rounded-xl border border-[#342d2d] overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
+                  <!-- Image -->
+                  <div class="aspect-[16/10] bg-[#1d1919] relative overflow-hidden">
+                    {% if benefit.image %}
+                      <img src="{{ benefit.image }}" alt="{{ benefit.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                    {% else %}
+                      <div class="w-full h-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-4xl text-[#3d2f2f]">redeem</span>
+                      </div>
+                    {% endif %}
+                    <!-- Badge -->
+                    <div class="absolute top-2 left-2">
+                      {% if benefit.benefit_type == 'discount' %}
+                        <span class="px-2 py-0.5 rounded-full bg-green-600 text-white text-[10px] font-bold shadow-md">
+                          {{ benefit.discount_percentage }}% OFF
+                        </span>
+                      {% else %}
+                        <span class="px-2 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold shadow-md">
+                          Canjeable
+                        </span>
+                      {% endif %}
+                    </div>
+                    <div class="absolute top-2 right-2 flex gap-1">
+                      {% if benefit.modality == 'virtual' %}
+                        <span class="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-bold shadow-md">Virtual</span>
+                      {% elif benefit.modality == 'in_person' %}
+                        <span class="px-2 py-0.5 rounded-full bg-amber-600 text-white text-[10px] font-bold shadow-md">Presencial</span>
+                      {% elif benefit.modality == 'both' %}
+                        <span class="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold shadow-md">Virtual y Presencial</span>
+                      {% endif %}
+                      {% if benefit.is_expired %}
+                        <span class="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold shadow-md">Expirado</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <!-- Content -->
+                  <div class="p-4">
+                    <h4 class="font-bold text-white text-sm group-hover:text-primary transition-colors line-clamp-1">{{ benefit.title }}</h4>
+                    <p class="text-[#8e8584] text-xs line-clamp-2 mt-1">{{ benefit.description }}</p>
+                  </div>
+                </a>
+              {% endfor %}
+            {% else %}
+              <!-- Empty state -->
+              <div class="sm:col-span-2 xl:col-span-3 bg-[#241f1e] border border-[#342d2d] rounded-2xl p-8 text-center">
+                <span class="material-symbols-outlined text-[#6b605f] text-5xl mb-4">card_giftcard</span>
+                <h4 class="text-lg font-bold text-white mb-2">Sin beneficios disponibles</h4>
+                <p class="text-sm text-[#8e8584]">Todavía no hay beneficios publicados.</p>
+              </div>
+            {% endif %}
           </div>
         </div>
 

@@ -17,27 +17,23 @@
   </div>
 
   <nav class="flex-1 px-4 py-6 flex flex-col gap-2 overflow-y-auto">
-    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl bg-[#2a2424] border border-[#3d2f2f] text-white shadow-lg shadow-black/20 transition-all duration-200 relative overflow-hidden" href="{% url 'dashboard' %}">
-      <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
-      <span class="material-symbols-outlined text-primary">dashboard</span>
+    {% with current_url=request.resolver_match.url_name %}
+    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl {% if current_url == 'dashboard' %}bg-[#2a2424] border border-[#3d2f2f] text-white shadow-lg shadow-black/20 relative overflow-hidden{% else %}hover:bg-[#2a2424] text-[#8e8584] hover:text-white{% endif %} transition-all duration-200" href="{% url 'dashboard' %}">
+      {% if current_url == 'dashboard' %}<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>{% endif %}
+      <span class="material-symbols-outlined {% if current_url == 'dashboard' %}text-primary{% else %}group-hover:text-primary transition-colors{% endif %}">dashboard</span>
       <span class="font-medium tracking-wide">Dashboard</span>
     </a>
-    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-all duration-200" href="#">
-      <span class="material-symbols-outlined group-hover:text-primary transition-colors">card_membership</span>
-      <span class="font-medium tracking-wide">Membresía</span>
-    </a>
-    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-all duration-200" href="{% url 'events' %}">
-      <span class="material-symbols-outlined group-hover:text-primary transition-colors">calendar_month</span>
-      <span class="font-medium tracking-wide">Eventos</span>
-    </a>
-    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-all duration-200" href="{% url 'profile_edit' %}">
-      <span class="material-symbols-outlined group-hover:text-primary transition-colors">person</span>
+    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl {% if current_url == 'profile_edit' %}bg-[#2a2424] border border-[#3d2f2f] text-white shadow-lg shadow-black/20 relative overflow-hidden{% else %}hover:bg-[#2a2424] text-[#8e8584] hover:text-white{% endif %} transition-all duration-200" href="{% url 'profile_edit' %}">
+      {% if current_url == 'profile_edit' %}<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>{% endif %}
+      <span class="material-symbols-outlined {% if current_url == 'profile_edit' %}text-primary{% else %}group-hover:text-primary transition-colors{% endif %}">person</span>
       <span class="font-medium tracking-wide">Perfil</span>
     </a>
-    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-all duration-200" href="#">
-      <span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
-      <span class="font-medium tracking-wide">Ajustes</span>
+    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl {% if 'benefit' in current_url %}bg-[#2a2424] border border-[#3d2f2f] text-white shadow-lg shadow-black/20 relative overflow-hidden{% else %}hover:bg-[#2a2424] text-[#8e8584] hover:text-white{% endif %} transition-all duration-200" href="{% url 'benefits_list' %}">
+      {% if 'benefit' in current_url %}<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>{% endif %}
+      <span class="material-symbols-outlined {% if 'benefit' in current_url %}text-primary{% else %}group-hover:text-primary transition-colors{% endif %}">redeem</span>
+      <span class="font-medium tracking-wide">Beneficios</span>
     </a>
+    {% endwith %}
   </nav>
 
   <div class="p-6 border-t border-[#342d2d]">

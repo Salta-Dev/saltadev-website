@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaltaDev - Beneficios</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex overflow-x-hidden selection:bg-primary selection:text-white font-display">
+
+  {% include "dashboard/includes/sidebar.html" %}
+  {% include "dashboard/includes/mobile_menu.html" %}
+
+  <main class="flex-1 lg:ml-72 flex flex-col min-h-screen overflow-y-auto relative bg-background-dark">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-background-dark/80 backdrop-blur-xl border-b border-[#342d2d] px-6 lg:px-8 py-4 lg:py-6 flex items-center justify-between">
+      <div class="flex flex-col gap-1">
+        <h1 class="text-2xl lg:text-3xl font-bold text-white tracking-tight">Beneficios</h1>
+        <p class="text-[#8e8584] text-sm font-medium hidden sm:block">Descuentos y promociones exclusivas para miembros.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        {% if can_create %}
+          <a href="{% url 'benefit_create' %}" class="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-all shadow-lg hover:shadow-glow">
+            <span class="material-symbols-outlined text-xl leading-none">add</span>
+            Crear Beneficio
+          </a>
+          <a href="{% url 'benefit_create' %}" class="sm:hidden size-11 flex items-center justify-center rounded-xl bg-primary hover:bg-primary-hover text-white transition-all shadow-lg">
+            <span class="material-symbols-outlined leading-none">add</span>
+          </a>
+        {% endif %}
+        <button class="lg:hidden size-10 rounded-lg bg-[#1d1919] text-[#8e8584] hover:text-white hover:bg-[#2a2424] transition-all border border-[#2a2424] flex items-center justify-center" onclick="openMobileMenu()">
+          <span class="material-symbols-outlined text-xl leading-none">menu</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="p-4 lg:p-8 pb-20">
+
+      {% if messages %}
+        <div class="mb-6 space-y-2 max-w-7xl mx-auto">
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-400">check_circle</span>
+                {{ message }}
+              </div>
+            {% elif message.tags == 'error' %}
+              <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-400">error</span>
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Filters -->
+      <div class="mb-6 max-w-7xl mx-auto">
+        <form method="get" class="flex flex-col sm:flex-row gap-4">
+          <div class="flex-1 flex gap-4">
+            <input type="text" name="search" value="{{ search_query }}" placeholder="Buscar beneficios..." class="flex-1 px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"/>
+            <button type="submit" class="px-6 py-3 bg-primary hover:bg-primary-hover rounded-xl text-white font-medium transition-colors flex items-center gap-2 shadow-lg hover:shadow-glow">
+              <span class="material-symbols-outlined">search</span>
+              <span class="hidden sm:inline">Buscar</span>
+            </button>
+          </div>
+          <select name="type" class="w-full sm:w-auto pl-4 pr-10 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer">
+            <option value="">Todos los tipos</option>
+            <option value="discount" {% if current_type == 'discount' %}selected{% endif %}>Descuento</option>
+            <option value="redeemable" {% if current_type == 'redeemable' %}selected{% endif %}>Canjeable</option>
+          </select>
+          <select name="modality" class="w-full sm:w-auto pl-4 pr-10 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer">
+            <option value="">Todas las modalidades</option>
+            <option value="virtual" {% if current_modality == 'virtual' %}selected{% endif %}>Virtual</option>
+            <option value="in_person" {% if current_modality == 'in_person' %}selected{% endif %}>Presencial</option>
+            <option value="both" {% if current_modality == 'both' %}selected{% endif %}>Virtual y Presencial</option>
+          </select>
+        </form>
+      </div>
+
+      <!-- Benefits Grid -->
+      {% if benefits %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+          {% for benefit in benefits %}
+            <a href="{% url 'benefit_detail' pk=benefit.pk %}" class="group bg-surface-dark rounded-2xl border border-[#342d2d] overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
+              <!-- Image -->
+              <div class="aspect-video bg-[#1d1919] relative overflow-hidden">
+                {% if benefit.image %}
+                  <img src="{{ benefit.image }}" alt="{{ benefit.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                {% else %}
+                  <div class="w-full h-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-6xl text-[#3d2f2f]">redeem</span>
+                  </div>
+                {% endif %}
+
+                <!-- Badge -->
+                <div class="absolute top-3 left-3">
+                  {% if benefit.benefit_type == 'discount' %}
+                    <span class="px-3 py-1 rounded-full bg-green-600 text-white text-xs font-bold shadow-md">
+                      {{ benefit.discount_percentage }}% OFF
+                    </span>
+                  {% else %}
+                    <span class="px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold shadow-md">
+                      Canjeable
+                    </span>
+                  {% endif %}
+                </div>
+
+                <!-- Status badges -->
+                <div class="absolute top-3 right-3 flex gap-2">
+                  {% if benefit.is_expired %}
+                    <span class="px-2 py-1 rounded-full bg-red-600 text-white text-xs font-bold shadow-md">Expirado</span>
+                  {% endif %}
+                  {% if benefit.modality == 'virtual' %}
+                    <span class="px-2 py-1 rounded-full bg-purple-600 text-white text-xs font-bold shadow-md">Virtual</span>
+                  {% elif benefit.modality == 'in_person' %}
+                    <span class="px-2 py-1 rounded-full bg-amber-600 text-white text-xs font-bold shadow-md">Presencial</span>
+                  {% elif benefit.modality == 'both' %}
+                    <span class="px-2 py-1 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-md">Virtual y Presencial</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="p-5">
+                <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors line-clamp-1">{{ benefit.title }}</h3>
+                <p class="text-[#8e8584] text-sm line-clamp-2 mb-4">{{ benefit.description }}</p>
+
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    {% if benefit.creator.profile.avatar_url %}
+                      <img src="{{ benefit.creator.profile.avatar_url }}" alt="{{ benefit.creator.first_name }}" class="w-6 h-6 rounded-full object-cover"/>
+                    {% else %}
+                      <div class="w-6 h-6 rounded-full bg-[#2a2424] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-sm">person</span>
+                      </div>
+                    {% endif %}
+                    <span class="text-xs text-[#6b605f]">{{ benefit.creator.first_name }}</span>
+                  </div>
+
+                  {% if benefit.expiration_date and not benefit.is_expired %}
+                    <span class="text-xs text-[#6b605f]">
+                      Hasta {{ benefit.expiration_date|date:"d/m/Y" }}
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+          <div class="mt-8 flex justify-center gap-2 max-w-7xl mx-auto">
+            {% if page_obj.has_previous %}
+              <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_modality %}&modality={{ current_modality }}{% endif %}" class="px-4 py-2 rounded-lg bg-[#2a2424] hover:bg-[#3d3434] text-white text-sm font-medium transition-colors">
+                Anterior
+              </a>
+            {% endif %}
+
+            <span class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium">
+              {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_modality %}&modality={{ current_modality }}{% endif %}" class="px-4 py-2 rounded-lg bg-[#2a2424] hover:bg-[#3d3434] text-white text-sm font-medium transition-colors">
+                Siguiente
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+
+      {% else %}
+        <!-- Empty State -->
+        <div class="max-w-md mx-auto text-center py-16">
+          <span class="material-symbols-outlined text-[#3d2f2f] text-7xl mb-4">redeem</span>
+          <h3 class="text-xl font-bold text-white mb-2">No hay beneficios disponibles</h3>
+          <p class="text-[#8e8584] mb-6">
+            {% if search_query or current_type or current_modality %}
+              No se encontraron beneficios con los filtros aplicados.
+            {% else %}
+              Todavía no hay beneficios publicados.
+            {% endif %}
+          </p>
+          {% if can_create %}
+            <a href="{% url 'benefit_create' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-all shadow-lg hover:shadow-glow">
+              <span class="material-symbols-outlined">add</span>
+              Crear el primer beneficio
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </div>
+  </main>
+
+</body>
+</html>

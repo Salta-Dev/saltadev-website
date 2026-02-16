@@ -13,6 +13,13 @@ from .models import EmailVerificationCode, User
 
 logger = get_logger()
 
+DEFAULT_LOCKOUT_MESSAGE = "Demasiados intentos fallidos. Intentá nuevamente más tarde."
+
+
+def get_lockout_message() -> str:
+    """Get the lockout message from settings or use default."""
+    return getattr(settings, "AXES_LOCKOUT_MESSAGE", DEFAULT_LOCKOUT_MESSAGE)
+
 
 def generate_verification_code() -> str:
     """Generate a random 6-digit numeric verification code."""

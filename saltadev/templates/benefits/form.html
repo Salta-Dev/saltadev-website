@@ -1,0 +1,242 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaltaDev - {% if is_edit %}Editar{% else %}Crear{% endif %} Beneficio</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex overflow-x-hidden selection:bg-primary selection:text-white font-display">
+
+  {% include "dashboard/includes/sidebar.html" %}
+  {% include "dashboard/includes/mobile_menu.html" %}
+
+  <main class="flex-1 lg:ml-72 flex flex-col min-h-screen overflow-y-auto relative bg-background-dark">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-background-dark/80 backdrop-blur-xl border-b border-[#342d2d] px-6 lg:px-8 py-4 lg:py-6 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="{% if is_edit %}{% url 'benefit_detail' pk=benefit.pk %}{% else %}{% url 'benefits_list' %}{% endif %}" class="p-2 rounded-lg hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-colors">
+          <span class="material-symbols-outlined leading-none">arrow_back</span>
+        </a>
+        <div class="flex flex-col gap-1">
+          <h2 class="text-2xl lg:text-3xl font-bold text-white tracking-tight">{% if is_edit %}Editar{% else %}Crear{% endif %} Beneficio</h2>
+          <p class="text-[#8e8584] text-sm font-medium hidden sm:block">{% if is_edit %}Modificá los datos del beneficio.{% else %}Publicá un nuevo beneficio para la comunidad.{% endif %}</p>
+        </div>
+      </div>
+      <button class="lg:hidden size-10 rounded-lg bg-[#1d1919] text-[#8e8584] hover:text-white hover:bg-[#2a2424] transition-all border border-[#2a2424] flex items-center justify-center" onclick="openMobileMenu()">
+        <span class="material-symbols-outlined text-xl leading-none">menu</span>
+      </button>
+    </header>
+
+    <div class="p-4 lg:p-8 max-w-4xl mx-auto w-full pb-20">
+
+      {% if form.errors %}
+        <div class="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-red-400">error</span>
+            <span class="font-bold">Por favor corregí los siguientes errores:</span>
+          </div>
+          <ul class="list-disc list-inside space-y-1">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="post" class="space-y-8">
+        {% csrf_token %}
+
+        <!-- Basic Info -->
+        <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
+          <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">info</span>
+            Información Básica
+          </h3>
+
+          <div class="space-y-6">
+            <div>
+              <label for="id_title" class="block text-sm font-medium text-white mb-2">Título *</label>
+              {{ form.title }}
+            </div>
+
+            <div>
+              <label for="id_description" class="block text-sm font-medium text-white mb-2">Descripción *</label>
+              {{ form.description }}
+            </div>
+
+            <div>
+              <label for="id_image" class="block text-sm font-medium text-white mb-2">URL de imagen</label>
+              {{ form.image }}
+              <p class="mt-2 text-xs text-[#6b605f]">URL de una imagen para mostrar en el beneficio (opcional)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Benefit Type -->
+        <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
+          <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">sell</span>
+            Tipo de Beneficio
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="id_benefit_type" class="block text-sm font-medium text-white mb-2">Tipo *</label>
+              {{ form.benefit_type }}
+            </div>
+
+            <div id="discount_percentage_field">
+              <label for="id_discount_percentage" class="block text-sm font-medium text-white mb-2">Porcentaje de descuento</label>
+              {{ form.discount_percentage }}
+            </div>
+
+            <div id="redemption_limit_field">
+              <label for="id_redemption_limit" class="block text-sm font-medium text-white mb-2">Límite de canjes</label>
+              {{ form.redemption_limit }}
+            </div>
+
+            <div>
+              <label for="id_expiration_date" class="block text-sm font-medium text-white mb-2">Fecha de expiración</label>
+              {{ form.expiration_date }}
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <label for="id_discount_codes" class="block text-sm font-medium text-white mb-2">Códigos de descuento</label>
+            {{ form.discount_codes }}
+            <p class="mt-2 text-xs text-[#6b605f]">Separar múltiples códigos con comas</p>
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
+          <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">contact_page</span>
+            Información de Contacto
+          </h3>
+
+          <div class="mb-6">
+            <label for="id_contact_source" class="block text-sm font-medium text-white mb-2">Fuente de contacto *</label>
+            {{ form.contact_source }}
+          </div>
+
+          <div id="custom_contact_fields" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="id_contact_phone" class="block text-sm font-medium text-white mb-2">Teléfono</label>
+              {{ form.contact_phone }}
+            </div>
+
+            <div>
+              <label for="id_contact_email" class="block text-sm font-medium text-white mb-2">Email</label>
+              {{ form.contact_email }}
+            </div>
+
+            <div class="md:col-span-2">
+              <label for="id_contact_website" class="block text-sm font-medium text-white mb-2">Sitio web</label>
+              {{ form.contact_website }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Modality and Location -->
+        <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
+          <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">place</span>
+            Modalidad y Ubicación
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="id_modality" class="block text-sm font-medium text-white mb-2">Modalidad *</label>
+              {{ form.modality }}
+            </div>
+
+            <div id="location_field">
+              <label for="id_location" class="block text-sm font-medium text-white mb-2">Ubicación</label>
+              {{ form.location }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-end">
+          <a href="{% if is_edit %}{% url 'benefit_detail' pk=benefit.pk %}{% else %}{% url 'benefits_list' %}{% endif %}" class="px-6 py-3 rounded-xl bg-[#2a2424] hover:bg-[#3d3434] text-white text-sm font-bold transition-all border border-[#3d2f2f] hover:border-[#4a4040] text-center">
+            Cancelar
+          </a>
+          <button type="submit" class="px-8 py-3 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-all shadow-lg hover:shadow-glow flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-xl">{% if is_edit %}save{% else %}add{% endif %}</span>
+            {% if is_edit %}Guardar Cambios{% else %}Crear Beneficio{% endif %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const benefitType = document.querySelector('[name="benefit_type"]');
+      const contactSource = document.getElementById('contact_source');
+      const modality = document.getElementById('modality');
+
+      const discountField = document.getElementById('discount_percentage_field');
+      const redemptionField = document.getElementById('redemption_limit_field');
+      const customContactFields = document.getElementById('custom_contact_fields');
+      const locationField = document.getElementById('location_field');
+
+      function toggleBenefitTypeFields() {
+        const value = benefitType.value;
+        if (value === 'discount') {
+          discountField.style.display = 'block';
+          redemptionField.style.display = 'none';
+        } else {
+          discountField.style.display = 'none';
+          redemptionField.style.display = 'block';
+        }
+      }
+
+      function toggleContactFields() {
+        const value = contactSource.value;
+        if (value === 'custom') {
+          customContactFields.style.display = 'grid';
+        } else {
+          customContactFields.style.display = 'none';
+        }
+      }
+
+      function toggleLocationField() {
+        const value = modality.value;
+        if (value === 'in_person' || value === 'both') {
+          locationField.style.display = 'block';
+        } else {
+          locationField.style.display = 'none';
+        }
+      }
+
+      if (benefitType) {
+        benefitType.addEventListener('change', toggleBenefitTypeFields);
+        toggleBenefitTypeFields();
+      }
+
+      if (contactSource) {
+        contactSource.addEventListener('change', toggleContactFields);
+        toggleContactFields();
+      }
+
+      if (modality) {
+        modality.addEventListener('change', toggleLocationField);
+        toggleLocationField();
+      }
+    });
+  </script>
+
+</body>
+</html>

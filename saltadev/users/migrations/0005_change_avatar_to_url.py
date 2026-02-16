@@ -4,24 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0004_change_location_to_fk'),
+        ("users", "0004_change_location_to_fk"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='profile',
-            name='avatar',
+            model_name="profile",
+            name="avatar",
         ),
         migrations.AddField(
-            model_name='profile',
-            name='avatar_delete_url',
-            field=models.URLField(blank=True, default=''),
+            model_name="profile",
+            name="avatar_delete_url",
+            field=models.URLField(blank=True, default=""),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='avatar_url',
-            field=models.URLField(blank=True, default=''),
+            model_name="profile",
+            name="avatar_url",
+            field=models.URLField(blank=True, default=""),
         ),
     ]

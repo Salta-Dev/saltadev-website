@@ -3,6 +3,10 @@
 
 {% block title %}SaltaDev - Comunidad de Desarrolladores{% endblock %}
 
+{% block canonical %}
+<link rel="canonical" href="https://salta.dev/">
+{% endblock %}
+
 {% block page_css %}
   <link rel="stylesheet" href="{% static 'assets/css/index.css' %}">
 {% endblock %}
@@ -346,6 +350,10 @@
   </button>
 </div>
 
+{% endblock %}
+
+{% block structured_data %}
+{% include "includes/structured_data/organization.html" %}
 {% endblock %}
 
 {% block page_js %}

@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /register/
+Disallow: /logout/
+Disallow: /verificar/
+Disallow: /password-reset/
+Disallow: /beneficios/mis-beneficios/
+Disallow: /beneficios/crear/
+Disallow: /beneficios/*/editar/
+Disallow: /beneficios/*/eliminar/
+
+Sitemap: https://salta.dev/sitemap.xml

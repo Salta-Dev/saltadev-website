@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaltaDev - Mis Beneficios</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex overflow-x-hidden selection:bg-primary selection:text-white font-display">
+
+  {% include "dashboard/includes/sidebar.html" %}
+  {% include "dashboard/includes/mobile_menu.html" %}
+
+  <main class="flex-1 lg:ml-72 flex flex-col min-h-screen overflow-y-auto relative bg-background-dark">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-background-dark/80 backdrop-blur-xl border-b border-[#342d2d] px-6 lg:px-8 py-4 lg:py-6 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="{% url 'benefits_list' %}" class="p-2 rounded-lg hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-colors">
+          <span class="material-symbols-outlined leading-none">arrow_back</span>
+        </a>
+        <div class="flex flex-col gap-1">
+          <h2 class="text-2xl lg:text-3xl font-bold text-white tracking-tight">Mis Beneficios</h2>
+          <p class="text-[#8e8584] text-sm font-medium hidden sm:block">Beneficios que has publicado.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="{% url 'benefit_create' %}" class="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-all shadow-lg hover:shadow-glow">
+          <span class="material-symbols-outlined text-xl leading-none">add</span>
+          Crear Beneficio
+        </a>
+        <a href="{% url 'benefit_create' %}" class="sm:hidden size-11 flex items-center justify-center rounded-xl bg-primary hover:bg-primary-hover text-white transition-all shadow-lg">
+          <span class="material-symbols-outlined leading-none">add</span>
+        </a>
+        <button class="lg:hidden size-10 rounded-lg bg-[#1d1919] text-[#8e8584] hover:text-white hover:bg-[#2a2424] transition-all border border-[#2a2424] flex items-center justify-center" onclick="openMobileMenu()">
+          <span class="material-symbols-outlined text-xl leading-none">menu</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="p-4 lg:p-8 pb-20">
+
+      {% if messages %}
+        <div class="mb-6 space-y-2 max-w-7xl mx-auto">
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-400">check_circle</span>
+                {{ message }}
+              </div>
+            {% elif message.tags == 'error' %}
+              <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-400">error</span>
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if benefits %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+          {% for benefit in benefits %}
+            <div class="group bg-surface-dark rounded-2xl border border-[#342d2d] overflow-hidden hover:border-primary/50 transition-all duration-300">
+              <!-- Image -->
+              <a href="{% url 'benefit_detail' pk=benefit.pk %}" class="block aspect-video bg-[#1d1919] relative overflow-hidden">
+                {% if benefit.image %}
+                  <img src="{{ benefit.image }}" alt="{{ benefit.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                {% else %}
+                  <div class="w-full h-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-6xl text-[#3d2f2f]">redeem</span>
+                  </div>
+                {% endif %}
+
+                <!-- Status Badge -->
+                <div class="absolute top-3 right-3">
+                  {% if not benefit.is_active %}
+                    <span class="px-2 py-1 rounded-full bg-gray-500/20 border border-gray-500/30 text-gray-300 text-xs font-bold">Inactivo</span>
+                  {% elif benefit.is_expired %}
+                    <span class="px-2 py-1 rounded-full bg-red-500/20 border border-red-500/30 text-red-300 text-xs font-bold">Expirado</span>
+                  {% else %}
+                    <span class="px-2 py-1 rounded-full bg-green-500/20 border border-green-500/30 text-green-300 text-xs font-bold">Activo</span>
+                  {% endif %}
+                </div>
+
+                <!-- Type Badge -->
+                <div class="absolute top-3 left-3">
+                  {% if benefit.benefit_type == 'discount' %}
+                    <span class="px-3 py-1 rounded-full bg-green-500/20 border border-green-500/30 text-green-300 text-xs font-bold">
+                      {{ benefit.discount_percentage }}% OFF
+                    </span>
+                  {% else %}
+                    <span class="px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs font-bold">
+                      Canjeable
+                    </span>
+                  {% endif %}
+                </div>
+              </a>
+
+              <!-- Content -->
+              <div class="p-5">
+                <a href="{% url 'benefit_detail' pk=benefit.pk %}">
+                  <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors line-clamp-1">{{ benefit.title }}</h3>
+                </a>
+                <p class="text-[#8e8584] text-sm line-clamp-2 mb-4">{{ benefit.description }}</p>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-between pt-3 border-t border-[#2a2424]">
+                  <span class="text-xs text-[#6b605f]">
+                    {{ benefit.created_at|date:"d/m/Y" }}
+                  </span>
+                  <div class="flex items-center gap-1">
+                    <a href="{% url 'benefit_edit' pk=benefit.pk %}" class="p-2 rounded-lg hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-colors" title="Editar">
+                      <span class="material-symbols-outlined text-lg">edit</span>
+                    </a>
+                    <form method="post" action="{% url 'benefit_toggle_active' pk=benefit.pk %}" class="inline">
+                      {% csrf_token %}
+                      <button type="submit" class="p-2 rounded-lg hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-colors" title="{% if benefit.is_active %}Desactivar{% else %}Activar{% endif %}">
+                        <span class="material-symbols-outlined text-lg">{% if benefit.is_active %}visibility_off{% else %}visibility{% endif %}</span>
+                      </button>
+                    </form>
+                    <a href="{% url 'benefit_delete' pk=benefit.pk %}" class="p-2 rounded-lg hover:bg-red-500/10 text-[#8e8584] hover:text-red-400 transition-colors" title="Eliminar">
+                      <span class="material-symbols-outlined text-lg">delete</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+          <div class="mt-8 flex justify-center gap-2 max-w-7xl mx-auto">
+            {% if page_obj.has_previous %}
+              <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 rounded-lg bg-[#2a2424] hover:bg-[#3d3434] text-white text-sm font-medium transition-colors">
+                Anterior
+              </a>
+            {% endif %}
+
+            <span class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium">
+              {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 rounded-lg bg-[#2a2424] hover:bg-[#3d3434] text-white text-sm font-medium transition-colors">
+                Siguiente
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+
+      {% else %}
+        <!-- Empty State -->
+        <div class="max-w-md mx-auto text-center py-16">
+          <span class="material-symbols-outlined text-[#3d2f2f] text-7xl mb-4">redeem</span>
+          <h3 class="text-xl font-bold text-white mb-2">No tenés beneficios publicados</h3>
+          <p class="text-[#8e8584] mb-6">Creá tu primer beneficio para compartir con la comunidad.</p>
+          <a href="{% url 'benefit_create' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-all shadow-lg hover:shadow-glow">
+            <span class="material-symbols-outlined">add</span>
+            Crear Beneficio
+          </a>
+        </div>
+      {% endif %}
+
+    </div>
+  </main>
+
+</body>
+</html>

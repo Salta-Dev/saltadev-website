@@ -18,7 +18,13 @@ DEBUG = True
 
 SECRET_KEY = "django-insecure-local-development-key-do-not-use-in-production"  # pragma: allowlist secret
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".ngrok-free.app", ".ngrok.io"]
+
+# Allow ngrok for CSRF (needed for form submissions)
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.ngrok-free.app",
+    "https://*.ngrok.io",
+]
 
 DATABASES = {
     "default": {

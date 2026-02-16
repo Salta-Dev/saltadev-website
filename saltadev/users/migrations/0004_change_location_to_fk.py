@@ -5,21 +5,30 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('locations', '0001_initial'),
-        ('users', '0003_add_country_province'),
+        ("locations", "0001_initial"),
+        ("users", "0003_add_country_province"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='country',
-            field=models.ForeignKey(default='AR', on_delete=django.db.models.deletion.PROTECT, related_name='users', to='locations.country'),
+            model_name="user",
+            name="country",
+            field=models.ForeignKey(
+                default="AR",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="users",
+                to="locations.country",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='province',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.PROTECT, related_name='users', to='locations.province'),
+            model_name="user",
+            name="province",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="users",
+                to="locations.province",
+            ),
         ),
     ]

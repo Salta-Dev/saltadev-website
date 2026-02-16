@@ -1,0 +1,35 @@
+Fdatabases:
+  - name: saltadev-db
+    plan: free
+    databaseName: saltadev
+    user: saltadev
+
+services:
+  - type: redis
+    name: saltadev-redis
+    plan: free
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
+
+  - type: web
+    plan: free
+    name: saltadev-dev
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "cd saltadev && gunicorn saltadev.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: saltadev-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: saltadev-redis
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DJANGO_SETTINGS_MODULE
+        value: saltadev.settings.development
+      - key: PYTHON_VERSION
+        value: "3.12"
