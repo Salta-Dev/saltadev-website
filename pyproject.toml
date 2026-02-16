@@ -10,6 +10,7 @@ dependencies = [
   "django-axes==8.3.1",
   "django-cloudinary-storage>=0.3.0",
   "django-recaptcha==4.1.0",
+  "django-anymail>=13.0",
   "gunicorn==23.0.0",
   "loguru==0.7.2",
   "pillow>=12.1.1",
