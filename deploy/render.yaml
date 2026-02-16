@@ -32,4 +32,4 @@ services:
       - key: DJANGO_SETTINGS_MODULE
         value: saltadev.settings.development
       - key: PYTHON_VERSION
-        value: "3.12"
+        value: "3.12.11"
