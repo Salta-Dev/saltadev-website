@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
+    "cloudinary",
+    "cloudinary_storage",
     "home",
     "events",
     "code_of_conduct",
@@ -155,7 +157,11 @@ SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")
 RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_V2_SECRET", "tu-secret-key")
 RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_V2_SITE_KEY", "tu-site-key")
 
-# ImgBB API for image uploads (production/staging only)
-IMGBB_API_KEY = os.getenv("IMGBB_API_KEY", "")
+# Cloudinary configuration for image uploads
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME", ""),
+    "API_KEY": os.getenv("CLOUDINARY_API_KEY", ""),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET", ""),
+}
 
 SILENCED_SYSTEM_CHECKS = ["django_recaptcha.recaptcha_test_key_error"]

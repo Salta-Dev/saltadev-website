@@ -4,9 +4,11 @@ version = "0.1.0"
 description = "SaltaDev website"
 requires-python = ">=3.12"
 dependencies = [
+  "cloudinary>=1.41.0",
   "dj-database-url>=2.3.0",
   "Django==5.2.11",
   "django-axes==8.3.1",
+  "django-cloudinary-storage>=0.3.0",
   "django-recaptcha==4.1.0",
   "gunicorn==23.0.0",
   "loguru==0.7.2",

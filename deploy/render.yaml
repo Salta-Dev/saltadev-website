@@ -33,3 +33,9 @@ services:
         value: saltadev.settings.development
       - key: PYTHON_VERSION
         value: "3.12.11"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

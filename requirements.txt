@@ -5,9 +5,15 @@ asgiref==3.11.1
     #   django
     #   django-axes
 certifi==2026.1.4
-    # via requests
+    # via
+    #   cloudinary
+    #   requests
 charset-normalizer==3.4.4
     # via requests
+cloudinary==1.44.1
+    # via
+    #   saltadev-website (pyproject.toml)
+    #   django-cloudinary-storage
 dj-database-url==3.1.1
     # via saltadev-website (pyproject.toml)
 django==5.2.11
@@ -17,6 +23,8 @@ django==5.2.11
     #   django-axes
     #   django-recaptcha
 django-axes==8.3.1
+    # via saltadev-website (pyproject.toml)
+django-cloudinary-storage==0.3.0
     # via saltadev-website (pyproject.toml)
 django-recaptcha==4.1.0
     # via saltadev-website (pyproject.toml)
@@ -39,12 +47,18 @@ python-dotenv==1.2.1
 redis==5.2.1
     # via saltadev-website (pyproject.toml)
 requests==2.32.5
-    # via saltadev-website (pyproject.toml)
+    # via
+    #   saltadev-website (pyproject.toml)
+    #   django-cloudinary-storage
 six==1.17.0
-    # via python-dateutil
+    # via
+    #   cloudinary
+    #   python-dateutil
 sqlparse==0.5.5
     # via django
 urllib3==2.6.3
-    # via requests
+    # via
+    #   cloudinary
+    #   requests
 whitenoise==6.8.2
     # via saltadev-website (pyproject.toml)

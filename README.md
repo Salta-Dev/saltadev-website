@@ -35,6 +35,8 @@
   <a href="#instalación">Instalación</a> •
   <a href="#configuración">Configuración</a> •
   <a href="#arquitectura">Arquitectura</a> •
+  <a href="#despliegue">Despliegue</a> •
+  <a href="#almacenamiento-de-imágenes">Imágenes</a> •
   <a href="#seguridad">Seguridad</a> •
   <a href="#seo">SEO</a> •
   <a href="#desarrollo">Desarrollo</a>
@@ -63,6 +65,7 @@
 | ![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-336791?style=flat-square&logo=postgresql&logoColor=white) | 15+ | Base de datos |
 | ![Redis](https://img.shields.io/badge/-Redis-DC382D?style=flat-square&logo=redis&logoColor=white) | 7+ | Cache y rate limiting |
 | ![Gunicorn](https://img.shields.io/badge/-Gunicorn-499848?style=flat-square&logo=gunicorn&logoColor=white) | 23.0 | WSGI Server |
+| ![Cloudinary](https://img.shields.io/badge/-Cloudinary-3448C5?style=flat-square&logo=cloudinary&logoColor=white) | - | CDN de imágenes |
 
 ### Frontend
 | Tecnología | Descripción |
@@ -74,6 +77,7 @@
 ### DevOps & Herramientas
 | Tecnología | Descripción |
 |------------|-------------|
+| ![Render](https://img.shields.io/badge/-Render-46E3B7?style=flat-square&logo=render&logoColor=white) | Cloud hosting |
 | ![Docker](https://img.shields.io/badge/-Docker-2496ED?style=flat-square&logo=docker&logoColor=white) | Containerización |
 | ![Nginx](https://img.shields.io/badge/-Nginx-269539?style=flat-square&logo=nginx&logoColor=white) | Reverse proxy |
 | ![uv](https://img.shields.io/badge/-uv-DE5FE9?style=flat-square) | Package manager |
@@ -101,6 +105,7 @@ saltadev-website/
 │   ├── users/                  # Modelo de usuario y perfil
 │   ├── dashboard/              # Panel de usuario
 │   ├── events/                 # Eventos
+│   ├── benefits/               # Beneficios para miembros
 │   ├── locations/              # Países y provincias
 │   ├── content/                # Contenido (colaboradores, etc)
 │   ├── code_of_conduct/        # Código de conducta
@@ -108,6 +113,9 @@ saltadev-website/
 │   ├── static/                 # Archivos estáticos
 │   └── templates/              # Templates HTML
 │
+├── deploy/                     # Configuración de despliegue
+│   └── render.yaml             # IaC para Render.com
+├── build.sh                    # Script de build para Render
 ├── tests/                      # Tests con pytest
 ├── docker/                     # Configuración Docker
 ├── nginx/                      # Configuración Nginx
@@ -272,6 +280,76 @@ sequenceDiagram
     PR->>PR: Valida token y actualiza password
     PR->>U: Redirige a login con mensaje de éxito
 ```
+
+## Despliegue
+
+### Render.com (Recomendado)
+
+El proyecto incluye configuración Infrastructure as Code (IaC) para Render.com en `deploy/render.yaml`:
+
+| Servicio | Tipo | Plan | Descripción |
+|----------|------|------|-------------|
+| `saltadev-db` | PostgreSQL | Free | Base de datos |
+| `saltadev-redis` | Redis | Free | Cache y rate limiting |
+| `saltadev-dev` | Web Service | Free | Aplicación Django |
+
+#### Deploy automático
+
+1. Conectar repositorio en [Render Dashboard](https://dashboard.render.com)
+2. Seleccionar "Blueprint" y apuntar a `deploy/render.yaml`
+3. Configurar variables secretas (Cloudinary, Email, reCAPTCHA)
+4. Deploy!
+
+#### Variables de entorno
+
+Las siguientes se generan automáticamente:
+- `DATABASE_URL` - Conexión a PostgreSQL
+- `REDIS_URL` - Conexión a Redis
+- `SECRET_KEY` - Generada automáticamente
+
+Las siguientes requieren configuración manual:
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`
+- `RECAPTCHA_V2_SITE_KEY`, `RECAPTCHA_V2_SECRET`
+
+#### Script de build
+
+El archivo `build.sh` ejecuta durante el deploy:
+```bash
+pip install -r requirements.txt
+python manage.py collectstatic --no-input
+python manage.py migrate
+python manage.py loaddata locations
+```
+
+## Almacenamiento de Imágenes
+
+### Cloudinary CDN
+
+El proyecto usa Cloudinary para almacenar y servir imágenes (avatares, etc.):
+
+| Característica | Detalle |
+|----------------|---------|
+| **CDN Global** | Servido desde edge locations mundiales |
+| **Formato automático** | WebP/AVIF según el navegador |
+| **Calidad automática** | Optimización sin pérdida visible |
+| **Transformaciones on-the-fly** | No consume créditos de transformación |
+
+#### Estrategia de transformaciones
+
+Las imágenes se suben SIN transformación y se procesan on-the-fly via URL:
+
+```
+https://res.cloudinary.com/{cloud}/upload/w_400,h_400,c_fill,g_face,q_auto,f_auto/{path}
+```
+
+Esto evita consumir los 25 créditos/mes del free tier, ya que las transformaciones
+on-the-fly no consumen créditos de transformación.
+
+#### Desarrollo local
+
+Cloudinary es **opcional** en desarrollo. Si no se configuran las credenciales,
+las imágenes se guardan localmente en `media/avatars/`.
 
 ## Seguridad
 
