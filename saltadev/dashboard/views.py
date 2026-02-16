@@ -11,7 +11,12 @@ from django.db.models import Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from users.image_service import delete_local_image, upload_avatar
+from users.image_service import (
+    _is_cloudinary_configured,
+    delete_cloudinary_image,
+    delete_local_image,
+    upload_avatar,
+)
 from users.models import Profile, User
 
 from .forms import ProfileForm
@@ -64,15 +69,20 @@ def profile_edit_view(request: HttpRequest) -> HttpResponse:
             # Handle avatar upload
             avatar_file = form.cleaned_data.get("avatar_file")
             if avatar_file:
-                # Delete old avatar if it exists (local only)
-                if profile.avatar_url and settings.DEBUG:
-                    delete_local_image(profile.avatar_url)
+                # Delete old avatar if it exists
+                if profile.avatar_url:
+                    if _is_cloudinary_configured() and profile.avatar_delete_url:
+                        # avatar_delete_url stores Cloudinary public_id
+                        delete_cloudinary_image(profile.avatar_delete_url)
+                    elif not _is_cloudinary_configured():
+                        delete_local_image(profile.avatar_url)
 
                 # Upload new avatar
                 result = upload_avatar(avatar_file)
                 if result.success:
                     profile.avatar_url = result.url or ""
-                    profile.avatar_delete_url = result.delete_url or ""
+                    # Store public_id for Cloudinary deletion (reusing field)
+                    profile.avatar_delete_url = result.public_id or ""
                 else:
                     messages.error(request, f"Error al subir imagen: {result.error}")
 

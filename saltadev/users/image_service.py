@@ -1,17 +1,22 @@
-"""Image upload service supporting local storage and ImgBB API."""
+"""Image upload service supporting local storage and Cloudinary."""
 
-import base64
 import logging
 import os
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
 
-import requests
+import cloudinary
+import cloudinary.uploader
 from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 
 logger = logging.getLogger(__name__)
+
+# Default transformation string for on-the-fly processing
+# Format: width_height_crop_gravity_quality_format
+# This is applied via URL, not on upload, to avoid consuming transformation credits
+AVATAR_TRANSFORMATION = "w_400,h_400,c_fill,g_face,q_auto,f_auto"
 
 
 @dataclass
@@ -20,12 +25,51 @@ class ImageUploadResult:
 
     success: bool
     url: str | None = None
-    delete_url: str | None = None
+    public_id: str | None = None
     error: str | None = None
 
 
-def _upload_to_imgbb(image_file: UploadedFile) -> ImageUploadResult:
-    """Upload image to ImgBB API.
+def _is_cloudinary_configured() -> bool:
+    """Check if Cloudinary credentials are configured."""
+    cloudinary_settings = getattr(settings, "CLOUDINARY_STORAGE", {})
+    return bool(
+        cloudinary_settings.get("CLOUD_NAME")
+        and cloudinary_settings.get("API_KEY")
+        and cloudinary_settings.get("API_SECRET")
+    )
+
+
+def _configure_cloudinary() -> None:
+    """Configure Cloudinary SDK from Django settings."""
+    cloudinary_settings = settings.CLOUDINARY_STORAGE
+    cloudinary.config(
+        cloud_name=cloudinary_settings["CLOUD_NAME"],
+        api_key=cloudinary_settings["API_KEY"],
+        api_secret=cloudinary_settings["API_SECRET"],
+    )
+
+
+def get_transformed_url(
+    base_url: str, transformation: str = AVATAR_TRANSFORMATION
+) -> str:
+    """Generate Cloudinary URL with on-the-fly transformation.
+
+    Cloudinary caches transformed images in their CDN, so this doesn't
+    consume transformation credits on subsequent requests. The transformation
+    is only processed once on first access.
+
+    Args:
+        base_url: The base Cloudinary URL from upload result.
+        transformation: Cloudinary transformation string (default: AVATAR_TRANSFORMATION).
+
+    Returns:
+        URL with transformation applied.
+    """
+    return base_url.replace("/upload/", f"/upload/{transformation}/")
+
+
+def _upload_to_cloudinary(image_file: UploadedFile) -> ImageUploadResult:
+    """Upload image to Cloudinary.
 
     Args:
         image_file: The uploaded image file.
@@ -33,44 +77,41 @@ def _upload_to_imgbb(image_file: UploadedFile) -> ImageUploadResult:
     Returns:
         ImageUploadResult with URL on success or error message on failure.
     """
-    api_key = getattr(settings, "IMGBB_API_KEY", None)
-    if not api_key:
+    if not _is_cloudinary_configured():
         return ImageUploadResult(
             success=False,
-            error="IMGBB_API_KEY not configured",
+            error="Cloudinary credentials not configured",
         )
 
     try:
-        # Read and encode image as base64
-        image_data = base64.b64encode(image_file.read()).decode("utf-8")
+        _configure_cloudinary()
 
-        # Upload to ImgBB
-        response = requests.post(
-            "https://api.imgbb.com/1/upload",
-            data={
-                "key": api_key,
-                "image": image_data,
-                "name": f"avatar_{uuid.uuid4().hex[:8]}",
-            },
-            timeout=30,
+        # Generate unique public_id for the avatar
+        public_id = f"avatars/avatar_{uuid.uuid4().hex[:12]}"
+
+        # Upload to Cloudinary without transformation on upload
+        # This avoids consuming transformation credits (25/month limit on free tier)
+        # Transformations are applied on-the-fly via URL and cached by Cloudinary CDN
+        result = cloudinary.uploader.upload(
+            image_file,
+            public_id=public_id,
+            folder="saltadev",
+            resource_type="image",
+            overwrite=True,
         )
-        response.raise_for_status()
-        result = response.json()
 
-        if result.get("success"):
-            data = result["data"]
-            return ImageUploadResult(
-                success=True,
-                url=data.get("display_url") or data.get("url"),
-                delete_url=data.get("delete_url"),
-            )
+        # Generate URL with on-the-fly transformation (cached by CDN)
+        base_url = result.get("secure_url")
+        transformed_url = get_transformed_url(base_url) if base_url else None
+
         return ImageUploadResult(
-            success=False,
-            error=result.get("error", {}).get("message", "Unknown error"),
+            success=True,
+            url=transformed_url,
+            public_id=result.get("public_id"),
         )
 
-    except requests.RequestException as e:
-        logger.error("ImgBB upload failed: %s", e)
+    except cloudinary.exceptions.Error as e:
+        logger.error("Cloudinary upload failed: %s", e)
         return ImageUploadResult(
             success=False,
             error=f"Upload failed: {e}",
@@ -120,7 +161,7 @@ def _upload_locally(image_file: UploadedFile) -> ImageUploadResult:
 def upload_avatar(image_file: UploadedFile) -> ImageUploadResult:
     """Upload avatar image using appropriate method based on environment.
 
-    In DEBUG mode, saves locally. Otherwise, uploads to ImgBB.
+    Uses Cloudinary if configured, otherwise saves locally.
 
     Args:
         image_file: The uploaded image file.
@@ -128,28 +169,29 @@ def upload_avatar(image_file: UploadedFile) -> ImageUploadResult:
     Returns:
         ImageUploadResult with URL on success or error on failure.
     """
-    if settings.DEBUG:
-        return _upload_locally(image_file)
-    return _upload_to_imgbb(image_file)
+    if _is_cloudinary_configured():
+        return _upload_to_cloudinary(image_file)
+    return _upload_locally(image_file)
 
 
-def delete_imgbb_image(delete_url: str) -> bool:
-    """Delete an image from ImgBB using its delete URL.
+def delete_cloudinary_image(public_id: str) -> bool:
+    """Delete an image from Cloudinary using its public_id.
 
     Args:
-        delete_url: The delete URL provided by ImgBB.
+        public_id: The public_id of the image in Cloudinary.
 
     Returns:
         True if deletion was successful, False otherwise.
     """
-    if not delete_url:
+    if not public_id or not _is_cloudinary_configured():
         return False
 
     try:
-        response = requests.get(delete_url, timeout=10)
-        return response.status_code == 200
-    except requests.RequestException as e:
-        logger.error("ImgBB delete failed: %s", e)
+        _configure_cloudinary()
+        result = cloudinary.uploader.destroy(public_id)
+        return result.get("result") == "ok"
+    except cloudinary.exceptions.Error as e:
+        logger.error("Cloudinary delete failed: %s", e)
         return False
 
 
