@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "SaltaDev website"
 requires-python = ">=3.12"
 dependencies = [
+  "dj-database-url>=2.3.0",
   "Django==5.2.11",
   "django-axes==8.3.1",
   "django-recaptcha==4.1.0",
