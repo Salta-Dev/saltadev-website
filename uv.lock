@@ -752,6 +752,7 @@ dependencies = [
     { name = "python-dateutil" },
     { name = "python-dotenv" },
     { name = "redis" },
+    { name = "requests" },
     { name = "whitenoise" },
 ]
 
@@ -796,6 +797,7 @@ requires-dist = [
     { name = "python-dateutil", specifier = "==2.9.0.post0" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "redis", specifier = "==5.2.1" },
+    { name = "requests", specifier = ">=2.32.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.15.1" },
     { name = "types-python-dateutil", marker = "extra == 'dev'", specifier = "==2.9.0.20240906" },
     { name = "types-requests", marker = "extra == 'dev'", specifier = "==2.32.0.20241016" },
