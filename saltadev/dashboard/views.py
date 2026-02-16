@@ -1,9 +1,13 @@
 """Dashboard views for authenticated users."""
 
+from typing import cast
+
+from benefits.models import Benefit
 from content.models import Event
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -16,7 +20,7 @@ from .forms import ProfileForm
 @login_required
 def dashboard_view(request: HttpRequest) -> HttpResponse:
     """Render the user dashboard with profile, membership and upcoming events."""
-    user = request.user
+    user = cast(User, request.user)  # @login_required ensures authenticated user
 
     # Get or create user profile
     profile, _ = Profile.objects.get_or_create(user=user)
@@ -26,6 +30,15 @@ def dashboard_view(request: HttpRequest) -> HttpResponse:
         event_start_date__gte=timezone.now()
     ).order_by("event_start_date")[:5]
 
+    # Get active, non-expired benefits (latest 6)
+    today = timezone.now().date()
+    benefits = (
+        Benefit.objects.filter(is_active=True)
+        .filter(Q(expiration_date__isnull=True) | Q(expiration_date__gte=today))
+        .select_related("creator", "creator__profile")
+        .order_by("-created_at")[:6]
+    )
+
     # Build credential URL for QR code
     credential_url = f"{settings.SITE_URL}/credencial/{user.public_id}/"
 
@@ -33,6 +46,7 @@ def dashboard_view(request: HttpRequest) -> HttpResponse:
         "user": user,
         "profile": profile,
         "upcoming_events": upcoming_events,
+        "benefits": benefits,
         "credential_url": credential_url,
     }
     return render(request, "dashboard/index.html", context)
@@ -41,7 +55,7 @@ def dashboard_view(request: HttpRequest) -> HttpResponse:
 @login_required
 def profile_edit_view(request: HttpRequest) -> HttpResponse:
     """Handle profile editing including avatar upload."""
-    user = request.user
+    user = cast(User, request.user)  # @login_required ensures authenticated user
     profile, _ = Profile.objects.get_or_create(user=user)
 
     if request.method == "POST":

@@ -21,11 +21,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.contrib.sitemaps.views import sitemap
 from django.shortcuts import render
 from django.urls import include, path
+from django.views.generic import TemplateView
+
+from .sitemaps import sitemaps
 
 
-def custom_404(request, exception=None):
+def custom_404(request, exception=None, **kwargs):
     """Custom 404 error handler."""
     return render(request, "404.html", status=404)
 
@@ -34,6 +38,12 @@ handler404 = custom_404
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+        "robots.txt",
+        TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
+        name="robots_txt",
+    ),
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path("", include("home.urls")),
     path("eventos/", include("events.urls")),
     path("reglamento/", include("code_of_conduct.urls")),
@@ -54,6 +64,7 @@ urlpatterns = [
     path("password-reset/", include("password_reset.urls")),
     path("locations/", include("locations.urls")),
     path("dashboard/", include("dashboard.urls")),
+    path("beneficios/", include("benefits.urls")),
     path(
         "credencial/<str:public_id>/", public_credential_view, name="public_credential"
     ),
@@ -64,8 +75,3 @@ if settings.DEBUG:
         settings.STATIC_URL, document_root=settings.BASE_DIR / "static"
     )
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# Catch-all for 404 - must be last
-urlpatterns += [
-    path("<path:path>", custom_404),
-]

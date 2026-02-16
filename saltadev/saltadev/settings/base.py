@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
     "home",
     "events",
     "code_of_conduct",
@@ -34,6 +35,7 @@ INSTALLED_APPS = [
     "locations",
     "password_reset",
     "dashboard",
+    "benefits",
     "django_recaptcha",
     "axes",
 ]

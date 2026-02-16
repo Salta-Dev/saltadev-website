@@ -88,7 +88,8 @@ def _upload_locally(image_file: UploadedFile) -> ImageUploadResult:
     """
     try:
         # Generate unique filename
-        ext = Path(image_file.name).suffix.lower() or ".jpg"
+        file_name: str = image_file.name or "avatar.jpg"
+        ext = Path(file_name).suffix.lower() or ".jpg"
         filename = f"avatar_{uuid.uuid4().hex[:12]}{ext}"
 
         # Ensure avatars directory exists

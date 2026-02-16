@@ -4,6 +4,28 @@
   {% load static %}
   <title>{% block title %}SaltaDev - Comunidad de Desarrolladores{% endblock %}</title>
   {% include "includes/head.html" %}
+
+  {% block meta_description %}
+  <meta name="description" content="Comunidad de desarrolladores, diseniadores y emprendedores en Salta. Eventos, aprendizaje y colaboracion para impulsar el talento local.">
+  {% endblock %}
+
+  {% block canonical %}{% endblock %}
+
+  <meta property="og:title" content="{% block og_title %}SaltaDev - Comunidad de Desarrolladores{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Comunidad de desarrolladores, diseniadores y emprendedores en Salta. Eventos, aprendizaje y colaboracion para impulsar el talento local.{% endblock %}">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{% static 'assets/img/seed-latam-salta.jpg' %}{% endblock %}">
+  <meta property="og:locale" content="es_AR">
+  <meta property="og:site_name" content="SaltaDev">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}SaltaDev - Comunidad de Desarrolladores{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Comunidad de desarrolladores, diseniadores y emprendedores en Salta. Eventos, aprendizaje y colaboracion para impulsar el talento local.{% endblock %}">
+  <meta name="twitter:image" content="{% block twitter_image %}{% static 'assets/img/seed-latam-salta.jpg' %}{% endblock %}">
+
+  {% block structured_data %}{% endblock %}
+
   <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
   {% block page_css %}{% endblock %}
 </head>
