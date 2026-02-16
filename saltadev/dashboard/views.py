@@ -1,13 +1,12 @@
 """Dashboard views for authenticated users."""
 
+from content.models import Event
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-
-from content.models import Event
 from users.image_service import delete_local_image, upload_avatar
 from users.models import Profile, User
 

@@ -8,11 +8,13 @@
     existing = null;
   }
   if (!existing) {
-    existing = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : String(Date.now()) + String(Math.random()).slice(2);
+    existing =
+      window.crypto && window.crypto.randomUUID
+        ? window.crypto.randomUUID()
+        : String(Date.now()) + String(Math.random()).slice(2);
     try {
       localStorage.setItem(key, existing);
-    } catch (e) {
-    }
+    } catch (e) {}
   }
   if (existing) {
     var maxAge = 60 * 60 * 24 * 30;

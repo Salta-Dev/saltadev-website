@@ -188,7 +188,13 @@ def login_view(request: HttpRequest) -> HttpResponse:
         user = form.get_user()
         if not user or not user.email_confirmed:
             return _handle_unverified_email(
-                request, form, email_value, ip_address, keys, fingerprint, should_set_cookie
+                request,
+                form,
+                email_value,
+                ip_address,
+                keys,
+                fingerprint,
+                should_set_cookie,
             )
         return _handle_successful_login(
             request, user, ip_address, keys, fingerprint, should_set_cookie

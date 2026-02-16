@@ -54,7 +54,9 @@ urlpatterns = [
     path("password-reset/", include("password_reset.urls")),
     path("locations/", include("locations.urls")),
     path("dashboard/", include("dashboard.urls")),
-    path("credencial/<str:public_id>/", public_credential_view, name="public_credential"),
+    path(
+        "credencial/<str:public_id>/", public_credential_view, name="public_credential"
+    ),
 ]
 
 if settings.DEBUG:

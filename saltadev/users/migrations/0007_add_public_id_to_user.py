@@ -28,7 +28,6 @@ def populate_public_ids(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("users", "0006_add_dni_to_profile"),
     ]

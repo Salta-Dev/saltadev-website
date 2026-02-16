@@ -4,32 +4,34 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0002_codigoverificacion'),
+        ("users", "0002_codigoverificacion"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='emailverificationcode',
-            options={'verbose_name': 'codigo de verificacion', 'verbose_name_plural': 'codigos de verificacion'},
+            name="emailverificationcode",
+            options={
+                "verbose_name": "codigo de verificacion",
+                "verbose_name_plural": "codigos de verificacion",
+            },
         ),
         migrations.AlterModelOptions(
-            name='profile',
-            options={'verbose_name': 'perfil', 'verbose_name_plural': 'perfiles'},
+            name="profile",
+            options={"verbose_name": "perfil", "verbose_name_plural": "perfiles"},
         ),
         migrations.AlterModelOptions(
-            name='user',
-            options={'verbose_name': 'usuario', 'verbose_name_plural': 'usuarios'},
+            name="user",
+            options={"verbose_name": "usuario", "verbose_name_plural": "usuarios"},
         ),
         migrations.AddField(
-            model_name='user',
-            name='country',
-            field=models.CharField(default='Argentina', max_length=100),
+            model_name="user",
+            name="country",
+            field=models.CharField(default="Argentina", max_length=100),
         ),
         migrations.AddField(
-            model_name='user',
-            name='province',
-            field=models.CharField(default='Salta', max_length=100),
+            model_name="user",
+            name="province",
+            field=models.CharField(default="Salta", max_length=100),
         ),
     ]

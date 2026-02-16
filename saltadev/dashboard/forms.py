@@ -1,7 +1,6 @@
 """Forms for the dashboard app."""
 
 from django import forms
-
 from users.models import Profile
 
 

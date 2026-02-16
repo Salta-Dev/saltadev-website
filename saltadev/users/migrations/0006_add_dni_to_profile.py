@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0005_change_avatar_to_url'),
+        ("users", "0005_change_avatar_to_url"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='dni',
-            field=models.CharField(blank=True, max_length=15, verbose_name='DNI'),
+            model_name="profile",
+            name="dni",
+            field=models.CharField(blank=True, max_length=15, verbose_name="DNI"),
         ),
         migrations.AlterField(
-            model_name='profile',
-            name='phone',
-            field=models.CharField(blank=True, max_length=20, verbose_name='teléfono'),
+            model_name="profile",
+            name="phone",
+            field=models.CharField(blank=True, max_length=20, verbose_name="teléfono"),
         ),
     ]
