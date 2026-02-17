@@ -7,8 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from users.image_service import upload_benefit_image
 
-from .forms import BenefitForm
+from .forms import BenefitForm, ImageSourceChoices
 from .models import Benefit
 
 if TYPE_CHECKING:
@@ -121,10 +122,26 @@ def benefit_create(request: HttpRequest) -> HttpResponse:
         return redirect("benefits_list")
 
     if request.method == "POST":
-        form = BenefitForm(request.POST)
+        form = BenefitForm(request.POST, request.FILES)
         if form.is_valid():
             benefit = form.save(commit=False)
             benefit.creator = user
+
+            # Handle image upload if file was provided
+            image_source = form.cleaned_data.get("image_source")
+            image_file = form.cleaned_data.get("image_file")
+
+            if image_source == ImageSourceChoices.FILE and image_file:
+                result = upload_benefit_image(image_file)
+                if result.success and result.url:
+                    benefit.image = result.url
+                else:
+                    messages.warning(
+                        request,
+                        f"No se pudo subir la imagen: {result.error}. "
+                        "El beneficio se creó sin imagen.",
+                    )
+
             benefit.save()
             messages.success(request, "Beneficio creado exitosamente.")
             return redirect("benefit_detail", pk=benefit.pk)
@@ -149,9 +166,26 @@ def benefit_edit(request: HttpRequest, pk: int) -> HttpResponse:
         return redirect("benefit_detail", pk=pk)
 
     if request.method == "POST":
-        form = BenefitForm(request.POST, instance=benefit)
+        form = BenefitForm(request.POST, request.FILES, instance=benefit)
         if form.is_valid():
-            form.save()
+            updated_benefit = form.save(commit=False)
+
+            # Handle image upload if file was provided
+            image_source = form.cleaned_data.get("image_source")
+            image_file = form.cleaned_data.get("image_file")
+
+            if image_source == ImageSourceChoices.FILE and image_file:
+                result = upload_benefit_image(image_file)
+                if result.success and result.url:
+                    updated_benefit.image = result.url
+                else:
+                    messages.warning(
+                        request,
+                        f"No se pudo subir la imagen: {result.error}. "
+                        "Se mantuvo la imagen anterior.",
+                    )
+
+            updated_benefit.save()
             messages.success(request, "Beneficio actualizado exitosamente.")
             return redirect("benefit_detail", pk=benefit.pk)
     else:

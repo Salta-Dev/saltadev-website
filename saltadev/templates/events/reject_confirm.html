@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaltaDev - Rechazar Evento</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex overflow-x-hidden selection:bg-primary selection:text-white font-display">
+
+  {% include "dashboard/includes/sidebar.html" %}
+  {% include "dashboard/includes/mobile_menu.html" %}
+
+  <main class="flex-1 lg:ml-72 flex flex-col min-h-screen overflow-y-auto relative bg-background-dark">
+
+    <div class="flex-1 flex items-center justify-center p-4">
+      <div class="w-full max-w-md">
+        <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6 text-center">
+          <div class="w-16 h-16 mx-auto rounded-full bg-red-600/20 flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-3xl text-red-400">cancel</span>
+          </div>
+
+          <h2 class="text-xl font-bold text-white mb-2">Rechazar Evento</h2>
+          <p class="text-[#8e8584] text-sm mb-6">
+            ¿Estás seguro de que querés rechazar el evento <strong class="text-white">"{{ event.title }}"</strong>? El creador será notificado.
+          </p>
+
+          <div class="flex gap-3 justify-center">
+            <a href="{% url 'pending_events' %}" class="px-6 py-3 rounded-xl bg-[#2a2424] hover:bg-[#3d3434] text-white text-sm font-bold transition-all border border-[#3d2f2f]">
+              Cancelar
+            </a>
+            <form action="{% url 'event_reject' pk=event.pk %}" method="post" class="inline">
+              {% csrf_token %}
+              <button type="submit" class="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold transition-all">
+                Rechazar
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>
