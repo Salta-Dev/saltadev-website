@@ -16,7 +16,7 @@
     <div class="text-center lg:text-left">
       <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Bienvenido</h2>
       <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-        Inicia sesión para continuar tu viaje de desarrollo.
+        Inicia sesión para continuar.
       </p>
     </div>
 
@@ -72,7 +72,7 @@
               autocomplete="email"
               placeholder="nombre@ejemplo.com"
               value="{{ form.username.value|default_if_none:'' }}"
-              class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6"
+              class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary focus:outline-none dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6"
               required
               {% if blocked_message %}disabled{% endif %}
             />
@@ -90,16 +90,30 @@
               id="id_password"
               autocomplete="current-password"
               placeholder="••••••••"
-              class="block w-full rounded-lg border-0 py-3 pl-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6"
+              class="block w-full rounded-lg border-0 py-3 pl-10 pr-10 text-slate-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary focus:outline-none dark:bg-surface-dark dark:text-white dark:ring-border-dark dark:placeholder:text-gray-500 sm:text-sm sm:leading-6"
               required
               {% if blocked_message %}disabled{% endif %}
             />
+            <button type="button" data-toggle-password class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer group">
+              <span class="material-symbols-outlined text-gray-400 group-hover:text-gray-300 text-[20px]">visibility</span>
+            </button>
           </div>
         </div>
         <div class="flex items-center justify-between">
           <div class="flex items-center">
-            <input class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-border-dark dark:bg-surface-dark" id="remember-me" name="remember-me" type="checkbox" {% if blocked_message %}disabled{% endif %}/>
-            <label class="ml-2 block text-sm text-gray-900 dark:text-gray-300" for="remember-me">Recordarme</label>
+            <label class="relative inline-flex cursor-pointer">
+              <input
+                type="checkbox"
+                name="remember-me"
+                id="remember-me"
+                class="peer h-4 w-4 cursor-pointer appearance-none rounded border border-border-dark bg-surface-dark transition-all checked:border-primary checked:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50"
+                {% if blocked_message %}disabled{% endif %}
+              />
+              <svg class="pointer-events-none absolute left-0 top-0 h-4 w-4 scale-0 p-0.5 text-white transition-transform peer-checked:scale-100" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 6l3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </label>
+            <label class="ml-2 block cursor-pointer text-sm text-gray-900 dark:text-gray-300" for="remember-me">Recordarme</label>
           </div>
           <div class="text-sm">
             <a class="font-medium text-primary hover:text-primary-hover hover:underline" href="/password-reset/">¿Olvidaste tu contraseña?</a>
@@ -148,4 +162,22 @@
     </p>
   </div>
 </div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+document.querySelectorAll('[data-toggle-password]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = btn.closest('.relative').querySelector('input');
+    const icon = btn.querySelector('.material-symbols-outlined');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.textContent = 'visibility_off';
+    } else {
+      input.type = 'password';
+      icon.textContent = 'visibility';
+    }
+  });
+});
+</script>
 {% endblock %}

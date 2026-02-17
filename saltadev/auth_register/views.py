@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from saltadev.logging import get_logger
@@ -49,7 +51,7 @@ def register_view(request: HttpRequest) -> HttpResponse:
                 "Register success",
                 extra={"ip": ip_address, "user_id": user.pk},
             )
-            response = redirect(f"/verificar/?email={user.email}")
+            response = redirect(f"/verificar/?{urlencode({'email': user.email})}")
             return attach_fingerprint_cookie(response, fingerprint, should_set_cookie)
         increment(keys)
         logger.info(

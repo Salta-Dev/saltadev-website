@@ -1,3 +1,5 @@
+"""Django app configuration for auth_register app."""
+
 from django.apps import AppConfig
 
 

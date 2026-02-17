@@ -1,3 +1,5 @@
+"""Django app configuration for home app."""
+
 from django.apps import AppConfig
 
 

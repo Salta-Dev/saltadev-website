@@ -1,3 +1,5 @@
+"""Django app configuration for password_reset app."""
+
 from django.apps import AppConfig
 
 

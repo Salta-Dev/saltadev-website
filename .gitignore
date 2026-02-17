@@ -234,8 +234,13 @@ saltadev/static/css/tailwind.css
 # Backups
 backups/
 *.sql.gz
-sonar-project.properties
+
+# SonarQube
 .scannerwork/
+
+# Security scan reports
+bandit-report.json
+semgrep-report.json
 
 # Claude Code
 .claude/

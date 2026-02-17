@@ -1,3 +1,5 @@
+"""Rate limiting utilities for authentication views."""
+
 import uuid
 from collections.abc import Iterable
 from datetime import timedelta
