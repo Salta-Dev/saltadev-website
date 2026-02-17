@@ -16,7 +16,7 @@ services:
     name: saltadev-website
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "source $HOME/.local/bin/env && cd saltadev && uv run gunicorn saltadev.wsgi:application"
+    startCommand: "cd saltadev && ../.venv/bin/gunicorn saltadev.wsgi:application"
     envVars:
       # Database and cache
       - key: DATABASE_URL
