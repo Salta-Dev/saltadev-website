@@ -39,7 +39,7 @@ class TestLoginView:
             },
         )
         assert response.status_code == 302
-        assert response.url == reverse("home")
+        assert response.url == reverse("dashboard")
 
     @pytest.mark.django_db
     def test_login_with_unverified_user_fails(self, client, unverified_user, user_data):
@@ -171,15 +171,22 @@ class TestVerifyEmailView:
     """Tests for verify_email view."""
 
     @pytest.mark.django_db
-    def test_verify_get_returns_200(self, client):
-        """Verify page GET should return 200."""
+    def test_verify_get_without_email_redirects(self, client):
+        """Verify page GET without email should redirect to login."""
         response = client.get(reverse("verify_email"))
+        assert response.status_code == 302
+        assert response.url == reverse("login")
+
+    @pytest.mark.django_db
+    def test_verify_get_with_valid_email_returns_200(self, client, unverified_user):
+        """Verify page GET with valid unverified email should return 200."""
+        response = client.get(reverse("verify_email") + f"?email={unverified_user.email}")
         assert response.status_code == 200
 
     @pytest.mark.django_db
-    def test_verify_uses_correct_template(self, client):
+    def test_verify_uses_correct_template(self, client, unverified_user):
         """Verify page should use users/verificar.html template."""
-        response = client.get(reverse("verify_email"))
+        response = client.get(reverse("verify_email") + f"?email={unverified_user.email}")
         assert "users/verificar.html" in [t.name for t in response.templates]
 
     @pytest.mark.django_db
@@ -199,7 +206,7 @@ class TestVerifyEmailView:
             },
         )
         assert response.status_code == 302
-        assert response.url == reverse("home")
+        assert response.url == reverse("dashboard")
         unverified_user.refresh_from_db()
         assert unverified_user.email_confirmed is True
 
@@ -232,21 +239,25 @@ class TestVerifyEmailView:
     @pytest.mark.django_db
     @patch("users.utils.send_mail")
     def test_resend_verification_code(self, mock_send_mail, client, unverified_user):
-        """Should resend verification code."""
-        response = client.get(
-            reverse("verify_email") + f"?email={unverified_user.email}&reenviar=1"
+        """Should resend verification code via POST."""
+        response = client.post(
+            reverse("verify_email"),
+            {"email": unverified_user.email, "action": "resend"},
         )
         assert response.status_code == 302
         mock_send_mail.assert_called_once()
 
     @pytest.mark.django_db
-    def test_resend_for_already_verified_user(self, client, verified_user):
+    @patch("users.utils.send_mail")
+    def test_resend_for_already_verified_user(self, mock_send_mail, client, verified_user):
         """Should show error for already verified user."""
-        response = client.get(
-            reverse("verify_email") + f"?email={verified_user.email}&reenviar=1",
+        response = client.post(
+            reverse("verify_email"),
+            {"email": verified_user.email, "action": "resend"},
             follow=True,
         )
         assert response.status_code == 200
+        mock_send_mail.assert_not_called()
 
     @pytest.mark.django_db
     def test_verify_blocked_when_rate_limited(self, client, block_rate_limit, user):
@@ -288,3 +299,38 @@ class TestClearRateLimitsView:
         response = client.get(reverse("clear_rate_limits") + "?ip=192.168.1.1")
         assert response.status_code == 302
         assert response.url == reverse("home")
+
+
+class TestLogoutView:
+    """Tests for logout view."""
+
+    @pytest.mark.django_db
+    def test_logout_get_returns_200(self, client, verified_user):
+        """Logout page GET should return 200."""
+        client.force_login(verified_user)
+        response = client.get(reverse("logout"))
+        assert response.status_code == 200
+
+    @pytest.mark.django_db
+    def test_logout_uses_correct_template(self, client, verified_user):
+        """Logout page should use auth_login/logout.html template."""
+        client.force_login(verified_user)
+        response = client.get(reverse("logout"))
+        assert "auth_login/logout.html" in [t.name for t in response.templates]
+
+    @pytest.mark.django_db
+    def test_logout_post_logs_out_user(self, client, verified_user):
+        """POST to logout should log out the user and redirect to home."""
+        client.force_login(verified_user)
+        response = client.post(reverse("logout"))
+        assert response.status_code == 302
+        assert response.url == reverse("home")
+        # Verify user is logged out
+        response = client.get(reverse("dashboard"))
+        assert response.status_code == 302  # Redirect to login
+
+    @pytest.mark.django_db
+    def test_logout_get_without_login(self, client):
+        """Logout page should be accessible even without being logged in."""
+        response = client.get(reverse("logout"))
+        assert response.status_code == 200
