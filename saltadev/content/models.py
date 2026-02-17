@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 
-from cloudinary.models import CloudinaryField
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -105,11 +104,11 @@ class Collaborator(models.Model):
         verbose_name="imagen (URL)",
         help_text="URL externa de la imagen",
     )
-    image_file = CloudinaryField(
-        "imagen",
+    image_file = models.ImageField(
+        upload_to="collaborators/",
         blank=True,
         null=True,
-        folder="collaborators",
+        verbose_name="imagen",
         help_text="Subir imagen desde tu computadora",
     )
     link = models.URLField(blank=True, verbose_name="sitio web")
@@ -148,11 +147,11 @@ class StaffProfile(models.Model):
         verbose_name="foto (URL)",
         help_text="URL externa de la imagen",
     )
-    photo_file = CloudinaryField(
-        "foto",
+    photo_file = models.ImageField(
+        upload_to="staff/",
         blank=True,
         null=True,
-        folder="staff",
+        verbose_name="foto",
         help_text="Subir imagen desde tu computadora",
     )
     linkedin = models.URLField(blank=True, verbose_name="LinkedIn")
