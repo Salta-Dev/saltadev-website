@@ -292,13 +292,15 @@ sequenceDiagram
 
 ### Render.com (Recomendado)
 
-El proyecto incluye configuración Infrastructure as Code (IaC) para Render.com en `deploy/render.yaml`:
+El proyecto incluye configuración Infrastructure as Code (IaC) para Render.com en `deploy/render.yaml`.
+
+Ver [deploy/RENDER.md](deploy/RENDER.md) para la guía completa de despliegue.
 
 | Servicio | Tipo | Plan | Descripción |
 |----------|------|------|-------------|
 | `saltadev-db` | PostgreSQL | Free | Base de datos |
 | `saltadev-redis` | Redis | Free | Cache y rate limiting |
-| `saltadev-dev` | Web Service | Free | Aplicación Django |
+| `saltadev-website` | Web Service | Free | Aplicación Django |
 
 #### Deploy automático
 
@@ -316,8 +318,9 @@ Las siguientes se generan automáticamente:
 
 Las siguientes requieren configuración manual:
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
-- `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`
+- `RESEND_API_KEY`, `DEFAULT_FROM_EMAIL`
 - `RECAPTCHA_V2_SITE_KEY`, `RECAPTCHA_V2_SECRET`
+- `SITE_URL`
 
 #### Script de build
 

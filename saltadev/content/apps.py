@@ -1,3 +1,5 @@
+"""Django app configuration for content app."""
+
 from django.apps import AppConfig
 
 

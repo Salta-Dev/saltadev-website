@@ -895,7 +895,7 @@ requires-dist = [
     { name = "django-recaptcha", specifier = "==4.1.0" },
     { name = "django-stubs", marker = "extra == 'dev'", specifier = "==5.2.9" },
     { name = "django-stubs-ext", marker = "extra == 'dev'", specifier = "==5.2.9" },
-    { name = "django-tailwind-cli", specifier = ">=2.16.0" },
+    { name = "django-tailwind-cli", specifier = ">=4.5.0" },
     { name = "gunicorn", specifier = "==23.0.0" },
     { name = "loguru", specifier = "==0.7.2" },
     { name = "mypy", marker = "extra == 'dev'", specifier = "==1.11.2" },

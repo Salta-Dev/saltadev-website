@@ -3,6 +3,7 @@ import string
 from datetime import date
 from typing import Any, ClassVar, cast
 
+from django.contrib.auth import password_validation
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -45,6 +46,8 @@ class UserManager(BaseUserManager):
                 **extra_fields,
             ),
         )
+        if password:
+            password_validation.validate_password(password, user)
         user.set_password(password)
         user.save(using=self._db)
         return user

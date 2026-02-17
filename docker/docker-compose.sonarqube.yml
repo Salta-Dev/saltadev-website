@@ -1,0 +1,60 @@
+# SonarQube and SAST Security Analysis Stack
+# Usage:
+#   docker compose -f docker/docker-compose.sonarqube.yml up -d sonarqube
+#   docker compose -f docker/docker-compose.sonarqube.yml --profile scan run --rm sonar-scanner
+#   docker compose -f docker/docker-compose.sonarqube.yml --profile scan run --rm semgrep
+
+services:
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: saltadev-sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    networks:
+      - sonar-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/api/system/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  sonar-scanner:
+    image: sonarsource/sonar-scanner-cli:latest
+    container_name: saltadev-scanner
+    depends_on:
+      sonarqube:
+        condition: service_healthy
+    environment:
+      - SONAR_HOST_URL=http://sonarqube:9000
+    volumes:
+      - ../:/usr/src
+    working_dir: /usr/src
+    networks:
+      - sonar-network
+    profiles:
+      - scan
+
+  semgrep:
+    image: semgrep/semgrep:latest
+    container_name: saltadev-semgrep
+    volumes:
+      - ../:/src
+    working_dir: /src
+    profiles:
+      - scan
+    command: semgrep scan --config=auto --json --output=/src/semgrep-report.json saltadev/
+
+volumes:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
+
+networks:
+  sonar-network:
+    driver: bridge

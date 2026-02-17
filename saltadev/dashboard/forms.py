@@ -70,6 +70,12 @@ class ProfileForm(forms.ModelForm):
             if match:
                 value = match.group(1)
 
+        # Validate username length
+        if len(value) > 50:
+            raise forms.ValidationError(
+                f"El nombre de usuario de {platform} es demasiado largo."
+            )
+
         return value
 
     def clean_github(self) -> str:

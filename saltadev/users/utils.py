@@ -1,6 +1,7 @@
 import hashlib
 import secrets
 from datetime import timedelta
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -32,7 +33,7 @@ def send_verification_code(user: User) -> None:
     code = generate_verification_code()
     EmailVerificationCode.objects.create(user=user, code=code)
 
-    verify_url = f"{settings.SITE_URL}/verificar/?email={user.email}"
+    verify_url = f"{settings.SITE_URL}/verificar/?{urlencode({'email': user.email})}"
     html_message = render_to_string(
         "emails/verification.html",
         {
@@ -62,37 +63,39 @@ def send_verification_code(user: User) -> None:
 
 
 def verify_code(user: User, code: str) -> bool:
-    """Validate a verification code and mark the user's email as confirmed."""
-    verifications = EmailVerificationCode.objects.filter(
-        user=user, code=code, used=False
-    ).order_by("-created_at")
-    if not verifications.exists():
+    """Validate a verification code and mark the user's email as confirmed.
+
+    The code must:
+    1. Exist and not be used
+    2. Be the newest code for this user (prevents using old codes)
+    3. Not be expired (24 hour limit)
+    """
+    # Find the code that matches
+    code_record = (
+        EmailVerificationCode.objects.filter(user=user, code=code, used=False)
+        .order_by("-created_at")
+        .first()
+    )
+
+    if code_record is None:
         return False
 
-    last_verification = verifications.first()
-    if last_verification is None:
+    # Check if expired (24 hours)
+    if timezone.now() - code_record.created_at > timedelta(hours=24):
         return False
 
-    newest_verification = (
+    # Check if this is the newest code for this user
+    newest_code = (
         EmailVerificationCode.objects.filter(user=user, used=False)
         .order_by("-created_at")
         .first()
     )
-    if newest_verification is None:
+
+    if newest_code is None or newest_code.pk != code_record.pk:
         return False
 
-    if newest_verification.pk != last_verification.pk:
-        return False
-
-    if timezone.now() - last_verification.created_at > timedelta(hours=24):
-        return False
-
-    EmailVerificationCode.objects.filter(user=user, used=False).exclude(
-        pk=last_verification.pk
-    ).update(used=True)
-
-    last_verification.used = True
-    last_verification.save()
+    # All checks passed - mark ALL codes as used and confirm email
+    EmailVerificationCode.objects.filter(user=user, used=False).update(used=True)
 
     user.email_confirmed = True
     user.save()

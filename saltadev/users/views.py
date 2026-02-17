@@ -1,5 +1,7 @@
 """Email verification views with rate limiting."""
 
+from urllib.parse import urlencode
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.core.exceptions import ObjectDoesNotExist
@@ -82,7 +84,7 @@ def _handle_resend_request(
     except ObjectDoesNotExist:
         messages.error(request, "No existe una cuenta con ese email.")
 
-    response = redirect(f"/verificar/?email={email}")
+    response = redirect(f"/verificar/?{urlencode({'email': email})}")
     return attach_fingerprint_cookie(response, fingerprint, should_set_cookie)
 
 

@@ -15,12 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from auth_login.views import logout_view
 from content import redirects as content_redirects
 from dashboard.views import public_credential_view
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 from django.contrib.sitemaps.views import sitemap
 from django.shortcuts import render
 from django.urls import include, path
@@ -48,11 +48,7 @@ urlpatterns = [
     path("eventos/", include("events.urls")),
     path("reglamento/", include("code_of_conduct.urls")),
     path("login/", include("auth_login.urls")),
-    path(
-        "logout/",
-        auth_views.LogoutView.as_view(next_page="/", http_method_names=["get", "post"]),
-        name="logout",
-    ),
+    path("logout/", logout_view, name="logout"),
     path("register/", include("auth_register.urls")),
     path("verificar/", include("users.urls")),
     path("discord/", content_redirects.redirect_discord, name="redirect_discord"),

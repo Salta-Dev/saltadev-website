@@ -7,7 +7,7 @@ Deployed on Render.com.
 
 import os
 
-import dj_database_url  # type: ignore[import-not-found]
+import dj_database_url
 
 from .base import *  # noqa: F403
 

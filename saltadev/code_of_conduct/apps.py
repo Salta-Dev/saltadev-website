@@ -1,3 +1,5 @@
+"""Django app configuration for code_of_conduct app."""
+
 from django.apps import AppConfig
 
 

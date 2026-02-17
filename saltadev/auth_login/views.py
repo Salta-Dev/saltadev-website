@@ -1,6 +1,6 @@
-"""Login view with rate limiting and email verification."""
+"""Login and logout views with rate limiting and email verification."""
 
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -200,3 +200,15 @@ def login_view(request: HttpRequest) -> HttpResponse:
     return _render_login_form(
         request, form, email_not_verified, email_value, fingerprint, should_set_cookie
     )
+
+
+def logout_view(request: HttpRequest) -> HttpResponse:
+    """Handle user logout with confirmation page.
+
+    GET: Display logout confirmation page.
+    POST: Log out the user and redirect to home.
+    """
+    if request.method == "POST":
+        logout(request)
+        return redirect("home")
+    return render(request, "auth_login/logout.html")

@@ -75,12 +75,25 @@ class RegisterForm(UserCreationForm):
         if not self.data:
             self.fields["province"].initial = 1
 
-    def clean_birth_date(self):
-        """Validate minimum age of 13 years."""
+    def clean_birth_date(self) -> date:
+        """Validate birth date is valid and user is at least 13 years old."""
         birth_date = self.cleaned_data.get("birth_date")
         if not birth_date:
-            return birth_date
-        age = relativedelta(date.today(), birth_date).years
+            raise forms.ValidationError("La fecha de nacimiento es obligatoria.")
+
+        today = date.today()
+
+        # No future dates
+        if birth_date > today:
+            raise forms.ValidationError("La fecha de nacimiento no puede ser futura.")
+
+        # Reasonable age limit (150 years)
+        min_date = today.replace(year=today.year - 150)
+        if birth_date < min_date:
+            raise forms.ValidationError("Por favor ingresá una fecha válida.")
+
+        # Minimum age (13 years)
+        age = relativedelta(today, birth_date).years
         if age < 13:
             raise forms.ValidationError(
                 "Debes tener al menos 13 años para registrarte."
@@ -101,9 +114,12 @@ class RegisterForm(UserCreationForm):
             raise forms.ValidationError("El apellido es requerido.")
         return last_name
 
-    def clean_email(self):
+    def clean_email(self) -> str:
         """Validate email is not already registered and not disposable."""
         email = self.cleaned_data.get("email")
+
+        if not email:
+            raise forms.ValidationError("El email es requerido.")
 
         # Check disposable email first
         validate_not_disposable_email(email)

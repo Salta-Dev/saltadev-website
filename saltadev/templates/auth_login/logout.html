@@ -1,0 +1,40 @@
+{% extends "auth/base_auth.html" %}
+{% load static %}
+
+{% block title %}SaltaDev - Cerrar sesión{% endblock %}
+
+{% block left_panel_class %}relative hidden lg:flex lg:w-1/2 flex-col justify-between overflow-hidden poncho-pattern group/design-root{% endblock %}
+
+{% block brand_icon %}
+  {% include "includes/auth_brand_logo.html" %}
+{% endblock %}
+
+{% block form %}
+<div class="flex w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark p-6 lg:w-1/2">
+  <div class="w-full max-w-md space-y-8">
+    {% include "includes/auth_mobile_logo.html" %}
+    <div class="text-center lg:text-left">
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Cerrar sesión</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        ¿Estás seguro que querés cerrar sesión?
+      </p>
+    </div>
+
+    <form class="mt-8 space-y-6" method="post">
+      {% csrf_token %}
+      <div class="space-y-4">
+        <button class="flex w-full justify-center rounded-lg bg-primary px-3 py-3.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-200" type="submit">
+          Cerrar sesión
+        </button>
+        <a href="{% url 'dashboard' %}" class="flex w-full justify-center rounded-lg bg-transparent px-3 py-3.5 text-sm font-semibold leading-6 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-border-dark hover:bg-gray-50 dark:hover:bg-surface-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-200">
+          Cancelar
+        </a>
+      </div>
+    </form>
+
+    <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+      <a class="font-semibold leading-6 text-primary hover:text-primary-hover hover:underline" href="{% url 'home' %}">Volver al inicio</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

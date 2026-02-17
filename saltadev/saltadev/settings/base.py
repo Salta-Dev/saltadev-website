@@ -177,3 +177,7 @@ CLOUDINARY_STORAGE = {
 }
 
 SILENCED_SYSTEM_CHECKS = ["django_recaptcha.recaptcha_test_key_error"]
+
+# Tailwind CSS CLI configuration
+TAILWIND_CLI_SRC_CSS = "static/css/source.css"
+TAILWIND_CLI_DIST_CSS = "css/tailwind.css"
