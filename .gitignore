@@ -227,6 +227,10 @@ certbot/
 saltadev/staticfiles/
 saltadev/media
 
+# Tailwind CLI (downloaded binary and compiled output)
+.django_tailwind_cli/
+saltadev/static/css/tailwind.css
+
 # Backups
 backups/
 *.sql.gz

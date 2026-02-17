@@ -1,27 +1,43 @@
+# Development server with gunicorn
+# Usage: docker compose -f docker/docker-compose.dev.yml up
+
 services:
   web:
     build:
-      context: .
-      dockerfile: Dockerfile.dev
-    ports:
-      - "8000:8000"
-    env_file:
-      - saltadev/.env.development
+      context: ..
+      dockerfile: docker/Dockerfile
     environment:
       - DJANGO_SETTINGS_MODULE=saltadev.settings.development
+      - LOAD_FIXTURES=true
+    env_file:
+      - ../saltadev/.env.development
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
+    command: uv run gunicorn saltadev.wsgi:application --bind 0.0.0.0:8000 --workers 2 --chdir saltadev
 
   db:
     image: postgres:16-alpine
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
     env_file:
-      - saltadev/.env.development
+      - ../saltadev/.env.development
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_dev_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -32,10 +48,11 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - web
     restart: unless-stopped
 
 volumes:
   postgres_dev_data:
+  redis_dev_data:

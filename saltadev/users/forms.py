@@ -12,6 +12,7 @@ from django_recaptcha.widgets import ReCaptchaV2Checkbox
 from locations.models import Country, Province
 
 from .models import Profile, User
+from .validators import validate_not_disposable_email
 
 
 def create_recaptcha_field() -> ReCaptchaField:
@@ -101,8 +102,12 @@ class RegisterForm(UserCreationForm):
         return last_name
 
     def clean_email(self):
-        """Validate email is not already registered."""
+        """Validate email is not already registered and not disposable."""
         email = self.cleaned_data.get("email")
+
+        # Check disposable email first
+        validate_not_disposable_email(email)
+
         existing_user = User.objects.filter(email=email).first()
         if existing_user:
             if existing_user.email_confirmed:

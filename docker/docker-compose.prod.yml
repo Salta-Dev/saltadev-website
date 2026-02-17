@@ -1,25 +1,30 @@
+# Production server with SSL and optimized settings
+# Usage: docker compose -f docker/docker-compose.prod.yml up
+
 services:
   web:
     build:
-      context: .
-      dockerfile: Dockerfile.prod
-    env_file:
-      - saltadev/.env.production
+      context: ..
+      dockerfile: docker/Dockerfile
+    user: appuser
     environment:
       - DJANGO_SETTINGS_MODULE=saltadev.settings.production
+    env_file:
+      - ../saltadev/.env.production
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
     restart: unless-stopped
+    command: uv run gunicorn saltadev.wsgi:application --bind 0.0.0.0:8000 --workers 4 --chdir saltadev
 
   db:
     image: postgres:16-alpine
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     env_file:
-      - saltadev/.env.production
+      - ../saltadev/.env.production
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -44,9 +49,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/production.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot:ro
+      - ../nginx/production.conf:/etc/nginx/conf.d/default.conf:ro
+      - certbot_conf:/etc/letsencrypt:ro
+      - certbot_www:/var/www/certbot:ro
     depends_on:
       - web
     restart: unless-stopped
@@ -54,9 +59,11 @@ services:
   certbot:
     image: certbot/certbot
     volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
 
 volumes:
   postgres_prod_data:
   redis_prod_data:
+  certbot_conf:
+  certbot_www:

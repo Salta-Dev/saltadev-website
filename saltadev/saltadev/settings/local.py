@@ -1,11 +1,14 @@
 """
 Local development settings.
 
-Uses SQLite, DEBUG=True, relaxed security.
+Uses DATABASE_URL (PostgreSQL via Docker), DEBUG=True, relaxed security.
+Falls back to SQLite if DATABASE_URL is not set.
 """
 
+import os
 from pathlib import Path
 
+import dj_database_url  # type: ignore[import-not-found]
 from dotenv import load_dotenv
 
 # Load environment variables BEFORE importing base settings
@@ -18,7 +21,7 @@ DEBUG = True
 
 SECRET_KEY = "django-insecure-local-development-key-do-not-use-in-production"  # pragma: allowlist secret
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".ngrok-free.app", ".ngrok.io"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", ".ngrok-free.app", ".ngrok.io"]  # nosec B104
 
 # Allow ngrok for CSRF (needed for form submissions)
 CSRF_TRUSTED_ORIGINS = [
@@ -26,12 +29,36 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.ngrok.io",
 ]
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",  # noqa: F405
+# Database: use DATABASE_URL if set, otherwise SQLite for quick runs without Docker
+if os.getenv("DATABASE_URL"):
+    DATABASES = {
+        "default": dj_database_url.config(
+            default="postgresql://saltadev:saltadev@localhost:5432/saltadev_local",  # pragma: allowlist secret
+            conn_max_age=600,
+        )
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",  # noqa: F405
+        }
+    }
+
+# Cache: use Redis if REDIS_URL is available, otherwise LocMem
+if os.getenv("REDIS_URL"):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": os.environ["REDIS_URL"],
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
 
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # Uncomment above to print emails to console instead of sending them

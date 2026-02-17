@@ -68,11 +68,11 @@
 | ![Cloudinary](https://img.shields.io/badge/-Cloudinary-3448C5?style=flat-square&logo=cloudinary&logoColor=white) | - | CDN de imágenes |
 
 ### Frontend
-| Tecnología | Descripción |
-|------------|-------------|
-| ![TailwindCSS](https://img.shields.io/badge/-TailwindCSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) | Framework CSS utility-first |
-| ![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) | Interactividad |
-| ![HTML5](https://img.shields.io/badge/-HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) | Templates Django |
+| Tecnología | Versión | Descripción |
+|------------|---------|-------------|
+| ![TailwindCSS](https://img.shields.io/badge/-TailwindCSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) | 4.x | CSS compilado via django-tailwind-cli |
+| ![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) | ES6+ | Interactividad |
+| ![HTML5](https://img.shields.io/badge/-HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) | - | Templates Django |
 
 ### DevOps & Herramientas
 | Tecnología | Descripción |
@@ -481,31 +481,70 @@ tests/
 
 ## Docker
 
-### Desarrollo con Docker
+El proyecto usa un **Dockerfile unificado** con docker-compose para cada ambiente.
+
+### Estructura
+
+```
+docker/
+├── Dockerfile                    # Dockerfile unificado (multi-stage)
+├── entrypoint.sh                 # Script de entrada (migraciones, collectstatic)
+├── docker-compose.local.yml      # Desarrollo local con hot reload
+├── docker-compose.dev.yml        # Servidor de desarrollo
+├── docker-compose.staging.yml    # Staging con SSL
+└── docker-compose.prod.yml       # Producción con SSL
+```
+
+### Desarrollo Local
 
 ```bash
-# Construir y ejecutar
-docker-compose up --build
+# Crear archivo .env.local (si no existe)
+cp saltadev/.env.local.example saltadev/.env.local
 
-# Solo construir
-docker-compose build
+# Iniciar todos los servicios (Django + PostgreSQL + Redis)
+docker compose -f docker/docker-compose.local.yml up
 
 # Ejecutar en background
-docker-compose up -d
+docker compose -f docker/docker-compose.local.yml up -d
 
 # Ver logs
-docker-compose logs -f web
+docker compose -f docker/docker-compose.local.yml logs -f web
+
+# Detener servicios
+docker compose -f docker/docker-compose.local.yml down
+
+# Eliminar volúmenes (reset de base de datos)
+docker compose -f docker/docker-compose.local.yml down -v
 ```
 
-### Producción
+El ambiente local incluye:
+- **Hot reload**: los cambios en `saltadev/` se reflejan sin rebuild
+- **Migraciones automáticas**: se ejecutan al iniciar el contenedor
+- **Fixtures**: se cargan automáticamente (locations)
+- **PostgreSQL**: puerto 5432 expuesto para acceso directo
+- **Redis**: puerto 6379 expuesto para acceso directo
+
+### Otros Ambientes
 
 ```bash
-# Build de producción
-docker build -f Dockerfile.prod -t saltadev-website .
+# Development (gunicorn + nginx)
+docker compose -f docker/docker-compose.dev.yml up
 
-# Ejecutar
-docker run -p 8000:8000 --env-file .env.production saltadev-website
+# Staging (gunicorn + nginx + SSL)
+docker compose -f docker/docker-compose.staging.yml up
+
+# Production (gunicorn + nginx + SSL + 4 workers)
+docker compose -f docker/docker-compose.prod.yml up
 ```
+
+### Comparación de Ambientes
+
+| Ambiente | Servidor | Workers | Hot Reload | SSL |
+|----------|----------|---------|------------|-----|
+| local | runserver | 1 | Sí | No |
+| development | gunicorn | 2 | No | No |
+| staging | gunicorn | 2 | No | Sí |
+| production | gunicorn | 4 | No | Sí |
 
 ## API de Credenciales
 

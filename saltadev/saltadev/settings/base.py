@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.sitemaps",
     "cloudinary",
     "cloudinary_storage",
+    "django_tailwind_cli",
     "home",
     "events",
     "code_of_conduct",

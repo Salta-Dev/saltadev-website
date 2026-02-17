@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Material Symbols fix */
+.material-symbols-outlined {
+  line-height: 1 !important;
+}
