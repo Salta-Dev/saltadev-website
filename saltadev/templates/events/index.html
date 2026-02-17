@@ -23,7 +23,7 @@
 {% block content %}
 <main class="pt-24 pb-16">
   <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-    <div id="currentEventDate" style="display: none;">{% if latest_event %}{{ latest_event.event_start_date }}{% endif %}</div>
+    <div id="currentEventDate" style="display: none;">{% if latest_event %}{{ latest_event.event_start_date|date:"c" }}{% endif %}</div>
 
     <section class="py-8 lg:py-14">
       <div class="grid lg:grid-cols-12 gap-10 items-start">
@@ -79,9 +79,8 @@
           <div class="lg:col-span-5">
             <div class="group relative rounded-2xl bg-surface-dark border border-border-dark overflow-hidden shadow-2xl hover:border-primary/50 transition-all duration-300">
               <div class="absolute top-0 right-0 w-36 h-36 bg-primary/20 blur-[70px] rounded-full pointer-events-none"></div>
-              <div class="h-56 bg-cover bg-center relative" style="background-image: url('{% if latest_event.photo|slice:":4" == "http" %}{{ latest_event.photo }}{% else %}{% static latest_event.photo %}{% endif %}');">
+              <div class="h-56 bg-cover bg-center relative" style="background-image: url('{% if latest_event.photo|slice:":4" == "http" %}{{ latest_event.photo }}{% else %}/{{ latest_event.photo }}{% endif %}');">
                 <div class="absolute inset-0 bg-gradient-to-t from-surface-dark via-transparent to-transparent"></div>
-                <div class="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">Featured</div>
               </div>
               <div class="p-6 md:p-7 flex flex-col gap-4">
                 <div class="flex items-center gap-2 text-white text-sm">
@@ -124,11 +123,7 @@
             <article class="group flex flex-col bg-surface-dark border border-border-dark rounded-xl overflow-hidden hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1">
               <div class="relative h-48 overflow-hidden">
                 {% if event.photo %}
-                  {% if event.photo|slice:":4" == "http" %}
-                    <img alt="{{ event.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="{{ event.photo }}">
-                  {% else %}
-                    <img alt="{{ event.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="{% static event.photo %}">
-                  {% endif %}
+                    <img alt="{{ event.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="{% if event.photo|slice:':4' == 'http' %}{{ event.photo }}{% else %}/{{ event.photo }}{% endif %}">
                 {% else %}
                   <img alt="{{ event.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="{% static 'assets/img/seed-latam-salta.jpg' %}">
                 {% endif %}
