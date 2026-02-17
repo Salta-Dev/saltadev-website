@@ -88,6 +88,7 @@
 saltadev-website/
 ├── saltadev/                   # Django project root
 │   ├── manage.py
+│   ├── tailwind.config.js      # Configuración Tailwind CSS
 │   ├── saltadev/               # Django settings package
 │   │   ├── settings/
 │   │   │   ├── base.py         # Configuración base
@@ -111,6 +112,8 @@ saltadev-website/
 │   ├── code_of_conduct/        # Código de conducta
 │   │
 │   ├── static/                 # Archivos estáticos
+│   │   └── css/
+│   │       └── source.css      # CSS fuente para Tailwind
 │   └── templates/              # Templates HTML
 │
 ├── deploy/                     # Configuración de despliegue
@@ -180,9 +183,13 @@ DEBUG=True
 # Base de datos (opcional para local, usa SQLite por defecto)
 DATABASE_URL=postgres://user:pass@localhost:5432/saltadev
 
-# Email
+# Email - Opción 1: SMTP (Gmail)
 EMAIL_HOST_USER=tu_email@gmail.com
 EMAIL_HOST_PASSWORD=tu_app_password
+
+# Email - Opción 2: Resend (requerido en Render.com free tier)
+RESEND_API_KEY=re_xxx
+DEFAULT_FROM_EMAIL=noreply@tudominio.com
 
 # reCAPTCHA v2
 RECAPTCHA_V2_SITE_KEY=tu-site-key
@@ -317,6 +324,7 @@ Las siguientes requieren configuración manual:
 El archivo `build.sh` ejecuta durante el deploy:
 ```bash
 pip install -r requirements.txt
+python manage.py tailwind build
 python manage.py collectstatic --no-input
 python manage.py migrate
 python manage.py loaddata locations
@@ -365,6 +373,7 @@ las imágenes se guardan localmente en `media/avatars/`.
 | **Single-use Tokens** | Tokens de un solo uso para reset de contraseña |
 | **Email Verification** | Verificación obligatoria de email |
 | **No User Enumeration** | Misma respuesta para emails existentes y no existentes |
+| **Disposable Email Block** | Rechaza emails de proveedores temporales (10minutemail, etc.) |
 | **Secure Headers** | Headers de seguridad configurados |
 | **HTTPS Only** | Forzado en producción |
 
@@ -546,6 +555,33 @@ docker compose -f docker/docker-compose.prod.yml up
 | staging | gunicorn | 2 | No | Sí |
 | production | gunicorn | 4 | No | Sí |
 
+## Tailwind CSS
+
+El proyecto usa **django-tailwind-cli** para compilar Tailwind CSS sin necesidad de Node.js.
+
+### Desarrollo Local
+
+```bash
+# Compilar CSS una vez
+cd saltadev
+python manage.py tailwind build
+
+# Watch mode (recompila automáticamente)
+python manage.py tailwind watch
+```
+
+### Docker
+
+El CSS se compila automáticamente al iniciar los containers via `entrypoint.sh`.
+
+### Configuración
+
+| Archivo | Descripción |
+|---------|-------------|
+| `saltadev/tailwind.config.js` | Colores, fuentes, sombras personalizadas |
+| `saltadev/static/css/source.css` | Directivas @tailwind |
+| `saltadev/static/css/tailwind.css` | Output (gitignored) |
+
 ## API de Credenciales
 
 ### Credencial Pública
@@ -568,6 +604,17 @@ Muestra la credencial pública de un usuario. Incluye:
 La credencial se puede descargar como PNG o compartir.
 
 ## Emails
+
+### Proveedores Soportados
+
+| Proveedor | Backend | Cuándo usar |
+|-----------|---------|-------------|
+| **SMTP (Gmail)** | `django.core.mail.backends.smtp.EmailBackend` | Desarrollo local |
+| **Resend** | `anymail.backends.resend.EmailBackend` | Render.com (SMTP bloqueado) |
+
+El sistema detecta automáticamente qué backend usar según `RESEND_API_KEY`:
+- Si está configurado → usa Resend via HTTP API
+- Si no → usa SMTP tradicional
 
 ### Templates de Email
 
