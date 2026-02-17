@@ -105,7 +105,7 @@ class Collaborator(models.Model):
         help_text="URL externa de la imagen",
     )
     image_file = models.ImageField(
-        upload_to="collaborators/",
+        upload_to="partners/",
         blank=True,
         null=True,
         verbose_name="imagen",
