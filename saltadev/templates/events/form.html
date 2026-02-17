@@ -137,13 +137,23 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label for="id_event_start_date" class="block text-sm font-medium text-white mb-2">Fecha y hora de inicio</label>
-              {{ form.event_start_date }}
+              <label for="id_start_date" class="block text-sm font-medium text-white mb-2">Fecha de inicio</label>
+              {{ form.start_date }}
             </div>
 
             <div>
-              <label for="id_event_end_date" class="block text-sm font-medium text-white mb-2">Fecha y hora de fin</label>
-              {{ form.event_end_date }}
+              <label for="id_start_time" class="block text-sm font-medium text-white mb-2">Hora de inicio</label>
+              {{ form.start_time }}
+            </div>
+
+            <div>
+              <label for="id_end_date" class="block text-sm font-medium text-white mb-2">Fecha de fin</label>
+              {{ form.end_date }}
+            </div>
+
+            <div>
+              <label for="id_end_time" class="block text-sm font-medium text-white mb-2">Hora de fin</label>
+              {{ form.end_time }}
             </div>
 
             <div>

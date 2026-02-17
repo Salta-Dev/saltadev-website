@@ -1,5 +1,8 @@
 """Forms for the events app."""
 
+from datetime import datetime
+from typing import Any
+
 from content.models import Event
 from django import forms
 from django.utils.text import slugify
@@ -42,6 +45,46 @@ class EventForm(forms.ModelForm):
         ),
     )
 
+    # Separate date and time fields for better 24h format control
+    start_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(
+            attrs={
+                "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                "type": "date",
+            }
+        ),
+    )
+    start_time = forms.TimeField(
+        required=False,
+        widget=forms.TimeInput(
+            attrs={
+                "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                "type": "time",
+                "step": "60",
+            }
+        ),
+    )
+    end_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(
+            attrs={
+                "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                "type": "date",
+            }
+        ),
+    )
+    end_time = forms.TimeField(
+        required=False,
+        widget=forms.TimeInput(
+            attrs={
+                "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                "type": "time",
+                "step": "60",
+            }
+        ),
+    )
+
     class Meta:
         model = Event
         fields = [
@@ -50,8 +93,6 @@ class EventForm(forms.ModelForm):
             "photo",
             "location",
             "link",
-            "event_start_date",
-            "event_end_date",
             "event_date_display",
             "event_time_display",
         ]
@@ -88,18 +129,6 @@ class EventForm(forms.ModelForm):
                     "placeholder": "https://ejemplo.com/registro",
                 }
             ),
-            "event_start_date": forms.DateTimeInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "type": "datetime-local",
-                }
-            ),
-            "event_end_date": forms.DateTimeInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "type": "datetime-local",
-                }
-            ),
             "event_date_display": forms.TextInput(
                 attrs={
                     "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
@@ -114,6 +143,18 @@ class EventForm(forms.ModelForm):
             ),
         }
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize form and populate separate date/time fields."""
+        super().__init__(*args, **kwargs)
+        instance: Event | None = kwargs.get("instance")
+        if instance:
+            if instance.event_start_date:
+                self.fields["start_date"].initial = instance.event_start_date.date()
+                self.fields["start_time"].initial = instance.event_start_date.time()
+            if instance.event_end_date:
+                self.fields["end_date"].initial = instance.event_end_date.date()
+                self.fields["end_time"].initial = instance.event_end_date.time()
+
     def clean_title(self) -> str:
         """Validate title is provided."""
         title = self.cleaned_data.get("title", "").strip()
@@ -122,14 +163,38 @@ class EventForm(forms.ModelForm):
         return title
 
     def clean(self) -> dict[str, object]:
-        """Validate form data and generate slug."""
+        """Validate form data and combine date/time fields."""
         cleaned_data = super().clean() or {}
 
-        # Validate dates
-        start_date = cleaned_data.get("event_start_date")
-        end_date = cleaned_data.get("event_end_date")
+        # Combine date and time fields into datetime
+        start_date = cleaned_data.get("start_date")
+        start_time = cleaned_data.get("start_time")
+        end_date = cleaned_data.get("end_date")
+        end_time = cleaned_data.get("end_time")
 
-        if start_date and end_date and end_date < start_date:
+        event_start_datetime = None
+        event_end_datetime = None
+
+        if start_date and start_time:
+            event_start_datetime = datetime.combine(start_date, start_time)
+        elif start_date:
+            event_start_datetime = datetime.combine(start_date, datetime.min.time())
+
+        if end_date and end_time:
+            event_end_datetime = datetime.combine(end_date, end_time)
+        elif end_date:
+            event_end_datetime = datetime.combine(end_date, datetime.min.time())
+
+        # Store combined datetime values
+        cleaned_data["event_start_date"] = event_start_datetime
+        cleaned_data["event_end_date"] = event_end_datetime
+
+        # Validate dates
+        if (
+            event_start_datetime
+            and event_end_datetime
+            and event_end_datetime < event_start_datetime
+        ):
             raise forms.ValidationError(
                 "La fecha de fin no puede ser anterior a la fecha de inicio."
             )
@@ -137,8 +202,12 @@ class EventForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit: bool = True) -> Event:
-        """Save the event with auto-generated slug."""
+        """Save the event with auto-generated slug and combined datetime."""
         event = super().save(commit=False)
+
+        # Set datetime fields from cleaned data
+        event.event_start_date = self.cleaned_data.get("event_start_date")
+        event.event_end_date = self.cleaned_data.get("event_end_date")
 
         # Generate slug if not set
         if not event.slug:
