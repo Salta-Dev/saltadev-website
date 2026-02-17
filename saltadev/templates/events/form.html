@@ -157,15 +157,15 @@
             </div>
 
             <div>
-              <label for="id_event_date_display" class="block text-sm font-medium text-white mb-2">Fecha a mostrar</label>
+              <label for="id_event_date_display" class="block text-sm font-medium text-white mb-2">Fecha a mostrar <span class="text-[#6b605f] font-normal">(opcional)</span></label>
               {{ form.event_date_display }}
-              <p class="mt-1 text-xs text-[#6b605f]">Texto que se mostrará como fecha (ej: "15 de Marzo")</p>
+              <p class="mt-1 text-xs text-[#6b605f]">Se genera automáticamente desde la fecha de inicio. Dejá vacío para usar el formato "17 de Marzo".</p>
             </div>
 
             <div>
-              <label for="id_event_time_display" class="block text-sm font-medium text-white mb-2">Hora a mostrar</label>
+              <label for="id_event_time_display" class="block text-sm font-medium text-white mb-2">Hora a mostrar <span class="text-[#6b605f] font-normal">(opcional)</span></label>
               {{ form.event_time_display }}
-              <p class="mt-1 text-xs text-[#6b605f]">Texto que se mostrará como hora (ej: "18:00 hs")</p>
+              <p class="mt-1 text-xs text-[#6b605f]">Se genera automáticamente desde la hora de inicio. Dejá vacío para usar el formato "18:00 hs".</p>
             </div>
           </div>
         </div>

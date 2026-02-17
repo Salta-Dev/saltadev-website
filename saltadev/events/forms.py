@@ -7,6 +7,22 @@ from content.models import Event
 from django import forms
 from django.utils.text import slugify
 
+MONTHS_ES = [
+    "",
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+]
+
 
 class ImageSourceChoices:
     """Choices for image source selection."""
@@ -206,8 +222,19 @@ class EventForm(forms.ModelForm):
         event = super().save(commit=False)
 
         # Set datetime fields from cleaned data
-        event.event_start_date = self.cleaned_data.get("event_start_date")
+        start_datetime = self.cleaned_data.get("event_start_date")
+        event.event_start_date = start_datetime
         event.event_end_date = self.cleaned_data.get("event_end_date")
+
+        # Auto-generate display fields from start date if not provided
+        if start_datetime:
+            if not event.event_date_display:
+                day = start_datetime.day
+                month = MONTHS_ES[start_datetime.month]
+                event.event_date_display = f"{day} de {month}"
+
+            if not event.event_time_display:
+                event.event_time_display = start_datetime.strftime("%H:%M hs")
 
         # Generate slug if not set
         if not event.slug:
