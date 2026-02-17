@@ -1,4 +1,4 @@
-{% load static %}
+{% load static tailwind_cli %}
 <!DOCTYPE html>
 <html class="dark" lang="es">
 <head>
@@ -9,43 +9,7 @@
   <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            "primary": "#94413d",
-            "primary-hover": "#b04e49",
-            "background-light": "#f7f6f6",
-            "background-dark": "#1d1515",
-            "surface-dark": "#241f1e",
-            "sidebar-dark": "#181414",
-            "border-dark": "#342d2d",
-            "text-muted": "#c4b5b3",
-            "alert-red": "#ef4444"
-          },
-          fontFamily: {
-            "display": ["Space Grotesk", "sans-serif"],
-            "sans": ["Space Grotesk", "sans-serif"],
-          },
-          borderRadius: {
-            "DEFAULT": "0.5rem",
-            "lg": "1rem",
-            "xl": "1.5rem",
-            "2xl": "2rem",
-            "full": "9999px"
-          },
-          boxShadow: {
-            "glow": "0 0 20px rgba(148, 65, 61, 0.4)",
-            "card": "0 10px 30px -5px rgba(0, 0, 0, 0.6)"
-          },
-        },
-      },
-    }
-  </script>
-  {% block tailwind_overrides %}{% endblock %}
+  {% tailwind_css %}
   <link rel="stylesheet" href="{% static 'assets/css/auth.css' %}">
   {% block page_css %}{% endblock %}
 </head>

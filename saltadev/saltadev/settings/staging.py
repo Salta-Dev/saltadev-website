@@ -1,10 +1,13 @@
 """
 Staging environment settings.
 
-Uses PostgreSQL, DEBUG=False, SSL security, INFO logging.
+Uses DATABASE_URL (PostgreSQL), Redis, Cloudinary, DEBUG=False, INFO logging.
+Deployed on Render.com.
 """
 
 import os
+
+import dj_database_url  # type: ignore[import-not-found]
 
 from .base import *  # noqa: F403
 
@@ -14,28 +17,33 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "staging.salta.dev").split(",")
 
+# Database: PostgreSQL via DATABASE_URL (required)
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB", "saltadev_staging"),
-        "USER": os.getenv("POSTGRES_USER", "saltadev_user"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
-        "HOST": os.getenv("POSTGRES_HOST", "db"),
-        "PORT": os.getenv("POSTGRES_PORT", "5432"),
-    }
+    "default": dj_database_url.config(
+        conn_max_age=600,
+    )
 }
 
 # WhiteNoise for static files
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")  # noqa: F405
 STATIC_ROOT = BASE_DIR / "staticfiles"  # noqa: F405
 
+# Cloudinary for media storage
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
+}
+
+# Redis cache (required)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.environ["REDIS_URL"],
+    }
 }
 
 # Security

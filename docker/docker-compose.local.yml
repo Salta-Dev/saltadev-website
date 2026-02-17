@@ -1,13 +1,57 @@
+# Local development with hot reload
+# Usage: docker compose -f docker/docker-compose.local.yml up
+
 services:
   web:
     build:
-      context: .
-      dockerfile: Dockerfile.local
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./saltadev:/app/saltadev
-    env_file:
-      - saltadev/.env.local
+      - ../saltadev:/app/saltadev  # Hot reload
     environment:
       - DJANGO_SETTINGS_MODULE=saltadev.settings.local
+      - DATABASE_URL=postgresql://saltadev:saltadev@db:5432/saltadev_local
+      - REDIS_URL=redis://redis:6379/0
+      - LOAD_FIXTURES=true
+    env_file:
+      - ../saltadev/.env.local
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uv run python saltadev/manage.py runserver 0.0.0.0:8000
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_local_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=saltadev_local
+      - POSTGRES_USER=saltadev
+      - POSTGRES_PASSWORD=saltadev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saltadev -d saltadev_local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_local_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_local_data:
+  redis_local_data:

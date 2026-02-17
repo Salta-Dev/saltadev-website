@@ -3,7 +3,8 @@
   "files": {
     "includes": [
       "saltadev/**/*.{js,css,html}",
-      "!!saltadev/static/**/*.min.*"
+      "!!saltadev/static/**/*.min.*",
+      "!!saltadev/static/css/source.css"
     ]
   },
   "formatter": {

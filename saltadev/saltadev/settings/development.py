@@ -1,8 +1,8 @@
 """
 Development environment settings.
 
-Uses PostgreSQL, DEBUG=True, WhiteNoise for static files.
-Configured for deployment on Render.com.
+Uses DATABASE_URL (PostgreSQL), Redis, Cloudinary, DEBUG=True.
+Deployed on Render.com.
 """
 
 import os
@@ -18,28 +18,16 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "0.0.0.0",  # Docker  # nosec B104
     ".onrender.com",  # Render domains
 ]
 
-# Database: use DATABASE_URL if available, fallback to individual env vars
-if os.environ.get("DATABASE_URL"):
-    DATABASES = {
-        "default": dj_database_url.config(
-            default="postgresql://localhost:5432/saltadev_dev",
-            conn_max_age=600,
-        )
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("POSTGRES_DB", "saltadev_dev"),
-            "USER": os.getenv("POSTGRES_USER", "saltadev_user"),
-            "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
-            "HOST": os.getenv("POSTGRES_HOST", "db"),
-            "PORT": os.getenv("POSTGRES_PORT", "5432"),
-        }
-    }
+# Database: PostgreSQL via DATABASE_URL (required)
+DATABASES = {
+    "default": dj_database_url.config(
+        conn_max_age=600,
+    )
+}
 
 # CSRF trusted origins for Render
 CSRF_TRUSTED_ORIGINS = [
@@ -51,22 +39,20 @@ MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")  # noqa: F405
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_ROOT = BASE_DIR / "staticfiles"  # noqa: F405
 
-# Use Cloudinary for media storage if configured, otherwise local filesystem
-if os.getenv("CLOUDINARY_CLOUD_NAME"):
-    STORAGES = {
-        "default": {
-            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
+# Cloudinary for media storage
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# Redis cache (required)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.environ["REDIS_URL"],
     }
-else:
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
-    }
+}
