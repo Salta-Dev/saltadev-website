@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+from cloudinary.models import CloudinaryField
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -117,12 +118,38 @@ class StaffProfile(models.Model):
     )
     role = models.CharField(max_length=150, blank=True)
     bio = models.TextField(blank=True)
-    photo = models.CharField(max_length=300, blank=True)
-    linkedin = models.URLField(blank=True)
-    github = models.URLField(blank=True)
-    twitter = models.URLField(blank=True)
-    order = models.PositiveIntegerField(default=0)
+    photo_url = models.URLField(
+        max_length=500,
+        blank=True,
+        verbose_name="foto (URL)",
+        help_text="URL externa de la imagen",
+    )
+    photo_file = CloudinaryField(
+        "foto",
+        blank=True,
+        null=True,
+        folder="staff",
+        help_text="Subir imagen desde tu computadora",
+    )
+    linkedin = models.URLField(blank=True, verbose_name="LinkedIn")
+    github = models.URLField(blank=True, verbose_name="GitHub")
+    twitter = models.URLField(blank=True, verbose_name="Twitter/X")
+    instagram = models.URLField(blank=True, verbose_name="Instagram")
+    website = models.URLField(blank=True, verbose_name="sitio web")
+    order = models.PositiveIntegerField(default=0, verbose_name="orden")
     created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "perfil de staff"
+        verbose_name_plural = "perfiles de staff"
+        ordering = ("order",)
 
     def __str__(self) -> str:
         return self.user.email
+
+    @property
+    def photo(self) -> str:
+        """Return the photo URL, prioritizing uploaded file over external URL."""
+        if self.photo_file:
+            return self.photo_file.url
+        return self.photo_url
