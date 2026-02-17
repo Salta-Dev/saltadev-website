@@ -19,6 +19,24 @@
 
     <div class="p-4 lg:p-8 max-w-[1600px] mx-auto w-full flex flex-col gap-6 lg:gap-8 pb-20">
 
+      {% if messages %}
+        <div class="space-y-2">
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-400">check_circle</span>
+                {{ message }}
+              </div>
+            {% elif message.tags == 'error' %}
+              <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-400">error</span>
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
       <!-- Profile & Credential Section -->
       <section class="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
 

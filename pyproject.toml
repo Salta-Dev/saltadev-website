@@ -22,6 +22,7 @@ dependencies = [
   "redis==5.2.1",
   "requests>=2.32.0",
   "whitenoise==6.8.2",
+  "django-notifications-hq @ git+https://github.com/django-notifications/django-notifications.git@master",
 ]
 
 [project.optional-dependencies]

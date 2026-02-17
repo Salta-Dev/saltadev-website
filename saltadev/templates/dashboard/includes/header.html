@@ -4,14 +4,12 @@
     <p class="text-[#6b605f] text-xs lg:text-sm font-medium hidden sm:block">Resumen de tu actividad en la comunidad</p>
   </div>
   <div class="flex items-center gap-3">
-    <div class="hidden md:flex items-center bg-[#1d1919] rounded-lg px-3 h-10 border border-[#2a2424] focus-within:border-primary/50 transition-all w-44 lg:w-64">
-      <span class="material-symbols-outlined text-[#4a4040] text-xl leading-none">search</span>
-      <input class="bg-transparent border-none text-white placeholder-[#4a4040] focus:ring-0 text-sm w-full ml-2" placeholder="Buscar..." type="text"/>
-    </div>
-    <button class="relative size-10 rounded-lg bg-[#1d1919] text-[#8e8584] hover:text-white hover:bg-[#2a2424] transition-all border border-[#2a2424] flex items-center justify-center group">
+    <a href="{% url 'user_notifications:list' %}" class="relative size-10 rounded-lg bg-[#1d1919] text-[#8e8584] hover:text-white hover:bg-[#2a2424] transition-all border border-[#2a2424] flex items-center justify-center group">
+      {% if unread_notifications_count > 0 %}
       <span class="absolute -top-0.5 -right-0.5 size-2 bg-primary rounded-full"></span>
+      {% endif %}
       <span class="material-symbols-outlined text-xl group-hover:text-primary transition-colors leading-none">notifications</span>
-    </button>
+    </a>
     <button class="lg:hidden size-10 rounded-lg bg-[#1d1919] text-[#8e8584] hover:text-white hover:bg-[#2a2424] transition-all border border-[#2a2424] flex items-center justify-center" onclick="openMobileMenu()">
       <span class="material-symbols-outlined text-xl leading-none">menu</span>
     </button>
