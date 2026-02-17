@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SaltaDev - {% if is_edit %}Editar{% else %}Crear{% endif %} Beneficio</title>
+  <title>SaltaDev - {% if is_edit %}Editar{% else %}Crear{% endif %} Evento</title>
   {% include "includes/head.html" %}
   <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
 </head>
@@ -18,12 +18,12 @@
     <!-- Header -->
     <header class="sticky top-0 z-40 bg-background-dark/80 backdrop-blur-xl border-b border-[#342d2d] px-6 lg:px-8 py-4 lg:py-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <a href="{% if is_edit %}{% url 'benefit_detail' pk=benefit.pk %}{% else %}{% url 'benefits_list' %}{% endif %}" class="p-2 rounded-lg hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-colors">
+        <a href="{% url 'my_events' %}" class="p-2 rounded-lg hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-colors">
           <span class="material-symbols-outlined leading-none">arrow_back</span>
         </a>
         <div class="flex flex-col gap-1">
-          <h2 class="text-2xl lg:text-3xl font-bold text-white tracking-tight">{% if is_edit %}Editar{% else %}Crear{% endif %} Beneficio</h2>
-          <p class="text-[#8e8584] text-sm font-medium hidden sm:block">{% if is_edit %}Modificá los datos del beneficio.{% else %}Publicá un nuevo beneficio para la comunidad.{% endif %}</p>
+          <h2 class="text-2xl lg:text-3xl font-bold text-white tracking-tight">{% if is_edit %}Editar{% else %}Crear{% endif %} Evento</h2>
+          <p class="text-[#8e8584] text-sm font-medium hidden sm:block">{% if is_edit %}Modificá los datos del evento.{% else %}Publicá un nuevo evento para la comunidad.{% endif %}</p>
         </div>
       </div>
       <button class="lg:hidden size-10 rounded-lg bg-[#1d1919] text-[#8e8584] hover:text-white hover:bg-[#2a2424] transition-all border border-[#2a2424] flex items-center justify-center" onclick="openMobileMenu()">
@@ -69,13 +69,13 @@
             </div>
 
             <div>
-              <label for="id_description" class="block text-sm font-medium text-white mb-2">Descripción *</label>
+              <label for="id_description" class="block text-sm font-medium text-white mb-2">Descripción</label>
               {{ form.description }}
             </div>
 
             <!-- Image Section -->
             <div>
-              <label class="block text-sm font-medium text-white mb-3">Imagen del beneficio</label>
+              <label class="block text-sm font-medium text-white mb-3">Imagen del evento</label>
 
               <!-- Image source selector -->
               <div class="flex flex-wrap gap-3 mb-4">
@@ -93,7 +93,7 @@
 
               <!-- URL input -->
               <div id="image_url_container">
-                {{ form.image }}
+                {{ form.photo }}
               </div>
 
               <!-- File input -->
@@ -115,113 +115,89 @@
 
               <p class="mt-3 text-xs text-[#6b605f] flex items-center gap-1">
                 <span class="material-symbols-outlined text-sm">info</span>
-                Tamaño recomendado: 800x500 píxeles (relación 16:10). La imagen se optimizará automáticamente.
+                Tamaño recomendado: 1200x630 píxeles (relación 2:1). La imagen se optimizará automáticamente.
               </p>
 
-              {% if is_edit and benefit.image %}
+              {% if is_edit and event.photo %}
                 <div class="mt-3 p-3 bg-[#1d1919] rounded-lg border border-[#3d2f2f]">
                   <p class="text-xs text-[#8e8584] mb-2">Imagen actual:</p>
-                  <img src="{{ benefit.image }}" alt="Imagen actual" class="max-h-24 rounded-lg object-contain">
+                  <img src="{{ event.photo }}" alt="Imagen actual" class="max-h-24 rounded-lg object-contain">
                 </div>
               {% endif %}
             </div>
           </div>
         </div>
 
-        <!-- Benefit Type -->
+        <!-- Date and Time -->
         <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
           <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">sell</span>
-            Tipo de Beneficio
+            <span class="material-symbols-outlined text-primary">schedule</span>
+            Fecha y Hora
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label for="id_benefit_type" class="block text-sm font-medium text-white mb-2">Tipo *</label>
-              {{ form.benefit_type }}
-            </div>
-
-            <div id="discount_percentage_field">
-              <label for="id_discount_percentage" class="block text-sm font-medium text-white mb-2">Porcentaje de descuento</label>
-              {{ form.discount_percentage }}
-            </div>
-
-            <div id="redemption_limit_field">
-              <label for="id_redemption_limit" class="block text-sm font-medium text-white mb-2">Límite de canjes</label>
-              {{ form.redemption_limit }}
+              <label for="id_start_date" class="block text-sm font-medium text-white mb-2">Fecha de inicio</label>
+              {{ form.start_date }}
             </div>
 
             <div>
-              <label for="id_expiration_date" class="block text-sm font-medium text-white mb-2">Fecha de expiración</label>
-              {{ form.expiration_date }}
-            </div>
-          </div>
-
-          <div class="mt-6">
-            <label for="id_discount_codes" class="block text-sm font-medium text-white mb-2">Códigos de descuento</label>
-            {{ form.discount_codes }}
-            <p class="mt-2 text-xs text-[#6b605f]">Separar múltiples códigos con comas</p>
-          </div>
-        </div>
-
-        <!-- Contact Info -->
-        <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
-          <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">contact_page</span>
-            Información de Contacto
-          </h3>
-
-          <div class="mb-6">
-            <label for="id_contact_source" class="block text-sm font-medium text-white mb-2">Fuente de contacto *</label>
-            {{ form.contact_source }}
-          </div>
-
-          <div id="custom_contact_fields" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label for="id_contact_phone" class="block text-sm font-medium text-white mb-2">Teléfono</label>
-              {{ form.contact_phone }}
+              <label for="id_start_time" class="block text-sm font-medium text-white mb-2">Hora de inicio</label>
+              {{ form.start_time }}
             </div>
 
             <div>
-              <label for="id_contact_email" class="block text-sm font-medium text-white mb-2">Email</label>
-              {{ form.contact_email }}
+              <label for="id_end_date" class="block text-sm font-medium text-white mb-2">Fecha de fin</label>
+              {{ form.end_date }}
             </div>
 
-            <div class="md:col-span-2">
-              <label for="id_contact_website" class="block text-sm font-medium text-white mb-2">Sitio web</label>
-              {{ form.contact_website }}
+            <div>
+              <label for="id_end_time" class="block text-sm font-medium text-white mb-2">Hora de fin</label>
+              {{ form.end_time }}
+            </div>
+
+            <div>
+              <label for="id_event_date_display" class="block text-sm font-medium text-white mb-2">Fecha a mostrar <span class="text-[#6b605f] font-normal">(opcional)</span></label>
+              {{ form.event_date_display }}
+              <p class="mt-1 text-xs text-[#6b605f]">Se genera automáticamente desde la fecha de inicio. Dejá vacío para usar el formato "17 de Marzo".</p>
+            </div>
+
+            <div>
+              <label for="id_event_time_display" class="block text-sm font-medium text-white mb-2">Hora a mostrar <span class="text-[#6b605f] font-normal">(opcional)</span></label>
+              {{ form.event_time_display }}
+              <p class="mt-1 text-xs text-[#6b605f]">Se genera automáticamente desde la hora de inicio. Dejá vacío para usar el formato "18:00 hs".</p>
             </div>
           </div>
         </div>
 
-        <!-- Modality and Location -->
+        <!-- Location and Link -->
         <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6">
           <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">place</span>
-            Modalidad y Ubicación
+            Ubicación y Registro
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label for="id_modality" class="block text-sm font-medium text-white mb-2">Modalidad *</label>
-              {{ form.modality }}
-            </div>
-
-            <div id="location_field">
               <label for="id_location" class="block text-sm font-medium text-white mb-2">Ubicación</label>
               {{ form.location }}
+            </div>
+
+            <div>
+              <label for="id_link" class="block text-sm font-medium text-white mb-2">Link de registro</label>
+              {{ form.link }}
             </div>
           </div>
         </div>
 
         <!-- Actions -->
         <div class="flex flex-col sm:flex-row gap-4 justify-end">
-          <a href="{% if is_edit %}{% url 'benefit_detail' pk=benefit.pk %}{% else %}{% url 'benefits_list' %}{% endif %}" class="px-6 py-3 rounded-xl bg-[#2a2424] hover:bg-[#3d3434] text-white text-sm font-bold transition-all border border-[#3d2f2f] hover:border-[#4a4040] text-center">
+          <a href="{% url 'my_events' %}" class="px-6 py-3 rounded-xl bg-[#2a2424] hover:bg-[#3d3434] text-white text-sm font-bold transition-all border border-[#3d2f2f] hover:border-[#4a4040] text-center">
             Cancelar
           </a>
           <button type="submit" class="px-8 py-3 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-all shadow-lg hover:shadow-glow flex items-center justify-center gap-2">
             <span class="material-symbols-outlined text-xl">{% if is_edit %}save{% else %}add{% endif %}</span>
-            {% if is_edit %}Guardar Cambios{% else %}Crear Beneficio{% endif %}
+            {% if is_edit %}Guardar Cambios{% else %}Crear Evento{% endif %}
           </button>
         </div>
       </form>
@@ -230,15 +206,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const benefitType = document.querySelector('[name="benefit_type"]');
-      const contactSource = document.getElementById('contact_source');
-      const modality = document.getElementById('modality');
-
-      const discountField = document.getElementById('discount_percentage_field');
-      const redemptionField = document.getElementById('redemption_limit_field');
-      const customContactFields = document.getElementById('custom_contact_fields');
-      const locationField = document.getElementById('location_field');
-
       // Image source elements
       const imageSourceOptions = document.querySelectorAll('.image-source-option');
       const imageUrlContainer = document.getElementById('image_url_container');
@@ -246,35 +213,6 @@
       const imageFileInput = document.getElementById('id_image_file');
       const imagePreview = document.getElementById('image_preview');
       const imageUploadPrompt = document.getElementById('image_upload_prompt');
-
-      function toggleBenefitTypeFields() {
-        const value = benefitType.value;
-        if (value === 'discount') {
-          discountField.style.display = 'block';
-          redemptionField.style.display = 'none';
-        } else {
-          discountField.style.display = 'none';
-          redemptionField.style.display = 'block';
-        }
-      }
-
-      function toggleContactFields() {
-        const value = contactSource.value;
-        if (value === 'custom') {
-          customContactFields.style.display = 'grid';
-        } else {
-          customContactFields.style.display = 'none';
-        }
-      }
-
-      function toggleLocationField() {
-        const value = modality.value;
-        if (value === 'in_person' || value === 'both') {
-          locationField.style.display = 'block';
-        } else {
-          locationField.style.display = 'none';
-        }
-      }
 
       function updateImageSourceStyles() {
         imageSourceOptions.forEach(option => {
@@ -304,7 +242,6 @@
       function handleImagePreview(event) {
         const file = event.target.files[0];
         if (file) {
-          // Validate file size (5MB max)
           if (file.size > 5 * 1024 * 1024) {
             alert('La imagen es muy grande. El tamaño máximo es 5MB.');
             imageFileInput.value = '';
@@ -322,7 +259,6 @@
         }
       }
 
-      // Initialize image source
       imageSourceOptions.forEach(option => {
         option.addEventListener('click', function() {
           const radio = this.querySelector('input[type="radio"]');
@@ -336,21 +272,6 @@
       }
 
       toggleImageSource();
-
-      if (benefitType) {
-        benefitType.addEventListener('change', toggleBenefitTypeFields);
-        toggleBenefitTypeFields();
-      }
-
-      if (contactSource) {
-        contactSource.addEventListener('change', toggleContactFields);
-        toggleContactFields();
-      }
-
-      if (modality) {
-        modality.addEventListener('change', toggleLocationField);
-        toggleLocationField();
-      }
     });
   </script>
 

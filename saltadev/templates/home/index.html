@@ -114,7 +114,7 @@
             {% if forloop.counter0 >= 4 %}
               {% with 'partner-hidden' as partner_hidden %}
                 <a class="bg-surface-dark border border-border-dark px-4 py-4 rounded-xl flex flex-col items-center justify-center gap-3 grayscale hover:grayscale-0 transition-all duration-300 hover:border-primary/50 group cursor-pointer min-h-[140px] {{ partner_hidden }}" href="{{ collaborator.link }}" target="_blank">
-                  {% if collaborator.image|slice:":4" == "http" %}
+                  {% if collaborator.image|slice:":4" == "http" or collaborator.image|slice:":1" == "/" %}
                     <img alt="{{ collaborator.name }}" class="max-h-10 max-w-[120px] object-contain" src="{{ collaborator.image }}">
                   {% else %}
                     <img alt="{{ collaborator.name }}" class="max-h-10 max-w-[120px] object-contain" src="{% static collaborator.image %}">
@@ -124,7 +124,7 @@
               {% endwith %}
             {% else %}
               <a class="bg-surface-dark border border-border-dark px-4 py-4 rounded-xl flex flex-col items-center justify-center gap-3 grayscale hover:grayscale-0 transition-all duration-300 hover:border-primary/50 group cursor-pointer min-h-[140px]" href="{{ collaborator.link }}" target="_blank">
-                {% if collaborator.image|slice:":4" == "http" %}
+                {% if collaborator.image|slice:":4" == "http" or collaborator.image|slice:":1" == "/" %}
                   <img alt="{{ collaborator.name }}" class="max-h-10 max-w-[120px] object-contain" src="{{ collaborator.image }}">
                 {% else %}
                   <img alt="{{ collaborator.name }}" class="max-h-10 max-w-[120px] object-contain" src="{% static collaborator.image %}">
@@ -259,7 +259,11 @@
           <div class="bg-background-dark border border-border-dark p-6 rounded-xl flex flex-col items-center text-center hover:-translate-y-1 transition-transform duration-300 h-full">
             <div class="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-primary/50">
               {% if member.photo %}
-                <img alt="{{ member.user.first_name }}" class="w-full h-full object-cover" src="{% static member.photo %}">
+                {% if member.photo|slice:":4" == "http" or member.photo|slice:":1" == "/" %}
+                  <img alt="{{ member.user.first_name }}" class="w-full h-full object-cover" src="{{ member.photo }}">
+                {% else %}
+                  <img alt="{{ member.user.first_name }}" class="w-full h-full object-cover" src="{% static member.photo %}">
+                {% endif %}
               {% else %}
                 <img alt="{{ member.user.first_name }}" class="w-full h-full object-cover" src="{% static 'assets/img/staff/facundo_padilla.jpg' %}">
               {% endif %}

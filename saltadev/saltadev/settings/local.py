@@ -71,3 +71,15 @@ RECAPTCHA_PUBLIC_KEY = (
 RECAPTCHA_PRIVATE_KEY = (
     "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"  # pragma: allowlist secret
 )
+
+# Media files: use local storage for development
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"  # noqa: F405

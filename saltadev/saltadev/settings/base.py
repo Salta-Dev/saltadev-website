@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "cloudinary",
     "cloudinary_storage",
     "django_tailwind_cli",
+    "notifications",
     "home",
     "events",
     "code_of_conduct",
@@ -39,9 +40,15 @@ INSTALLED_APPS = [
     "password_reset",
     "dashboard",
     "benefits",
+    "user_notifications",
     "django_recaptcha",
     "axes",
 ]
+
+DJANGO_NOTIFICATIONS_CONFIG = {
+    "USE_JSONFIELD": True,
+    "SOFT_DELETE": False,
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -67,6 +74,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "content.context_processors.site_links",
+                "user_notifications.context_processors.unread_notifications_count",
             ],
         },
     },

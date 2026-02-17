@@ -5,8 +5,42 @@ from django import forms
 from .models import Benefit
 
 
+class ImageSourceChoices:
+    """Choices for image source selection."""
+
+    URL = "url"
+    FILE = "file"
+
+    CHOICES = [
+        (URL, "Ingresar URL"),
+        (FILE, "Subir archivo"),
+    ]
+
+
 class BenefitForm(forms.ModelForm):
     """Form for creating and editing benefits."""
+
+    image_source = forms.ChoiceField(
+        choices=ImageSourceChoices.CHOICES,
+        initial=ImageSourceChoices.URL,
+        widget=forms.RadioSelect(
+            attrs={
+                "class": "hidden peer",
+            }
+        ),
+        required=False,
+    )
+
+    image_file = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(
+            attrs={
+                "class": "hidden",
+                "accept": "image/*",
+                "id": "id_image_file",
+            }
+        ),
+    )
 
     class Meta:
         model = Benefit
@@ -44,6 +78,7 @@ class BenefitForm(forms.ModelForm):
                 attrs={
                     "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
                     "placeholder": "https://ejemplo.com/imagen.jpg",
+                    "id": "id_image_url",
                 }
             ),
             "benefit_type": forms.Select(

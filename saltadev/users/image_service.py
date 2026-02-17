@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 # Format: width_height_crop_gravity_quality_format
 # This is applied via URL, not on upload, to avoid consuming transformation credits
 AVATAR_TRANSFORMATION = "w_400,h_400,c_fill,g_face,q_auto,f_auto"
+BENEFIT_TRANSFORMATION = "w_800,h_500,c_fill,g_auto,q_auto,f_auto"
+EVENT_TRANSFORMATION = "w_1200,h_630,c_fill,g_auto,q_auto,f_auto"
 
 
 @dataclass
@@ -68,11 +70,19 @@ def get_transformed_url(
     return base_url.replace("/upload/", f"/upload/{transformation}/")
 
 
-def _upload_to_cloudinary(image_file: UploadedFile) -> ImageUploadResult:
+def _upload_to_cloudinary(
+    image_file: UploadedFile,
+    folder: str = "avatars",
+    prefix: str = "avatar",
+    transformation: str = AVATAR_TRANSFORMATION,
+) -> ImageUploadResult:
     """Upload image to Cloudinary.
 
     Args:
         image_file: The uploaded image file.
+        folder: Cloudinary folder to upload to.
+        prefix: Prefix for the public_id.
+        transformation: Transformation string for on-the-fly processing.
 
     Returns:
         ImageUploadResult with URL on success or error message on failure.
@@ -86,8 +96,8 @@ def _upload_to_cloudinary(image_file: UploadedFile) -> ImageUploadResult:
     try:
         _configure_cloudinary()
 
-        # Generate unique public_id for the avatar
-        public_id = f"avatars/avatar_{uuid.uuid4().hex[:12]}"
+        # Generate unique public_id
+        public_id = f"{folder}/{prefix}_{uuid.uuid4().hex[:12]}"
 
         # Upload to Cloudinary without transformation on upload
         # This avoids consuming transformation credits (25/month limit on free tier)
@@ -102,7 +112,9 @@ def _upload_to_cloudinary(image_file: UploadedFile) -> ImageUploadResult:
 
         # Generate URL with on-the-fly transformation (cached by CDN)
         base_url = result.get("secure_url")
-        transformed_url = get_transformed_url(base_url) if base_url else None
+        transformed_url = (
+            get_transformed_url(base_url, transformation) if base_url else None
+        )
 
         return ImageUploadResult(
             success=True,
@@ -118,33 +130,39 @@ def _upload_to_cloudinary(image_file: UploadedFile) -> ImageUploadResult:
         )
 
 
-def _upload_locally(image_file: UploadedFile) -> ImageUploadResult:
+def _upload_locally(
+    image_file: UploadedFile,
+    folder: str = "avatars",
+    prefix: str = "avatar",
+) -> ImageUploadResult:
     """Save image to local media directory.
 
     Args:
         image_file: The uploaded image file.
+        folder: Subdirectory in media root.
+        prefix: Prefix for the filename.
 
     Returns:
         ImageUploadResult with local URL on success.
     """
     try:
         # Generate unique filename
-        file_name: str = image_file.name or "avatar.jpg"
+        file_name: str = image_file.name or f"{prefix}.jpg"
         ext = Path(file_name).suffix.lower() or ".jpg"
-        filename = f"avatar_{uuid.uuid4().hex[:12]}{ext}"
+        filename = f"{prefix}_{uuid.uuid4().hex[:12]}{ext}"
 
-        # Ensure avatars directory exists
-        avatars_dir = Path(settings.MEDIA_ROOT) / "avatars"
-        avatars_dir.mkdir(parents=True, exist_ok=True)
+        # Ensure directory exists
+        upload_dir = Path(settings.MEDIA_ROOT) / folder
+        upload_dir.mkdir(parents=True, exist_ok=True)
 
         # Save file
-        file_path = avatars_dir / filename
+        file_path = upload_dir / filename
         with open(file_path, "wb") as f:
             for chunk in image_file.chunks():
                 f.write(chunk)
 
         # Return URL
-        url = f"{settings.MEDIA_URL}avatars/{filename}"
+        url = f"{settings.MEDIA_URL}{folder}/{filename}"
         return ImageUploadResult(
             success=True,
             url=url,
@@ -170,8 +188,61 @@ def upload_avatar(image_file: UploadedFile) -> ImageUploadResult:
         ImageUploadResult with URL on success or error on failure.
     """
     if _is_cloudinary_configured():
-        return _upload_to_cloudinary(image_file)
-    return _upload_locally(image_file)
+        return _upload_to_cloudinary(
+            image_file,
+            folder="avatars",
+            prefix="avatar",
+            transformation=AVATAR_TRANSFORMATION,
+        )
+    return _upload_locally(image_file, folder="avatars", prefix="avatar")
+
+
+def upload_benefit_image(image_file: UploadedFile) -> ImageUploadResult:
+    """Upload benefit image using appropriate method based on environment.
+
+    Uses Cloudinary if configured (with on-the-fly optimization),
+    otherwise saves locally.
+
+    Recommended image size: 800x500 pixels (16:10 aspect ratio).
+
+    Args:
+        image_file: The uploaded image file.
+
+    Returns:
+        ImageUploadResult with URL on success or error on failure.
+    """
+    if _is_cloudinary_configured():
+        return _upload_to_cloudinary(
+            image_file,
+            folder="benefits",
+            prefix="benefit",
+            transformation=BENEFIT_TRANSFORMATION,
+        )
+    return _upload_locally(image_file, folder="benefits", prefix="benefit")
+
+
+def upload_event_image(image_file: UploadedFile) -> ImageUploadResult:
+    """Upload event image using appropriate method based on environment.
+
+    Uses Cloudinary if configured (with on-the-fly optimization),
+    otherwise saves locally.
+
+    Recommended image size: 1200x630 pixels (approx 2:1 aspect ratio).
+
+    Args:
+        image_file: The uploaded image file.
+
+    Returns:
+        ImageUploadResult with URL on success or error on failure.
+    """
+    if _is_cloudinary_configured():
+        return _upload_to_cloudinary(
+            image_file,
+            folder="events",
+            prefix="event",
+            transformation=EVENT_TRANSFORMATION,
+        )
+    return _upload_locally(image_file, folder="events", prefix="event")
 
 
 def delete_cloudinary_image(public_id: str) -> bool:

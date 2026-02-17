@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/claude-code) when working 
 
 ## Project Overview
 
-SaltaDev Website - Community website for SaltaDev (Salta, Argentina). Built with Django 5.2, featuring custom authentication with email verification, rate limiting, reCAPTCHA v2, password reset, events management, and staff profiles.
+SaltaDev Website - Community website for SaltaDev (Salta, Argentina). Built with Django 5.2, featuring custom authentication with email verification, rate limiting, reCAPTCHA v2, password reset, events management with approval workflow, staff profiles, and in-app notifications.
 
 ## Key Architecture
 
@@ -27,7 +27,8 @@ saltadev-website/
 │   ├── content/                 # Site content (links, etc.)
 │   ├── locations/               # Argentine provinces/cities
 │   ├── dashboard/               # User dashboard
-│   └── benefits/                # Member benefits
+│   ├── benefits/                # Member benefits
+│   └── user_notifications/      # Notification system
 ├── tests/                       # Pytest tests (outside Django root)
 └── deploy/                      # Deployment configs
 ```
@@ -104,6 +105,20 @@ CloudinaryImage(public_id).build_url(transformation=[...])
 
 ### Rate Limiting
 django-axes handles login attempt limiting (5 attempts, 1 hour lockout).
+
+### Notifications
+Uses django-notifications-hq for in-app notifications:
+```python
+from notifications.signals import notify
+notify.send(sender, recipient=user, verb="Message", target=object)
+```
+
+### Image Uploads (Local Dev)
+In local development, images use Django's ImageField stored in `static/assets/img/`:
+- Collaborator images: `static/assets/img/partners/`
+- Staff photos: `static/assets/img/staff/`
+
+In production, images are stored in Cloudinary.
 
 ## Deployment
 

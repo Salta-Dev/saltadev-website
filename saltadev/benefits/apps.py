@@ -9,3 +9,7 @@ class BenefitsConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "benefits"
     verbose_name = "Beneficios"
+
+    def ready(self) -> None:
+        """Import signals when the app is ready."""
+        import benefits.signals  # noqa: F401

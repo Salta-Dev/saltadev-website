@@ -50,7 +50,8 @@
 - **Dashboard de usuario** - Panel personalizado con perfil, credencial digital y gestión de datos
 - **Credencial digital** - Credencial verificable con QR code, descargable como PNG
 - **Sistema de roles** - Miembro, Colaborador, Moderador y Administrador
-- **Eventos** - Listado y gestión de eventos de la comunidad
+- **Eventos** - Listado y gestión de eventos con workflow de aprobación
+- **Notificaciones** - Sistema de notificaciones in-app para usuarios
 - **Colaboradores** - Showcase de empresas y organizaciones aliadas
 - **Staff** - Perfiles del equipo organizador
 - **Código de conducta** - Reglamento de la comunidad
@@ -110,6 +111,7 @@ saltadev-website/
 │   ├── locations/              # Países y provincias
 │   ├── content/                # Contenido (colaboradores, etc)
 │   ├── code_of_conduct/        # Código de conducta
+│   ├── user_notifications/     # Sistema de notificaciones
 │   │
 │   ├── static/                 # Archivos estáticos
 │   │   └── css/
@@ -288,6 +290,38 @@ sequenceDiagram
     PR->>U: Redirige a login con mensaje de éxito
 ```
 
+### Sistema de Notificaciones
+
+El proyecto usa **django-notifications-hq** para notificaciones in-app:
+
+```python
+from notifications.signals import notify
+notify.send(sender, recipient=user, verb="aprobó tu evento", target=event)
+```
+
+**Endpoints disponibles:**
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `/notificaciones/` | Lista de notificaciones del usuario |
+| `/notificaciones/marcar-leidas/` | Marcar todas como leídas |
+| `/notificaciones/<id>/marcar-leida/` | Marcar una como leída |
+
+### Gestión de Eventos
+
+Los eventos tienen un workflow de aprobación con tres estados:
+
+| Estado | Descripción |
+|--------|-------------|
+| `PENDING` | Evento creado, esperando aprobación |
+| `APPROVED` | Evento aprobado, visible públicamente |
+| `REJECTED` | Evento rechazado |
+
+**Flujo:**
+1. Usuario crea evento → estado `PENDING`
+2. Staff/Admin revisa en el admin
+3. Al aprobar/rechazar → se envía notificación automática al creador
+
 ## Despliegue
 
 ### Render.com (Recomendado)
@@ -359,8 +393,16 @@ on-the-fly no consumen créditos de transformación.
 
 #### Desarrollo local
 
+En desarrollo local, las imágenes usan Django `ImageField` y se guardan en `static/assets/img/`:
+
+| Tipo | Ruta |
+|------|------|
+| Colaboradores | `static/assets/img/partners/` |
+| Staff | `static/assets/img/staff/` |
+| Avatares | `media/avatars/` |
+
 Cloudinary es **opcional** en desarrollo. Si no se configuran las credenciales,
-las imágenes se guardan localmente en `media/avatars/`.
+las imágenes se guardan localmente.
 
 ## Seguridad
 

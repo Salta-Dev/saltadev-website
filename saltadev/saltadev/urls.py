@@ -64,6 +64,10 @@ urlpatterns = [
     path(
         "credencial/<str:public_id>/", public_credential_view, name="public_credential"
     ),
+    path(
+        "inbox/notifications/", include("notifications.urls", namespace="notifications")
+    ),
+    path("notificaciones/", include("user_notifications.urls")),
 ]
 
 if settings.DEBUG:
