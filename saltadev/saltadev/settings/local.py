@@ -8,7 +8,7 @@ Falls back to SQLite if DATABASE_URL is not set.
 import os
 from pathlib import Path
 
-import dj_database_url  # type: ignore[import-not-found]
+import dj_database_url
 from dotenv import load_dotenv
 
 # Load environment variables BEFORE importing base settings
@@ -41,7 +41,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",  # noqa: F405
+            "NAME": str(BASE_DIR / "db.sqlite3"),  # noqa: F405
         }
     }
 
