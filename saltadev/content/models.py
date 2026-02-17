@@ -98,14 +98,38 @@ class Event(models.Model):
 class Collaborator(models.Model):
     """Organization or company that collaborates with the SaltaDev community."""
 
-    name = models.CharField(max_length=150)
-    image = models.CharField(max_length=300, blank=True)
-    link = models.URLField(blank=True)
+    name = models.CharField(max_length=150, verbose_name="nombre")
+    image_url = models.URLField(
+        max_length=500,
+        blank=True,
+        verbose_name="imagen (URL)",
+        help_text="URL externa de la imagen",
+    )
+    image_file = CloudinaryField(
+        "imagen",
+        blank=True,
+        null=True,
+        folder="collaborators",
+        help_text="Subir imagen desde tu computadora",
+    )
+    link = models.URLField(blank=True, verbose_name="sitio web")
     slug = models.SlugField(unique=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="creado")
+
+    class Meta:
+        verbose_name = "colaborador"
+        verbose_name_plural = "colaboradores"
+        ordering = ("name",)
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def image(self) -> str:
+        """Return the image URL, prioritizing uploaded file over external URL."""
+        if self.image_file:
+            return self.image_file.url
+        return self.image_url
 
 
 class StaffProfile(models.Model):

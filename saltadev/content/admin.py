@@ -1,3 +1,6 @@
+from collections.abc import Sequence
+from typing import ClassVar
+
 from django.contrib import admin
 
 from .models import Collaborator, Event, StaffProfile
@@ -12,8 +15,27 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(Collaborator)
 class CollaboratorAdmin(admin.ModelAdmin):
-    list_display = ("name", "link")
+    """Admin configuration for Collaborator with dual image upload options."""
+
+    list_display = ("name", "link", "has_image")
     search_fields = ("name",)
+    prepopulated_fields: ClassVar[dict[str, Sequence[str]]] = {"slug": ("name",)}
+    fieldsets = (
+        (None, {"fields": ("name", "slug", "link")}),
+        (
+            "Imagen",
+            {
+                "description": "Podés subir una imagen desde tu PC o pegar una URL. "
+                "Si usás ambas, la imagen subida tiene prioridad.",
+                "fields": ("image_file", "image_url"),
+            },
+        ),
+    )
+
+    @admin.display(boolean=True, description="Imagen")
+    def has_image(self, obj: Collaborator) -> bool:
+        """Return True if the collaborator has an image."""
+        return bool(obj.image_file or obj.image_url)
 
 
 @admin.register(StaffProfile)
