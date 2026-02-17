@@ -72,8 +72,7 @@ RECAPTCHA_PRIVATE_KEY = (
     "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"  # pragma: allowlist secret
 )
 
-# Media files: store in static/assets/img/ for local development
-# This allows uploaded files to be served alongside existing static assets
+# Media files: use local storage for development
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -82,5 +81,5 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-MEDIA_URL = "/static/assets/img/"
-MEDIA_ROOT = BASE_DIR / "static/assets/img"  # noqa: F405
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"  # noqa: F405
