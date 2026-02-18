@@ -27,6 +27,9 @@
   <a href="http://mypy-lang.org/">
     <img src="https://img.shields.io/badge/type%20checked-mypy-blue.svg?style=flat-square" alt="mypy">
   </a>
+  <a href="https://github.com/Salta-Dev/saltadev-website/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/Salta-Dev/saltadev-website/ci.yml?branch=main&style=flat-square&logo=github&label=CI" alt="CI">
+  </a>
 </p>
 
 <p align="center">
@@ -36,6 +39,8 @@
   <a href="#configuración">Configuración</a> •
   <a href="#arquitectura">Arquitectura</a> •
   <a href="#despliegue">Despliegue</a> •
+  <a href="#cicd">CI/CD</a> •
+  <a href="#monitoreo">Monitoreo</a> •
   <a href="#almacenamiento-de-imágenes">Imágenes</a> •
   <a href="#seguridad">Seguridad</a> •
   <a href="#seo">SEO</a> •
@@ -81,6 +86,7 @@
 | ![Render](https://img.shields.io/badge/-Render-46E3B7?style=flat-square&logo=render&logoColor=white) | Cloud hosting |
 | ![Docker](https://img.shields.io/badge/-Docker-2496ED?style=flat-square&logo=docker&logoColor=white) | Containerización |
 | ![Nginx](https://img.shields.io/badge/-Nginx-269539?style=flat-square&logo=nginx&logoColor=white) | Reverse proxy |
+| ![GitHub Actions](https://img.shields.io/badge/-GitHub%20Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white) | CI/CD |
 | ![uv](https://img.shields.io/badge/-uv-DE5FE9?style=flat-square) | Package manager |
 
 ## Estructura del Proyecto
@@ -367,6 +373,63 @@ python manage.py migrate
 python manage.py loaddata locations
 ```
 
+## CI/CD
+
+### GitHub Actions
+
+El proyecto incluye un workflow de CI que se ejecuta en cada push y PR a `main`:
+
+| Check | Comando | Descripción |
+|-------|---------|-------------|
+| Tests | `pytest --cov` | Tests con coverage |
+| Linting | `ruff check` | Verificación de código |
+| Format | `ruff format --check` | Verificación de formato |
+| Types | `mypy` | Chequeo de tipos |
+| Security | `bandit` | Análisis de seguridad |
+
+El workflow usa PostgreSQL en un service container para tests de integración.
+
+Ver `.github/workflows/ci.yml` para la configuración completa.
+
+## Monitoreo
+
+### Healthcheck Endpoint
+
+```
+GET /health/
+```
+
+Verifica el estado de los servicios críticos:
+- **Django**: Aplicación web
+- **PostgreSQL**: Base de datos
+- **Redis**: Cache
+
+**Respuesta exitosa (200 OK):**
+```json
+{
+  "status": "healthy",
+  "services": {
+    "django": "ok",
+    "postgres": "ok",
+    "redis": "ok"
+  }
+}
+```
+
+**Respuesta con error (503 Service Unavailable):**
+```json
+{
+  "status": "unhealthy",
+  "services": {
+    "django": "ok",
+    "postgres": "error",
+    "redis": "ok"
+  }
+}
+```
+
+Este endpoint es utilizado por Render.com para verificar la salud del servicio.
+
 ## Almacenamiento de Imágenes
 
 ### Cloudinary CDN
@@ -419,6 +482,7 @@ las imágenes se guardan localmente.
 | **Email Verification** | Verificación obligatoria de email |
 | **No User Enumeration** | Misma respuesta para emails existentes y no existentes |
 | **Disposable Email Block** | Rechaza emails de proveedores temporales (10minutemail, etc.) |
+| **CSP Headers** | Content Security Policy via django-csp (producción) |
 | **Secure Headers** | Headers de seguridad configurados |
 | **HTTPS Only** | Forzado en producción |
 
@@ -489,6 +553,12 @@ ruff format .
 
 # Solo mypy
 mypy saltadev/
+
+# Ejecutar checks de CI localmente
+uv run pytest --cov=saltadev
+uv run ruff check saltadev && uv run ruff format --check saltadev
+uv run mypy saltadev
+uv run bandit -r saltadev -x "**/tests/**"
 
 # Crear migraciones
 python manage.py makemigrations

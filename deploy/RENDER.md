@@ -51,6 +51,7 @@ En el Web Service, ir a **Environment** y agregar:
 ## Paso 5: Verificar
 
 - [ ] La web carga correctamente
+- [ ] El healthcheck responde: `curl https://tu-app.onrender.com/health/`
 - [ ] El registro de usuario funciona
 - [ ] Los emails de verificación llegan (vía Resend)
 - [ ] El login funciona
@@ -110,3 +111,31 @@ Revisar los logs en Render Dashboard → Web Service → Logs
 1. Revisar logs de Render
 2. Verificar que `ALLOWED_HOSTS` incluya el dominio de Render
 3. Verificar que `SECRET_KEY` esté configurado
+
+## Monitoreo
+
+### Healthcheck Endpoint
+
+Render puede usar `/health/` para verificar que la aplicación está funcionando:
+
+```bash
+curl https://saltadev-website.onrender.com/health/
+```
+
+**Respuesta esperada:**
+```json
+{
+  "status": "healthy",
+  "services": {
+    "django": "ok",
+    "postgres": "ok",
+    "redis": "ok"
+  }
+}
+```
+
+### Configurar Health Check en Render
+
+1. Ir a **Web Service** → **Settings** → **Health & Alerts**
+2. Configurar **Health Check Path**: `/health/`
+3. Render verificará automáticamente el endpoint cada 30 segundos
