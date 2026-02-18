@@ -38,8 +38,10 @@ def can_approve_events(user: "User") -> bool:
 
 def events_list(request: HttpRequest) -> HttpResponse:
     """Render the events page with all approved events sorted by date."""
-    events = Event.objects.filter(status=Event.Status.APPROVED).order_by(
-        "-event_start_date"
+    events = (
+        Event.objects.filter(status=Event.Status.APPROVED)
+        .select_related("creator")
+        .order_by("-event_start_date")
     )
     latest_event = events.first()
     return render(

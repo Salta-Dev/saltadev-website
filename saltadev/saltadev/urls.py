@@ -27,6 +27,7 @@ from django.urls import include, path
 from django.views.generic import TemplateView
 
 from .sitemaps import sitemaps
+from .views import health_check
 
 
 def custom_404(request, exception=None, **kwargs):
@@ -37,6 +38,7 @@ def custom_404(request, exception=None, **kwargs):
 handler404 = custom_404
 
 urlpatterns = [
+    path("health/", health_check, name="health_check"),
     path("admin/", admin.site.urls),
     path(
         "robots.txt",
