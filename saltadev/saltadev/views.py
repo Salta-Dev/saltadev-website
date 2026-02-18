@@ -16,16 +16,15 @@ def health_check(request: HttpRequest) -> JsonResponse:
 
     Errors are logged but not exposed in the API response.
     """
+    services: dict[str, str] = {
+        "django": "ok",
+        "postgres": "unknown",
+        "redis": "unknown",
+    }
     health: dict[str, str | dict[str, str]] = {
         "status": "healthy",
-        "services": {
-            "django": "ok",
-            "postgres": "unknown",
-            "redis": "unknown",
-        },
+        "services": services,
     }
-    services = health["services"]
-    assert isinstance(services, dict)
 
     # Check PostgreSQL
     try:

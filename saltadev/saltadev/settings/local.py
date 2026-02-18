@@ -19,7 +19,7 @@ from .base import *  # noqa: F403, E402
 
 DEBUG = True
 
-SECRET_KEY = "django-insecure-local-development-key-do-not-use-in-production"  # pragma: allowlist secret
+SECRET_KEY = "django-insecure-local-development-key-do-not-use-in-production"  # nosec B105  # pragma: allowlist secret
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", ".ngrok-free.app", ".ngrok.io"]  # nosec B104
 
