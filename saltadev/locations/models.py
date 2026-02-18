@@ -9,7 +9,7 @@ class Country(models.Model):
     class Meta:
         verbose_name = "país"
         verbose_name_plural = "países"
-        ordering = ["name"]  # noqa: RUF012
+        ordering = ["name"]
 
     code = models.CharField(max_length=2, unique=True, primary_key=True)
     name = models.CharField(max_length=100)
@@ -24,8 +24,8 @@ class Province(models.Model):
     class Meta:
         verbose_name = "provincia"
         verbose_name_plural = "provincias"
-        ordering = ["country", "name"]  # noqa: RUF012
-        unique_together = ["country", "code"]  # noqa: RUF012
+        ordering = ["country", "name"]
+        unique_together = ["country", "code"]
 
     country = models.ForeignKey(
         Country,

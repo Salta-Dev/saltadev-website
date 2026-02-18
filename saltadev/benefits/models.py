@@ -146,6 +146,10 @@ class Benefit(models.Model):
         verbose_name = "beneficio"
         verbose_name_plural = "beneficios"
         ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=["is_active"]),
+            models.Index(fields=["creator"]),
+        ]
 
     def __str__(self) -> str:
         """Return string representation of the benefit."""

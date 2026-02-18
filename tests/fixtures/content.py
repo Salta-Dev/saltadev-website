@@ -23,6 +23,7 @@ def event(db):
         event_end_date=timezone.now() + timedelta(days=7, hours=2),
         location="Test Location",
         slug=_unique_slug("event"),
+        status=Event.Status.APPROVED,
     )
 
 
@@ -36,6 +37,7 @@ def past_event(db):
         event_end_date=timezone.now() - timedelta(days=7, hours=2),
         location="Past Location",
         slug=_unique_slug("past-event"),
+        status=Event.Status.APPROVED,
     )
 
 
@@ -53,6 +55,7 @@ def multiple_events(db):
                 event_end_date=now + timedelta(days=i, hours=2),
                 location=f"Location {i + 1}",
                 slug=_unique_slug(f"event-{i}"),
+                status=Event.Status.APPROVED,
             )
         )
     return events
@@ -74,7 +77,7 @@ def collaborator(db):
     """Create and return a collaborator."""
     return Collaborator.objects.create(
         name="Test Collaborator",
-        image="https://example.com/logo.png",
+        image_url="https://example.com/logo.png",
         link="https://example.com",
         slug=_unique_slug("collab"),
     )

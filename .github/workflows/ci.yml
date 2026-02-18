@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main, feature/*]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      DJANGO_SETTINGS_MODULE: saltadev.settings.local
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+      SECRET_KEY: test-secret-key-for-ci-only
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Run tests with coverage
+        run: uv run pytest --cov=saltadev --cov-report=xml -v
+
+      - name: Run ruff check
+        run: uv run ruff check saltadev
+
+      - name: Run ruff format check
+        run: uv run ruff format --check saltadev
+
+      - name: Run mypy
+        run: uv run mypy saltadev
+
+      - name: Run bandit security check
+        run: uv run bandit -r saltadev -x "**/tests/**"

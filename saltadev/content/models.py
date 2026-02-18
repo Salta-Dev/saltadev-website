@@ -69,6 +69,11 @@ class Event(models.Model):
         verbose_name = "evento"
         verbose_name_plural = "eventos"
         ordering = ("-event_start_date",)
+        indexes = [
+            models.Index(fields=["status"]),
+            models.Index(fields=["creator"]),
+            models.Index(fields=["event_start_date"]),
+        ]
 
     def __str__(self) -> str:
         return self.title
