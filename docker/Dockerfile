@@ -8,9 +8,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# System dependencies for PostgreSQL
+# System dependencies for PostgreSQL and git (required for git+ dependencies)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv
