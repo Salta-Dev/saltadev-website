@@ -55,6 +55,27 @@ cd saltadev && python manage.py tailwind build   # Build CSS
 cd saltadev && python manage.py tailwind watch   # Watch mode
 ```
 
+## CI/CD
+
+GitHub Actions workflow (`.github/workflows/ci.yml`) runs on push/PR to main:
+- pytest with coverage
+- ruff check/format
+- mypy type checking
+- bandit security scan
+
+```bash
+# Run CI checks locally
+uv run pytest --cov=saltadev
+uv run ruff check saltadev && uv run ruff format --check saltadev
+uv run mypy saltadev
+uv run bandit -r saltadev -x "**/tests/**"
+```
+
+## Healthcheck
+
+Endpoint `/health/` returns JSON with Django, PostgreSQL, and Redis status.
+Used by Render.com for service monitoring.
+
 ## Code Conventions
 
 ### Language
@@ -86,6 +107,7 @@ from saltadev.users.models import User, Profile
 | reCAPTCHA v2 | Form protection | `RECAPTCHA_V2_*` env vars |
 | Redis | Cache & sessions | `REDIS_URL` |
 | PostgreSQL | Database | `DATABASE_URL` |
+| django-csp | CSP headers (production) | Middleware in production.py |
 
 ## Common Patterns
 
@@ -127,3 +149,9 @@ Production runs on Render.com (free tier). See `deploy/RENDER.md` for full guide
 Key files:
 - `deploy/render.yaml` - Infrastructure as Code
 - `build.sh` - Build script (Tailwind, collectstatic, migrate)
+
+## Performance Optimizations
+
+- **Database indexes**: Event (status, creator, event_start_date), Benefit (is_active, creator), User (email_confirmed, role)
+- **Query optimization**: Views use `select_related()` to avoid N+1 queries
+- **View caching**: Home page cached for 1 minute
