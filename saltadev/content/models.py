@@ -35,7 +35,7 @@ class Event(models.Model):
     event_time_display = models.CharField(
         max_length=30, blank=True, verbose_name="hora a mostrar"
     )
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(max_length=255, unique=True)
     created_at = models.DateTimeField(default=timezone.now, verbose_name="creado")
 
     # New fields for user-created events
@@ -112,7 +112,7 @@ class Collaborator(models.Model):
         help_text="Subir imagen desde tu computadora",
     )
     link = models.URLField(blank=True, verbose_name="sitio web")
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(max_length=255, unique=True)
     created_at = models.DateTimeField(default=timezone.now, verbose_name="creado")
 
     class Meta:
