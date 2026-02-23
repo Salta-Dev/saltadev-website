@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from users.image_service import upload_benefit_image
 
 from .forms import BenefitForm, ImageSourceChoices
@@ -33,6 +34,7 @@ def _get_user(request: HttpRequest) -> "User":
 
 
 @login_required
+@require_GET
 def benefits_list(request: HttpRequest) -> HttpResponse:
     """Display list of all active benefits."""
     user = _get_user(request)
@@ -74,6 +76,7 @@ def benefits_list(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@require_GET
 def benefits_my_list(request: HttpRequest) -> HttpResponse:
     """Display list of benefits created by the current user."""
     user = _get_user(request)
@@ -97,6 +100,7 @@ def benefits_my_list(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@require_GET
 def benefit_detail(request: HttpRequest, pk: int) -> HttpResponse:
     """Display detail of a single benefit."""
     benefit = get_object_or_404(
@@ -114,6 +118,7 @@ def benefit_detail(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def benefit_create(request: HttpRequest) -> HttpResponse:
     """Create a new benefit."""
     user = _get_user(request)
@@ -156,6 +161,7 @@ def benefit_create(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def benefit_edit(request: HttpRequest, pk: int) -> HttpResponse:
     """Edit an existing benefit."""
     benefit = get_object_or_404(Benefit, pk=pk)
@@ -200,6 +206,7 @@ def benefit_edit(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def benefit_delete(request: HttpRequest, pk: int) -> HttpResponse:
     """Delete a benefit."""
     benefit = get_object_or_404(Benefit, pk=pk)
@@ -221,6 +228,7 @@ def benefit_delete(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 @login_required
+@require_POST
 def benefit_toggle_active(request: HttpRequest, pk: int) -> HttpResponse:
     """Toggle the active status of a benefit."""
     benefit = get_object_or_404(Benefit, pk=pk)

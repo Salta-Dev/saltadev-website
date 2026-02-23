@@ -4,6 +4,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.http import require_http_methods
 from saltadev.logging import get_logger
 from users.fingerprint import attach_fingerprint_cookie
 from users.models import User
@@ -141,6 +142,7 @@ def _handle_successful_login(
     return attach_fingerprint_cookie(response, fingerprint, should_set_cookie)
 
 
+@require_http_methods(["GET", "POST"])
 def login_view(request: HttpRequest) -> HttpResponse:
     """Handle user login with rate limiting and email verification check."""
     ip_address = get_client_ip(request)
@@ -202,6 +204,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
     )
 
 
+@require_http_methods(["GET", "POST"])
 def logout_view(request: HttpRequest) -> HttpResponse:
     """Handle user logout with confirmation page.
 

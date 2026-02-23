@@ -6,6 +6,7 @@ from typing import Any
 from content.models import Event
 from django import forms
 from django.utils.text import slugify
+from saltadev.form_widgets import DATE_TIME_CLASS, INPUT_CLASS, TEXTAREA_CLASS
 
 MONTHS_ES = [
     "",
@@ -64,40 +65,22 @@ class EventForm(forms.ModelForm):
     # Separate date and time fields for better 24h format control
     start_date = forms.DateField(
         required=False,
-        widget=forms.DateInput(
-            attrs={
-                "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                "type": "date",
-            }
-        ),
+        widget=forms.DateInput(attrs={"class": DATE_TIME_CLASS, "type": "date"}),
     )
     start_time = forms.TimeField(
         required=False,
         widget=forms.TimeInput(
-            attrs={
-                "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                "type": "time",
-                "step": "60",
-            }
+            attrs={"class": DATE_TIME_CLASS, "type": "time", "step": "60"}
         ),
     )
     end_date = forms.DateField(
         required=False,
-        widget=forms.DateInput(
-            attrs={
-                "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                "type": "date",
-            }
-        ),
+        widget=forms.DateInput(attrs={"class": DATE_TIME_CLASS, "type": "date"}),
     )
     end_time = forms.TimeField(
         required=False,
         widget=forms.TimeInput(
-            attrs={
-                "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                "type": "time",
-                "step": "60",
-            }
+            attrs={"class": DATE_TIME_CLASS, "type": "time", "step": "60"}
         ),
     )
 
@@ -114,48 +97,39 @@ class EventForm(forms.ModelForm):
         ]
         widgets = {
             "title": forms.TextInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "placeholder": "Título del evento",
-                }
+                attrs={"class": INPUT_CLASS, "placeholder": "Título del evento"}
             ),
             "description": forms.Textarea(
                 attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none",
+                    "class": TEXTAREA_CLASS,
                     "placeholder": "Descripción del evento...",
                     "rows": 4,
                 }
             ),
             "photo": forms.URLInput(
                 attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                    "class": INPUT_CLASS,
                     "placeholder": "https://ejemplo.com/imagen.jpg",
                     "id": "id_image_url",
                 }
             ),
             "location": forms.TextInput(
                 attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                    "class": INPUT_CLASS,
                     "placeholder": "Lugar del evento o 'Virtual'",
                 }
             ),
             "link": forms.URLInput(
                 attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                    "class": INPUT_CLASS,
                     "placeholder": "https://ejemplo.com/registro",
                 }
             ),
             "event_date_display": forms.TextInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "placeholder": "Ej: 15 de Marzo",
-                }
+                attrs={"class": INPUT_CLASS, "placeholder": "Ej: 15 de Marzo"}
             ),
             "event_time_display": forms.TextInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "placeholder": "Ej: 18:00 hs",
-                }
+                attrs={"class": INPUT_CLASS, "placeholder": "Ej: 18:00 hs"}
             ),
         }
 

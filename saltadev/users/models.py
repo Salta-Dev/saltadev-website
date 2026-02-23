@@ -12,6 +12,9 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.utils import timezone
 
+# Help text for social media username fields
+SOCIAL_USERNAME_HELP = "Solo el nombre de usuario (ej: facundopadilla)"
+
 
 def generate_public_id() -> str:
     """Generate a short, URL-safe public ID (8 characters)."""
@@ -164,25 +167,25 @@ class Profile(models.Model):
         max_length=100,
         blank=True,
         verbose_name="GitHub",
-        help_text="Solo el nombre de usuario (ej: facundopadilla)",
+        help_text=SOCIAL_USERNAME_HELP,
     )
     linkedin = models.CharField(
         max_length=100,
         blank=True,
         verbose_name="LinkedIn",
-        help_text="Solo el nombre de usuario (ej: facundopadilla)",
+        help_text=SOCIAL_USERNAME_HELP,
     )
     twitter = models.CharField(
         max_length=100,
         blank=True,
         verbose_name="Twitter/X",
-        help_text="Solo el nombre de usuario (ej: facundopadilla)",
+        help_text=SOCIAL_USERNAME_HELP,
     )
     instagram = models.CharField(
         max_length=100,
         blank=True,
         verbose_name="Instagram",
-        help_text="Solo el nombre de usuario (ej: facundopadilla)",
+        help_text=SOCIAL_USERNAME_HELP,
     )
     discord = models.CharField(
         max_length=100,

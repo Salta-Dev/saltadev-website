@@ -4,7 +4,7 @@ function initCountdown() {
   if (!dateElement || !dateElement.textContent.trim()) return;
 
   const eventDate = new Date(dateElement.textContent.trim());
-  if (isNaN(eventDate.getTime())) return;
+  if (Number.isNaN(eventDate.getTime())) return;
 
   function updateCountdown() {
     const now = new Date();

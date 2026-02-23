@@ -7,6 +7,14 @@
   <title>SaltaDev - {% if is_edit %}Editar{% else %}Crear{% endif %} Evento</title>
   {% include "includes/head.html" %}
   <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+  <style>
+    /* Date/Time picker icons - invert to white for dark theme */
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.1);
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex overflow-x-hidden selection:bg-primary selection:text-white font-display">
 
@@ -31,7 +39,7 @@
       </button>
     </header>
 
-    <div class="p-4 lg:p-8 max-w-4xl mx-auto w-full pb-20">
+    <div class="p-4 lg:p-8 max-w-4xl mx-auto w-full pb-32">
 
       {% if form.errors %}
         <div class="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
@@ -121,7 +129,6 @@
               {% if is_edit and event.photo %}
                 <div class="mt-3 p-3 bg-[#1d1919] rounded-lg border border-[#3d2f2f]">
                   <p class="text-xs text-[#8e8584] mb-2">Imagen actual:</p>
-                  <img src="{{ event.photo }}" alt="Imagen actual" class="max-h-24 rounded-lg object-contain">
                 </div>
               {% endif %}
             </div>

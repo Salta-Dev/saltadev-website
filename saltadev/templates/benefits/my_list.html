@@ -104,7 +104,7 @@
                 <a href="{% url 'benefit_detail' pk=benefit.pk %}">
                   <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors line-clamp-1">{{ benefit.title }}</h3>
                 </a>
-                <p class="text-[#8e8584] text-sm line-clamp-2 mb-4">{{ benefit.description }}</p>
+                <p class="text-[#8e8584] text-sm line-clamp-2 mb-4">{{ benefit.description|linebreaksbr }}</p>
 
                 <!-- Actions -->
                 <div class="flex items-center justify-between pt-3 border-t border-[#2a2424]">

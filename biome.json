@@ -4,7 +4,8 @@
     "includes": [
       "saltadev/**/*.{js,css,html}",
       "!!saltadev/static/**/*.min.*",
-      "!!saltadev/tailwind/**"
+      "!!saltadev/tailwind/**",
+      "!!saltadev/static/static/css/tailwind.css"
     ]
   },
   "formatter": {
@@ -17,6 +18,9 @@
     "rules": {
       "complexity": {
         "noImportantStyles": "off"
+      },
+      "suspicious": {
+        "noDocumentCookie": "off"
       }
     }
   },

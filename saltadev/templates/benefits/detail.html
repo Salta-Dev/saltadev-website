@@ -138,23 +138,10 @@
 
           <h1 class="text-2xl lg:text-3xl font-bold text-white mb-4">{{ benefit.title }}</h1>
 
-          <p class="text-[#b2a5a4] text-lg leading-relaxed mb-6">{{ benefit.description }}</p>
+          <p class="text-[#b2a5a4] text-lg leading-relaxed mb-6">{{ benefit.description|linebreaksbr }}</p>
 
           <!-- Info Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <!-- Modality -->
-            <div class="bg-[#1d1919] rounded-xl p-4 border border-[#2a2424]">
-              <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-primary">
-                  {% if benefit.modality == 'virtual' %}videocam{% elif benefit.modality == 'in_person' %}location_on{% else %}public{% endif %}
-                </span>
-                <div>
-                  <p class="text-xs text-[#6b605f] uppercase tracking-wider">Modalidad</p>
-                  <p class="text-white font-medium">{{ benefit.get_modality_display }}</p>
-                </div>
-              </div>
-            </div>
-
             <!-- Expiration -->
             {% if benefit.expiration_date %}
               <div class="bg-[#1d1919] rounded-xl p-4 border border-[#2a2424]">
@@ -201,28 +188,28 @@
           {% endif %}
 
           <!-- Contact Info -->
-          <div class="bg-[#1d1919] rounded-xl p-4 border border-[#2a2424] mb-6">
-            <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+          <div class="bg-[#1d1919] rounded-xl p-5 border border-[#2a2424] mb-6">
+            <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
               <span class="material-symbols-outlined text-primary">contact_page</span>
               Contacto
             </h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-wrap gap-2">
+              {% if benefit.get_contact_website %}
+                <a href="{{ benefit.get_contact_website }}" target="_blank" class="px-4 py-2 bg-[#2a2424] hover:bg-primary rounded-lg text-white text-sm transition-colors flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm">language</span>
+                  Sitio web
+                </a>
+              {% endif %}
               {% if benefit.get_contact_phone %}
-                <a href="tel:{{ benefit.get_contact_phone }}" class="flex items-center gap-2 text-[#8e8584] hover:text-white transition-colors">
-                  <span class="material-symbols-outlined">phone</span>
-                  <span class="text-sm">{{ benefit.get_contact_phone }}</span>
+                <a href="tel:{{ benefit.get_contact_phone }}" class="px-4 py-2 bg-[#2a2424] hover:bg-primary rounded-lg text-white text-sm transition-colors flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm">phone</span>
+                  {{ benefit.get_contact_phone }}
                 </a>
               {% endif %}
               {% if benefit.get_contact_email %}
-                <a href="mailto:{{ benefit.get_contact_email }}" class="flex items-center gap-2 text-[#8e8584] hover:text-white transition-colors">
-                  <span class="material-symbols-outlined">mail</span>
-                  <span class="text-sm truncate">{{ benefit.get_contact_email }}</span>
-                </a>
-              {% endif %}
-              {% if benefit.get_contact_website %}
-                <a href="{{ benefit.get_contact_website }}" target="_blank" class="flex items-center gap-2 text-[#8e8584] hover:text-white transition-colors">
-                  <span class="material-symbols-outlined">language</span>
-                  <span class="text-sm truncate">Sitio web</span>
+                <a href="mailto:{{ benefit.get_contact_email }}" class="px-4 py-2 bg-[#2a2424] hover:bg-primary rounded-lg text-white text-sm transition-colors flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm">mail</span>
+                  {{ benefit.get_contact_email }}
                 </a>
               {% endif %}
             </div>
