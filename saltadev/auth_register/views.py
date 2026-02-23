@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.http import require_http_methods
 from saltadev.logging import get_logger
 from users.fingerprint import attach_fingerprint_cookie
 from users.forms import RegisterForm
@@ -20,6 +21,7 @@ from users.utils import get_lockout_message
 logger = get_logger()
 
 
+@require_http_methods(["GET", "POST"])
 def register_view(request: HttpRequest) -> HttpResponse:
     """Handle new user registration with rate limiting and reCAPTCHA."""
     ip_address = get_client_ip(request)

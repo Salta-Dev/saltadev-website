@@ -6,9 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from users.image_service import upload_event_image
+from django.views.decorators.http import require_GET, require_http_methods
+from users.image_service import ImageUploadResult, upload_event_image
 
 from .forms import EventForm, ImageSourceChoices
+
+# Template paths
+_TEMPLATE_FORM = "events/form.html"
 
 if TYPE_CHECKING:
     from users.models import User
@@ -20,6 +24,48 @@ def _get_user(request: HttpRequest) -> "User":
 
     pk: int = request.user.pk  # type: ignore[assignment]
     return User.objects.get(pk=pk)
+
+
+def _set_event_status(event: Event, user: "User") -> None:
+    """Set event status based on user permissions."""
+    if can_approve_events(user):
+        event.status = Event.Status.APPROVED
+        event.approved_by = user
+        event.approved_at = timezone.now()
+    else:
+        event.status = Event.Status.PENDING
+
+
+def _handle_event_image_upload(
+    event: Event, form: EventForm, request: HttpRequest
+) -> None:
+    """Handle optional image upload for event."""
+    image_source = form.cleaned_data.get("image_source")
+    image_file = form.cleaned_data.get("image_file")
+
+    if image_source != ImageSourceChoices.FILE or not image_file:
+        return
+
+    result: ImageUploadResult = upload_event_image(image_file)
+    if result.success and result.url:
+        event.photo = result.url
+    else:
+        messages.warning(
+            request,
+            f"No se pudo subir la imagen: {result.error}. "
+            "El evento se creó sin imagen.",
+        )
+
+
+def _show_event_success_message(event: Event, request: HttpRequest) -> None:
+    """Show success message based on event status."""
+    if event.status == Event.Status.PENDING:
+        messages.success(
+            request,
+            "Evento creado. Está pendiente de aprobación por un moderador.",
+        )
+    else:
+        messages.success(request, "Evento creado exitosamente.")
 
 
 def can_manage_events(user: "User") -> bool:
@@ -36,6 +82,7 @@ def can_approve_events(user: "User") -> bool:
     return user.role in ["administrador", "moderador"]
 
 
+@require_GET
 def events_list(request: HttpRequest) -> HttpResponse:
     """Render the events page with all approved events sorted by date."""
     events = (
@@ -50,6 +97,7 @@ def events_list(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@require_GET
 def my_events(request: HttpRequest) -> HttpResponse:
     """Display events created by the current user."""
     user = _get_user(request)
@@ -70,6 +118,7 @@ def my_events(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@require_GET
 def pending_events(request: HttpRequest) -> HttpResponse:
     """Display events pending approval (admin/moderator only)."""
     user = _get_user(request)
@@ -87,6 +136,7 @@ def pending_events(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def event_create(request: HttpRequest) -> HttpResponse:
     """Create a new event."""
     user = _get_user(request)
@@ -94,60 +144,25 @@ def event_create(request: HttpRequest) -> HttpResponse:
         messages.error(request, "No tenés permisos para crear eventos.")
         return redirect("events")
 
-    if request.method == "POST":
-        form = EventForm(request.POST, request.FILES)
-        if form.is_valid():
-            event = form.save(commit=False)
-            event.creator = user
+    if request.method != "POST":
+        return render(request, _TEMPLATE_FORM, {"form": EventForm(), "is_edit": False})
 
-            # Determine status based on user role
-            if can_approve_events(user):
-                event.status = Event.Status.APPROVED
-                event.approved_by = user
-                event.approved_at = timezone.now()
-            else:
-                event.status = Event.Status.PENDING
+    form = EventForm(request.POST, request.FILES)
+    if not form.is_valid():
+        return render(request, _TEMPLATE_FORM, {"form": form, "is_edit": False})
 
-            # Handle image upload if file was provided
-            image_source = form.cleaned_data.get("image_source")
-            image_file = form.cleaned_data.get("image_file")
+    event = form.save(commit=False)
+    event.creator = user
+    _set_event_status(event, user)
+    _handle_event_image_upload(event, form, request)
+    event.save()
+    _show_event_success_message(event, request)
 
-            if image_source == ImageSourceChoices.FILE and image_file:
-                result = upload_event_image(image_file)
-                if result.success and result.url:
-                    event.photo = result.url
-                else:
-                    messages.warning(
-                        request,
-                        f"No se pudo subir la imagen: {result.error}. "
-                        "El evento se creó sin imagen.",
-                    )
-
-            event.save()
-
-            if event.status == Event.Status.PENDING:
-                messages.success(
-                    request,
-                    "Evento creado. Está pendiente de aprobación por un moderador.",
-                )
-            else:
-                messages.success(request, "Evento creado exitosamente.")
-
-            return redirect("my_events")
-    else:
-        form = EventForm()
-
-    return render(
-        request,
-        "events/form.html",
-        {
-            "form": form,
-            "is_edit": False,
-        },
-    )
+    return redirect("my_events")
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def event_edit(request: HttpRequest, pk: int) -> HttpResponse:
     """Edit an existing event."""
     event = get_object_or_404(Event, pk=pk)
@@ -185,7 +200,7 @@ def event_edit(request: HttpRequest, pk: int) -> HttpResponse:
 
     return render(
         request,
-        "events/form.html",
+        _TEMPLATE_FORM,
         {
             "form": form,
             "event": event,
@@ -195,6 +210,7 @@ def event_edit(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def event_delete(request: HttpRequest, pk: int) -> HttpResponse:
     """Delete an event."""
     event = get_object_or_404(Event, pk=pk)
@@ -217,6 +233,7 @@ def event_delete(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def event_approve(request: HttpRequest, pk: int) -> HttpResponse:
     """Approve a pending event."""
     event = get_object_or_404(Event, pk=pk)
@@ -242,6 +259,7 @@ def event_approve(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def event_reject(request: HttpRequest, pk: int) -> HttpResponse:
     """Reject a pending event."""
     event = get_object_or_404(Event, pk=pk)

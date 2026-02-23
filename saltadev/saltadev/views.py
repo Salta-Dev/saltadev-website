@@ -3,10 +3,12 @@
 from django.core.cache import cache
 from django.db import connection
 from django.http import HttpRequest, JsonResponse
+from django.views.decorators.http import require_GET
 from loguru import logger
 
 
-def health_check(request: HttpRequest) -> JsonResponse:
+@require_GET
+def health_check(_request: HttpRequest) -> JsonResponse:
     """Healthcheck endpoint for Render monitoring.
 
     Verifies:

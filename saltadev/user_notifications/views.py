@@ -4,10 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.http import require_GET, require_POST
 from notifications.models import Notification
 
 
 @login_required
+@require_GET
 def notification_list(request: HttpRequest) -> HttpResponse:
     """Display list of user notifications.
 
@@ -27,6 +29,7 @@ def notification_list(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@require_POST
 def mark_as_read(request: HttpRequest, notification_id: int) -> HttpResponseRedirect:
     """Mark a single notification as read.
 
@@ -41,6 +44,7 @@ def mark_as_read(request: HttpRequest, notification_id: int) -> HttpResponseRedi
 
 
 @login_required
+@require_POST
 def mark_all_as_read(request: HttpRequest) -> HttpResponseRedirect:
     """Mark all notifications as read for the current user."""
     request.user.notifications.mark_all_as_read()  # type: ignore[union-attr]

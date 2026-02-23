@@ -1,6 +1,6 @@
 """Dashboard views for authenticated users."""
 
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from benefits.models import Benefit
 from content.models import Event
@@ -11,6 +11,7 @@ from django.db.models import Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_GET, require_http_methods
 from users.image_service import (
     _is_cloudinary_configured,
     delete_cloudinary_image,
@@ -21,8 +22,35 @@ from users.models import Profile, User
 
 from .forms import ProfileForm
 
+if TYPE_CHECKING:
+    from django.core.files.uploadedfile import UploadedFile
+
+
+def _delete_old_avatar(profile: Profile) -> None:
+    """Delete previous avatar (Cloudinary or local)."""
+    if not profile.avatar_url:
+        return
+
+    if _is_cloudinary_configured() and profile.avatar_delete_url:
+        delete_cloudinary_image(profile.avatar_delete_url)
+    elif not _is_cloudinary_configured():
+        delete_local_image(profile.avatar_url)
+
+
+def _upload_new_avatar(
+    profile: Profile, avatar_file: "UploadedFile", request: HttpRequest
+) -> None:
+    """Upload new avatar and update profile fields."""
+    result = upload_avatar(avatar_file)
+    if result.success:
+        profile.avatar_url = result.url or ""
+        profile.avatar_delete_url = result.public_id or ""
+    else:
+        messages.error(request, f"Error al subir imagen: {result.error}")
+
 
 @login_required
+@require_GET
 def dashboard_view(request: HttpRequest) -> HttpResponse:
     """Render the user dashboard with profile, membership and upcoming events."""
     user = cast(User, request.user)  # @login_required ensures authenticated user
@@ -58,48 +86,39 @@ def dashboard_view(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def profile_edit_view(request: HttpRequest) -> HttpResponse:
     """Handle profile editing including avatar upload."""
     user = cast(User, request.user)  # @login_required ensures authenticated user
     profile, _ = Profile.objects.get_or_create(user=user)
 
-    if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            # Handle avatar upload
-            avatar_file = form.cleaned_data.get("avatar_file")
-            if avatar_file:
-                # Delete old avatar if it exists
-                if profile.avatar_url:
-                    if _is_cloudinary_configured() and profile.avatar_delete_url:
-                        # avatar_delete_url stores Cloudinary public_id
-                        delete_cloudinary_image(profile.avatar_delete_url)
-                    elif not _is_cloudinary_configured():
-                        delete_local_image(profile.avatar_url)
-
-                # Upload new avatar
-                result = upload_avatar(avatar_file)
-                if result.success:
-                    profile.avatar_url = result.url or ""
-                    # Store public_id for Cloudinary deletion (reusing field)
-                    profile.avatar_delete_url = result.public_id or ""
-                else:
-                    messages.error(request, f"Error al subir imagen: {result.error}")
-
-            form.save()
-            messages.success(request, "Perfil actualizado correctamente.")
-            return redirect("dashboard")
-    else:
+    if request.method != "POST":
         form = ProfileForm(instance=profile)
+        return render(
+            request,
+            "dashboard/profile_edit.html",
+            {"user": user, "profile": profile, "form": form},
+        )
 
-    context = {
-        "user": user,
-        "profile": profile,
-        "form": form,
-    }
-    return render(request, "dashboard/profile_edit.html", context)
+    form = ProfileForm(request.POST, request.FILES, instance=profile)
+    if not form.is_valid():
+        return render(
+            request,
+            "dashboard/profile_edit.html",
+            {"user": user, "profile": profile, "form": form},
+        )
+
+    avatar_file = form.cleaned_data.get("avatar_file")
+    if avatar_file:
+        _delete_old_avatar(profile)
+        _upload_new_avatar(profile, avatar_file, request)
+
+    form.save()
+    messages.success(request, "Perfil actualizado correctamente.")
+    return redirect("dashboard")
 
 
+@require_GET
 def public_credential_view(request: HttpRequest, public_id: str) -> HttpResponse:
     """Display a public credential page for a user."""
     user = get_object_or_404(User, public_id=public_id)

@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 from saltadev.logging import get_logger
 from users.fingerprint import attach_fingerprint_cookie
 from users.models import User
@@ -30,6 +31,7 @@ from .models import PasswordResetToken
 logger = get_logger()
 
 
+@require_http_methods(["GET", "POST"])
 def request_reset_view(request: HttpRequest) -> HttpResponse:
     """Handle the password reset request form and send the reset email."""
     ip_address = get_client_ip(request)
@@ -94,6 +96,7 @@ def request_reset_view(request: HttpRequest) -> HttpResponse:
     return attach_fingerprint_cookie(response, fingerprint, should_set_cookie)
 
 
+@require_http_methods(["GET", "POST"])
 def confirm_reset_view(request: HttpRequest) -> HttpResponse:
     """Validate the reset token and allow the user to set a new password."""
     ip_address = get_client_ip(request)

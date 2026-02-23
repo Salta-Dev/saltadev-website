@@ -7,6 +7,7 @@ from django.contrib.auth import login
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.http import require_GET, require_http_methods
 from saltadev.logging import get_logger
 
 from .fingerprint import attach_fingerprint_cookie
@@ -179,6 +180,72 @@ def _handle_invalid_code(
     return _render_verify_page(request, email, fingerprint, should_set_cookie)
 
 
+def _handle_verify_post(
+    request: HttpRequest, ip_address: str, fingerprint: str, should_set_cookie: bool
+) -> HttpResponse:
+    """Process POST request for verification (verify code or resend)."""
+    email = request.POST.get("email", "")
+    action = request.POST.get("action", "verify")
+    keys = build_keys("verify", ip_address, email, fingerprint)
+
+    if is_blocked(keys, VERIFY_LIMIT):
+        return _handle_verify_blocked(
+            request, email, ip_address, fingerprint, should_set_cookie
+        )
+
+    if action == "resend":
+        if not email:
+            messages.error(request, "Email requerido.")
+            return redirect("login")
+        return _handle_resend_request(
+            request, email, ip_address, fingerprint, should_set_cookie
+        )
+
+    code = request.POST.get("code", "")
+
+    if not email or not code:
+        return _handle_missing_fields(
+            request, email, ip_address, keys, fingerprint, should_set_cookie
+        )
+
+    try:
+        user = User.objects.get(email=email)
+    except ObjectDoesNotExist:
+        return _handle_user_not_found(
+            request, email, ip_address, keys, fingerprint, should_set_cookie
+        )
+
+    if verify_code(user, code):
+        return _handle_successful_verification(
+            request, user, ip_address, keys, fingerprint, should_set_cookie
+        )
+    return _handle_invalid_code(
+        request, email, ip_address, keys, fingerprint, should_set_cookie
+    )
+
+
+def _handle_verify_get(request: HttpRequest) -> HttpResponse | None:
+    """Validate GET request. Returns redirect if invalid, None if valid."""
+    email = request.GET.get("email", "").strip()
+
+    if not email:
+        messages.error(request, "Acceso inválido. Iniciá sesión o registrate.")
+        return redirect("login")
+
+    try:
+        user = User.objects.get(email=email)
+    except ObjectDoesNotExist:
+        messages.error(request, "No existe una cuenta con ese email.")
+        return redirect("login")
+
+    if user.email_confirmed:
+        messages.info(request, "Tu cuenta ya está verificada. Podés iniciar sesión.")
+        return redirect("login")
+
+    return None
+
+
+@require_http_methods(["GET", "POST"])
 def verify_email(request: HttpRequest) -> HttpResponse:
     """Handle email verification via 6-digit code submission or code resend.
 
@@ -191,74 +258,18 @@ def verify_email(request: HttpRequest) -> HttpResponse:
     ip_address = get_client_ip(request)
     fingerprint, should_set_cookie = get_fingerprint(request)
 
-    # Handle POST requests (code verification or resend)
     if request.method == "POST":
-        email = request.POST.get("email", "")
-        action = request.POST.get("action", "verify")
-        keys = build_keys("verify", ip_address, email, fingerprint)
+        return _handle_verify_post(request, ip_address, fingerprint, should_set_cookie)
 
-        if is_blocked(keys, VERIFY_LIMIT):
-            return _handle_verify_blocked(
-                request, email, ip_address, fingerprint, should_set_cookie
-            )
+    redirect_response = _handle_verify_get(request)
+    if redirect_response:
+        return redirect_response
 
-        # Handle resend request (POST with action=resend)
-        if action == "resend":
-            if not email:
-                messages.error(request, "Email requerido.")
-                return redirect("login")
-            return _handle_resend_request(
-                request, email, ip_address, fingerprint, should_set_cookie
-            )
-
-        # Handle code verification
-        code = request.POST.get("code", "")
-
-        if not email or not code:
-            return _handle_missing_fields(
-                request, email, ip_address, keys, fingerprint, should_set_cookie
-            )
-
-        try:
-            user = User.objects.get(email=email)
-        except ObjectDoesNotExist:
-            return _handle_user_not_found(
-                request, email, ip_address, keys, fingerprint, should_set_cookie
-            )
-
-        if verify_code(user, code):
-            return _handle_successful_verification(
-                request, user, ip_address, keys, fingerprint, should_set_cookie
-            )
-        return _handle_invalid_code(
-            request, email, ip_address, keys, fingerprint, should_set_cookie
-        )
-
-    # GET request - validate email parameter
     email = request.GET.get("email", "").strip()
-
-    # No email provided - redirect to login
-    if not email:
-        messages.error(request, "Acceso inválido. Iniciá sesión o registrate.")
-        return redirect("login")
-
-    # Validate user exists
-    try:
-        user = User.objects.get(email=email)
-    except ObjectDoesNotExist:
-        messages.error(request, "No existe una cuenta con ese email.")
-        return redirect("login")
-
-    # Check if already verified
-    if user.email_confirmed:
-        messages.info(request, "Tu cuenta ya está verificada. Podés iniciar sesión.")
-        return redirect("login")
-
-    # Valid unverified user - show verification page
-    keys = build_keys("verify", ip_address, email, fingerprint)
     return _render_verify_page(request, email, fingerprint, should_set_cookie)
 
 
+@require_GET
 def clear_rate_limits_view(request: HttpRequest) -> HttpResponse:
     """Staff-only view to clear rate limit blocks by IP, email, or fingerprint."""
     if not request.user.is_authenticated or not request.user.is_staff:
