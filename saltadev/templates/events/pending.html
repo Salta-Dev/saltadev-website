@@ -70,7 +70,7 @@
                 <div class="flex-1 min-w-0">
                   <div>
                     <h3 class="font-bold text-white text-lg">{{ event.title }}</h3>
-                    <p class="text-sm text-[#8e8584] mt-1 line-clamp-2">{{ event.description|default:"Sin descripción" }}</p>
+                    <p class="text-sm text-[#8e8584] mt-1 line-clamp-2">{{ event.description|default:"Sin descripción"|linebreaksbr }}</p>
                     <div class="flex flex-wrap items-center gap-3 mt-2 text-xs text-[#6b605f]">
                       {% if event.creator %}
                         <span class="flex items-center gap-1">

@@ -41,19 +41,12 @@ def notify_event_approved(
     # Get previous status from pre_save signal
     previous_status = getattr(instance, "_previous_status", None)
 
-    # Check if this is a new approval
-    is_newly_approved = False
-
-    if created and instance.status == Event.Status.APPROVED:
-        # New event created as approved (by admin/moderator)
-        is_newly_approved = True
-    elif (
-        not created
-        and previous_status == Event.Status.PENDING
-        and instance.status == Event.Status.APPROVED
-    ):
-        # Existing event changed from pending to approved
-        is_newly_approved = True
+    # Check if this is a new approval:
+    # - New event created as approved (by admin/moderator), OR
+    # - Existing event changed from pending to approved
+    is_newly_approved = instance.status == Event.Status.APPROVED and (
+        created or previous_status == Event.Status.PENDING
+    )
 
     if not is_newly_approved:
         return

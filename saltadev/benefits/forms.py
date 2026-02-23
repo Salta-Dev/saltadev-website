@@ -1,6 +1,12 @@
 """Forms for the benefits app."""
 
 from django import forms
+from saltadev.form_widgets import (
+    DATE_TIME_CLASS,
+    INPUT_CLASS,
+    SELECT_CLASS,
+    TEXTAREA_CLASS,
+)
 
 from .models import Benefit
 
@@ -62,33 +68,26 @@ class BenefitForm(forms.ModelForm):
         ]
         widgets = {
             "title": forms.TextInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "placeholder": "Título del beneficio",
-                }
+                attrs={"class": INPUT_CLASS, "placeholder": "Título del beneficio"}
             ),
             "description": forms.Textarea(
                 attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none",
+                    "class": TEXTAREA_CLASS,
                     "placeholder": "Descripción detallada del beneficio...",
                     "rows": 4,
                 }
             ),
             "image": forms.URLInput(
                 attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                    "class": INPUT_CLASS,
                     "placeholder": "https://ejemplo.com/imagen.jpg",
                     "id": "id_image_url",
                 }
             ),
-            "benefit_type": forms.Select(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                }
-            ),
+            "benefit_type": forms.Select(attrs={"class": SELECT_CLASS}),
             "discount_percentage": forms.NumberInput(
                 attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                    "class": INPUT_CLASS,
                     "placeholder": "Ej: 20",
                     "min": 1,
                     "max": 100,
@@ -96,56 +95,33 @@ class BenefitForm(forms.ModelForm):
             ),
             "redemption_limit": forms.NumberInput(
                 attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
+                    "class": INPUT_CLASS,
                     "placeholder": "Dejar vacío para ilimitado",
                     "min": 1,
                 }
             ),
             "expiration_date": forms.DateInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "type": "date",
-                }
+                attrs={"class": DATE_TIME_CLASS, "type": "date"}
             ),
             "contact_source": forms.Select(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "id": "contact_source",
-                }
+                attrs={"class": SELECT_CLASS, "id": "contact_source"}
             ),
             "contact_phone": forms.TextInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "placeholder": "+54 9 387 123 4567",
-                }
+                attrs={"class": INPUT_CLASS, "placeholder": "+54 9 387 123 4567"}
             ),
             "contact_email": forms.EmailInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "placeholder": "contacto@ejemplo.com",
-                }
+                attrs={"class": INPUT_CLASS, "placeholder": "contacto@ejemplo.com"}
             ),
             "contact_website": forms.URLInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "placeholder": "https://ejemplo.com",
-                }
+                attrs={"class": INPUT_CLASS, "placeholder": "https://ejemplo.com"}
             ),
-            "modality": forms.Select(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "id": "modality",
-                }
-            ),
+            "modality": forms.Select(attrs={"class": SELECT_CLASS, "id": "modality"}),
             "location": forms.TextInput(
-                attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary",
-                    "placeholder": "Av. Ejemplo 123, Salta",
-                }
+                attrs={"class": INPUT_CLASS, "placeholder": "Av. Ejemplo 123, Salta"}
             ),
             "discount_codes": forms.Textarea(
                 attrs={
-                    "class": "w-full px-4 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white placeholder-[#6b605f] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none",
+                    "class": TEXTAREA_CLASS,
                     "placeholder": "CODIGO1, CODIGO2, CODIGO3",
                     "rows": 2,
                 }

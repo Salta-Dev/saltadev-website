@@ -73,9 +73,6 @@
               <option value="discount" {% if current_type == 'discount' %}selected{% endif %}>Descuento</option>
               <option value="redeemable" {% if current_type == 'redeemable' %}selected{% endif %}>Canjeable</option>
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <span class="material-symbols-outlined text-[#6b605f] text-[20px]">expand_more</span>
-            </div>
           </div>
           <div class="relative w-full sm:w-auto">
             <select name="modality" class="w-full pl-4 pr-10 py-3 bg-[#1d1919] border border-[#3d2f2f] rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer appearance-none">
@@ -84,9 +81,6 @@
               <option value="in_person" {% if current_modality == 'in_person' %}selected{% endif %}>Presencial</option>
               <option value="both" {% if current_modality == 'both' %}selected{% endif %}>Virtual y Presencial</option>
             </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <span class="material-symbols-outlined text-[#6b605f] text-[20px]">expand_more</span>
-            </div>
           </div>
         </form>
       </div>
@@ -137,7 +131,7 @@
               <!-- Content -->
               <div class="p-5">
                 <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors line-clamp-1">{{ benefit.title }}</h3>
-                <p class="text-[#8e8584] text-sm line-clamp-2 mb-4">{{ benefit.description }}</p>
+                <p class="text-[#8e8584] text-sm line-clamp-2 mb-4">{{ benefit.description|linebreaksbr }}</p>
 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">

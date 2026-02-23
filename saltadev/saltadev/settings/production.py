@@ -63,17 +63,18 @@ SECURE_BROWSER_XSS_FILTER = True
 
 # Content Security Policy (django-csp)
 MIDDLEWARE.append("csp.middleware.CSPMiddleware")  # noqa: F405
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", "https://www.google.com", "https://www.gstatic.com")
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com")
-CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
+_CSP_SELF = "'self'"
+CSP_DEFAULT_SRC = (_CSP_SELF,)
+CSP_SCRIPT_SRC = (_CSP_SELF, "https://www.google.com", "https://www.gstatic.com")
+CSP_STYLE_SRC = (_CSP_SELF, "'unsafe-inline'", "https://fonts.googleapis.com")
+CSP_FONT_SRC = (_CSP_SELF, "https://fonts.gstatic.com")
 CSP_IMG_SRC = (
-    "'self'",
+    _CSP_SELF,
     "https://res.cloudinary.com",
     "data:",
     "https://api.qrserver.com",
 )
-CSP_CONNECT_SRC = ("'self'",)
+CSP_CONNECT_SRC = (_CSP_SELF,)
 CSP_FRAME_SRC = ("https://www.google.com",)  # For reCAPTCHA
 
 # Logging

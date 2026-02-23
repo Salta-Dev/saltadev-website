@@ -65,7 +65,7 @@
               {% endif %}
             </div>
             <h2 class="text-2xl md:text-3xl font-bold text-white">{% if latest_event %}{{ latest_event.title }}{% endif %}</h2>
-            <p class="text-white leading-relaxed">{% if latest_event %}{{ latest_event.description }}{% endif %}</p>
+            <p class="text-white leading-relaxed">{% if latest_event %}{{ latest_event.description|linebreaksbr }}{% endif %}</p>
             {% if latest_event %}
               <div class="flex flex-wrap gap-3">
                 <a class="bg-primary hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-primary/20 transition-all" href="{{ latest_event.link }}" target="_blank">Inscribirse</a>
@@ -88,7 +88,7 @@
                   <span>{{ latest_event.location }}</span>
                 </div>
                 <h3 class="text-2xl font-bold text-white group-hover:text-primary transition-colors">{{ latest_event.title }}</h3>
-                <p class="text-white leading-relaxed">{{ latest_event.description }}</p>
+                <p class="text-white leading-relaxed">{{ latest_event.description|linebreaksbr }}</p>
               </div>
             </div>
           </div>
@@ -135,7 +135,7 @@
                   <span>{{ event.event_time_display }}</span>
                 </div>
                 <h3 class="text-xl font-bold text-white mb-2 leading-tight group-hover:text-primary transition-colors">{{ event.title }}</h3>
-                <p class="text-white text-sm mb-4">{{ event.description }}</p>
+                <p class="text-white text-sm mb-4">{{ event.description|linebreaksbr }}</p>
                 <div class="mt-auto pt-4 border-t border-border-dark/50 flex items-center justify-between gap-3">
                   <div class="flex items-center gap-1.5 text-white text-xs">
                     <span class="material-symbols-outlined text-base">location_on</span>
