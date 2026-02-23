@@ -7,4 +7,7 @@ pytest_plugins = [
     "tests.fixtures.http",
     "tests.fixtures.content",
     "tests.fixtures.locations",
+    "tests.fixtures.benefits",
+    "tests.fixtures.notifications",
+    "tests.fixtures.password_reset",
 ]
