@@ -9,33 +9,33 @@ from django.urls import reverse
 class TestPublicCredentialView:
     """Tests for the public credential page."""
 
-    def test_public_credential_view_returns_200(self, verified_user):
+    def test_public_credential_view_returns_200(self, verified_user_with_dni):
         """Public credential should return 200 for valid public_id."""
         client = Client()
         response = client.get(
-            reverse("public_credential", kwargs={"public_id": verified_user.public_id})
+            reverse("public_credential", kwargs={"public_id": verified_user_with_dni.public_id})
         )
         assert response.status_code == 200
 
-    def test_public_credential_includes_user_info(self, verified_user):
+    def test_public_credential_includes_user_info(self, verified_user_with_dni):
         """Public credential should include user information."""
         client = Client()
         response = client.get(
-            reverse("public_credential", kwargs={"public_id": verified_user.public_id})
+            reverse("public_credential", kwargs={"public_id": verified_user_with_dni.public_id})
         )
         content = response.content.decode()
-        assert verified_user.first_name in content
+        assert verified_user_with_dni.first_name in content
 
-    def test_public_credential_context(self, verified_user):
+    def test_public_credential_context(self, verified_user_with_dni):
         """Public credential context should include expected data."""
         client = Client()
         response = client.get(
-            reverse("public_credential", kwargs={"public_id": verified_user.public_id})
+            reverse("public_credential", kwargs={"public_id": verified_user_with_dni.public_id})
         )
         assert "credential_user" in response.context
         assert "credential_profile" in response.context
         assert "credential_url" in response.context
-        assert response.context["credential_user"] == verified_user
+        assert response.context["credential_user"] == verified_user_with_dni
 
     def test_public_credential_invalid_id_returns_404(self):
         """Public credential should return 404 for invalid public_id."""
@@ -45,13 +45,13 @@ class TestPublicCredentialView:
         )
         assert response.status_code == 404
 
-    def test_public_credential_no_login_required(self, verified_user):
+    def test_public_credential_no_login_required(self, verified_user_with_dni):
         """Public credential should be accessible without login."""
         client = Client()
         # Ensure no user is logged in
         client.logout()
         response = client.get(
-            reverse("public_credential", kwargs={"public_id": verified_user.public_id})
+            reverse("public_credential", kwargs={"public_id": verified_user_with_dni.public_id})
         )
         assert response.status_code == 200
 
