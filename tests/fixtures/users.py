@@ -3,7 +3,7 @@
 from datetime import date
 
 import pytest
-from users.models import EmailVerificationCode, User
+from users.models import EmailVerificationCode, Profile, User
 
 
 @pytest.fixture
@@ -30,6 +30,15 @@ def verified_user(user):
     user.email_confirmed = True
     user.save()
     return user
+
+
+@pytest.fixture
+def verified_user_with_dni(verified_user):
+    """Return a verified user with DNI set (required for credential views)."""
+    profile, _ = Profile.objects.get_or_create(user=verified_user)
+    profile.dni = "12345678"
+    profile.save()
+    return verified_user
 
 
 @pytest.fixture
