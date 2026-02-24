@@ -53,12 +53,18 @@ if os.getenv("REDIS_URL"):
             "LOCATION": os.environ["REDIS_URL"],
         }
     }
+    # Celery: use Redis as broker when available
+    CELERY_BROKER_URL = os.environ["REDIS_URL"]
+    CELERY_RESULT_BACKEND = os.environ["REDIS_URL"]
 else:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
+    # Celery: run tasks synchronously when Redis is not available
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
 
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # Uncomment above to print emails to console instead of sending them

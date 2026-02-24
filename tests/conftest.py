@@ -10,4 +10,5 @@ pytest_plugins = [
     "tests.fixtures.benefits",
     "tests.fixtures.notifications",
     "tests.fixtures.password_reset",
+    "tests.fixtures.celery",
 ]

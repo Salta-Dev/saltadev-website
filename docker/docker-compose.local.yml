@@ -52,6 +52,25 @@ services:
       timeout: 5s
       retries: 5
 
+  celery:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ../saltadev:/app/saltadev  # Hot reload
+    environment:
+      - DJANGO_SETTINGS_MODULE=saltadev.settings.local
+      - DATABASE_URL=postgresql://saltadev:saltadev@db:5432/saltadev_local
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - ../saltadev/.env.local
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uv run celery -A saltadev worker --loglevel=info --chdir /app/saltadev
+
 volumes:
   postgres_local_data:
   redis_local_data:

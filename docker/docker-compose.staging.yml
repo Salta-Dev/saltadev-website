@@ -43,6 +43,22 @@ services:
       retries: 5
     restart: unless-stopped
 
+  celery:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      - DJANGO_SETTINGS_MODULE=saltadev.settings.staging
+    env_file:
+      - ../saltadev/.env.staging
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    command: uv run celery -A saltadev worker --loglevel=info --chdir /app/saltadev
+
   nginx:
     image: nginx:alpine
     ports:

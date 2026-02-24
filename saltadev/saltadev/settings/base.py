@@ -190,3 +190,12 @@ SILENCED_SYSTEM_CHECKS = ["django_recaptcha.recaptcha_test_key_error"]
 # source.css is outside static/ to avoid WhiteNoise processing issues
 TAILWIND_CLI_SRC_CSS = "tailwind/source.css"
 TAILWIND_CLI_DIST_CSS = "static/css/tailwind.css"
+
+# Celery configuration (base settings, broker/result backend set per environment)
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TIME_LIMIT = 300  # 5 minutes max per task
+CELERY_RESULT_EXPIRES = 3600  # Results expire after 1 hour
+CELERY_TASK_ACKS_LATE = True  # Re-execute task if worker dies

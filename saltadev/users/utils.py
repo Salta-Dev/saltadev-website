@@ -11,6 +11,7 @@ from django.utils.html import strip_tags
 from saltadev.logging import get_logger
 
 from .models import EmailVerificationCode, User
+from .tasks import send_password_reset_email_task, send_verification_email_task
 
 logger = get_logger()
 
@@ -27,13 +28,12 @@ def generate_verification_code() -> str:
     return "".join(secrets.choice("0123456789") for _ in range(6))
 
 
-def send_verification_code(user: User) -> None:
-    """Invalidate existing codes and send a new verification email to the user."""
-    EmailVerificationCode.objects.filter(user=user, used=False).update(used=True)
-    code = generate_verification_code()
-    EmailVerificationCode.objects.create(user=user, code=code)
-
-    verify_url = f"{settings.SITE_URL}/verificar/?{urlencode({'email': user.email})}"
+def _send_verification_email_sync(
+    user: User,
+    code: str,
+    verify_url: str,
+) -> None:
+    """Send verification email synchronously (internal helper)."""
     html_message = render_to_string(
         "emails/verification.html",
         {
@@ -59,7 +59,33 @@ def send_verification_code(user: User) -> None:
         fail_silently=False,
         html_message=html_message,
     )
-    logger.info("Verification email sent", extra={"user_id": user.pk})
+    logger.info("Verification email sent (sync)", extra={"user_id": user.pk})
+
+
+def send_verification_code(user: User, sync: bool = False) -> None:
+    """Invalidate existing codes and send a new verification email to the user.
+
+    Args:
+        user: The user to send the verification code to.
+        sync: If True, send email synchronously (useful for tests/debugging).
+    """
+    EmailVerificationCode.objects.filter(user=user, used=False).update(used=True)
+    code = generate_verification_code()
+    EmailVerificationCode.objects.create(user=user, code=code)
+
+    verify_url = f"{settings.SITE_URL}/verificar/?{urlencode({'email': user.email})}"
+
+    # Use sync mode if explicitly requested or if Celery is in eager mode
+    if sync or getattr(settings, "CELERY_TASK_ALWAYS_EAGER", False):
+        _send_verification_email_sync(user, code, verify_url)
+    else:
+        send_verification_email_task.delay(
+            user_id=user.pk,
+            user_email=user.email,
+            user_first_name=user.first_name,
+            code=code,
+            verify_url=verify_url,
+        )
 
 
 def verify_code(user: User, code: str) -> bool:
@@ -130,8 +156,8 @@ def create_password_reset_token(user: User, expires_minutes: int = 10) -> str:
     return token
 
 
-def send_password_reset(user: User, reset_link: str) -> None:
-    """Send a password reset email containing the given reset link."""
+def _send_password_reset_sync(user: User, reset_link: str) -> None:
+    """Send password reset email synchronously (internal helper)."""
     html_message = render_to_string(
         "emails/password_reset.html",
         {
@@ -156,4 +182,24 @@ def send_password_reset(user: User, reset_link: str) -> None:
         fail_silently=False,
         html_message=html_message,
     )
-    logger.info("Password reset email sent", extra={"user_id": user.pk})
+    logger.info("Password reset email sent (sync)", extra={"user_id": user.pk})
+
+
+def send_password_reset(user: User, reset_link: str, sync: bool = False) -> None:
+    """Send a password reset email containing the given reset link.
+
+    Args:
+        user: The user requesting password reset.
+        reset_link: URL for the password reset page.
+        sync: If True, send email synchronously (useful for tests/debugging).
+    """
+    # Use sync mode if explicitly requested or if Celery is in eager mode
+    if sync or getattr(settings, "CELERY_TASK_ALWAYS_EAGER", False):
+        _send_password_reset_sync(user, reset_link)
+    else:
+        send_password_reset_email_task.delay(
+            user_id=user.pk,
+            user_email=user.email,
+            user_first_name=user.first_name,
+            reset_link=reset_link,
+        )
