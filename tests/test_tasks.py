@@ -28,20 +28,19 @@ class TestSendVerificationEmailTask:
         assert "Verifica tu email" in email.subject
         assert "123456" in email.body
 
-    def test_email_contains_verification_url(self):
-        """Task should include verification URL in email."""
-        verify_url = "http://localhost:8000/verificar/?email=test@example.com"
+    def test_email_contains_verification_code_in_html(self):
+        """Task should include verification code in HTML email body."""
         send_verification_email_task(
             user_id=1,
             user_email="test@example.com",
             user_first_name="Test",
             code="654321",
-            verify_url=verify_url,
+            verify_url="http://localhost:8000/verificar/?email=test@example.com",
         )
 
         assert len(mail.outbox) == 1
-        # URL should be in the HTML message
-        assert verify_url in mail.outbox[0].alternatives[0][0]
+        # Code should be in the HTML message (email is code-only, no clickable link)
+        assert "654321" in mail.outbox[0].alternatives[0][0]
 
 
 @pytest.mark.django_db

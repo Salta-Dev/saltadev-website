@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaltaDev - Completar Perfil</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex items-center justify-center overflow-x-hidden selection:bg-primary selection:text-white font-display p-4">
+
+  <div class="w-full max-w-lg">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <a href="/" class="inline-block">
+        <img src="{% static 'assets/img/logo.webp' %}" alt="SaltaDev" class="h-16 w-16 mx-auto mb-4"/>
+      </a>
+      <h1 class="text-3xl font-bold text-white tracking-tight">Completar Perfil</h1>
+      <p class="mt-2 text-[#8e8584] text-sm">
+        ¡Hola, {{ user.first_name }}! Solo necesitamos unos datos más para completar tu registro.
+      </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-surface-dark rounded-2xl border border-[#342d2d] p-6 shadow-xl">
+
+      {% if form.errors %}
+        <div class="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-red-400">error</span>
+            <span class="font-medium">Por favor corrige los siguientes errores:</span>
+          </div>
+          <ul class="list-disc list-inside space-y-1 ml-6">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Birth Date -->
+        <div>
+          <label for="id_birth_date" class="block text-sm font-medium text-white mb-2">
+            Fecha de Nacimiento <span class="text-red-400">*</span>
+          </label>
+          <input
+            type="date"
+            name="birth_date"
+            id="id_birth_date"
+            value="{{ form.birth_date.value|default:'' }}"
+            required
+            class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 px-4 ring-1 ring-inset ring-[#342d2d] placeholder:text-[#6b605f] focus:ring-2 focus:ring-primary transition-all"
+          />
+          <p class="mt-1 text-xs text-[#6b605f]">Requerido para ser miembro de la comunidad.</p>
+        </div>
+
+        <!-- Country -->
+        <div>
+          <label for="id_country" class="block text-sm font-medium text-white mb-2">
+            País <span class="text-red-400">*</span>
+          </label>
+          <select
+            name="country"
+            id="id_country"
+            required
+            class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 pl-4 pr-10 ring-1 ring-inset ring-[#342d2d] focus:ring-2 focus:ring-primary transition-all"
+          >
+            {% for country in form.fields.country.queryset %}
+              <option value="{{ country.pk }}" {% if form.country.value == country.pk|stringformat:"s" or form.country.value == country.pk %}selected{% endif %}>
+                {{ country.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Province -->
+        <div id="province-container">
+          <label for="id_province" class="block text-sm font-medium text-white mb-2">
+            Provincia
+          </label>
+          <select
+            name="province"
+            id="id_province"
+            class="w-full rounded-xl border-0 bg-[#1d1919] text-white py-3 pl-4 pr-10 ring-1 ring-inset ring-[#342d2d] focus:ring-2 focus:ring-primary transition-all"
+          >
+            <option value="">Seleccionar provincia</option>
+            {% for province in form.fields.province.queryset %}
+              <option value="{{ province.pk }}" {% if form.province.value == province.pk|stringformat:"s" or form.province.value == province.pk %}selected{% endif %}>
+                {{ province.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="w-full px-8 py-3.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-all shadow-lg hover:shadow-glow flex items-center justify-center gap-2"
+        >
+          <span class="material-symbols-outlined text-xl">check_circle</span>
+          Completar Registro
+        </button>
+      </form>
+
+      <div class="mt-6 pt-6 border-t border-[#342d2d]">
+        <p class="text-center text-xs text-[#6b605f]">
+          Al completar tu perfil, aceptás nuestro
+          <a href="{% url 'code_of_conduct' %}" class="text-primary hover:underline">reglamento</a>.
+        </p>
+      </div>
+    </div>
+
+    <!-- Logout Link -->
+    <p class="text-center mt-6 text-sm text-[#6b605f]">
+      ¿Querés usar otra cuenta?
+      <a href="{% url 'logout' %}" class="text-primary hover:underline">Cerrar sesión</a>
+    </p>
+  </div>
+
+  <script>
+    // Load provinces dynamically when country changes
+    const countrySelect = document.getElementById('id_country');
+    const provinceSelect = document.getElementById('id_province');
+    const provinceContainer = document.getElementById('province-container');
+
+    countrySelect.addEventListener('change', async function() {
+      const countryCode = this.value;
+
+      // Clear current options
+      provinceSelect.innerHTML = '<option value="">Seleccionar provincia</option>';
+
+      if (!countryCode) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/locations/provinces/?country=${countryCode}`);
+        if (!response.ok) return;
+
+        const provinces = await response.json();
+
+        if (provinces.length === 0) {
+          provinceContainer.style.display = 'none';
+          return;
+        }
+
+        provinceContainer.style.display = 'block';
+        provinces.forEach(function(province) {
+          const option = document.createElement('option');
+          option.value = province.id;
+          option.textContent = province.name;
+          provinceSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error loading provinces:', error);
+      }
+    });
+  </script>
+
+</body>
+</html>

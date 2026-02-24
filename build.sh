@@ -24,3 +24,4 @@ uv run python manage.py tailwind build
 uv run python manage.py collectstatic --no-input
 uv run python manage.py migrate
 uv run python manage.py loaddata locations
+uv run python manage.py configure_site

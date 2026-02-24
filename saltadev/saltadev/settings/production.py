@@ -77,6 +77,7 @@ CSP_IMG_SRC = (
     "https://res.cloudinary.com",
     "data:",
     "https://api.qrserver.com",
+    "https://lh3.googleusercontent.com",  # Google OAuth avatars
 )
 CSP_CONNECT_SRC = (_CSP_SELF,)
 CSP_FRAME_SRC = ("https://www.google.com",)  # For reCAPTCHA

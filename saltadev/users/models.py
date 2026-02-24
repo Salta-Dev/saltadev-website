@@ -28,9 +28,9 @@ class UserManager(BaseUserManager):
     def create_user(
         self,
         email: str,
-        first_name: str,
-        last_name: str,
-        birth_date: date,
+        first_name: str = "",
+        last_name: str = "",
+        birth_date: date | None = None,
         password: str | None = None,
         **extra_fields: Any,
     ) -> "User":
@@ -58,9 +58,9 @@ class UserManager(BaseUserManager):
     def create_superuser(
         self,
         email: str,
-        first_name: str,
-        last_name: str,
-        birth_date: date,
+        first_name: str = "",
+        last_name: str = "",
+        birth_date: date | None = None,
         password: str | None = None,
         **extra_fields: Any,
     ) -> "User":
@@ -96,6 +96,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         COLABORADOR = "colaborador", "Colaborador"
         MIEMBRO = "miembro", "Miembro"
 
+    class RegistrationMethod(models.TextChoices):
+        EMAIL = "email", "Email"
+        GOOGLE = "google", "Google"
+
     public_id = models.CharField(
         max_length=8,
         unique=True,
@@ -106,7 +110,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    birth_date = models.DateField()
+    birth_date = models.DateField(null=True, blank=True)
     country = models.ForeignKey(
         "locations.Country",
         on_delete=models.PROTECT,
@@ -124,6 +128,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     registered_at = models.DateTimeField(default=timezone.now)
     email_confirmed = models.BooleanField(default=False)
+    registration_method = models.CharField(
+        max_length=20,
+        choices=RegistrationMethod.choices,
+        default=RegistrationMethod.EMAIL,
+        verbose_name="método de registro",
+    )
 
     objects = UserManager()
 
@@ -132,6 +142,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name} ({self.email})"
+
+    @property
+    def needs_profile_completion(self) -> bool:
+        """Check if user needs to complete their profile (social login users)."""
+        return self.birth_date is None
 
 
 class Profile(models.Model):

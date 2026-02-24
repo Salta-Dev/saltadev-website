@@ -25,6 +25,7 @@ dependencies = [
   "whitenoise==6.8.2",
   "django-notifications-hq @ git+https://github.com/django-notifications/django-notifications.git@master",
   "django-csp>=4.0",
+  "django-allauth[socialaccount]>=65.0.0",
 ]
 
 [project.optional-dependencies]
