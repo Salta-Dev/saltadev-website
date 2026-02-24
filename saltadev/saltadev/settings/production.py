@@ -103,21 +103,3 @@ LOGGING = {
         "level": "WARNING",
     },
 }
-
-# Temporary: log Google OAuth client_id on startup to debug invalid_client error
-_google_client_id = os.getenv("GOOGLE_CLIENT_ID", "")
-import logging as _logging  # noqa: E402
-
-_log = _logging.getLogger(__name__)
-_log.warning(
-    "Google OAuth debug: client_id=%s (length=%d)",
-    _google_client_id[:20] + "..."
-    if len(_google_client_id) > 20
-    else _google_client_id,
-    len(_google_client_id),
-)
-_log.warning(
-    "Google OAuth debug: secret set=%s (length=%d)",
-    bool(os.getenv("GOOGLE_CLIENT_SECRET", "")),
-    len(os.getenv("GOOGLE_CLIENT_SECRET", "")),
-)
