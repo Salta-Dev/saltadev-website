@@ -58,5 +58,8 @@ repos:
             "types-requests==2.32.0.20241016",
             "python-dotenv==1.2.1",
             "django-notifications-hq @ git+https://github.com/django-notifications/django-notifications.git@master",
+            "celery==5.6.2",
+            "celery-types==0.23.0",
+            "django-allauth[socialaccount]==65.14.3",
           ]
         files: ^saltadev/.*\.py$

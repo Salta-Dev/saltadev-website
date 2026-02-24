@@ -20,7 +20,7 @@ from users.image_service import (
 )
 from users.models import Profile, User
 
-from .forms import ProfileForm
+from .forms import CompleteProfileForm, ProfileForm
 
 if TYPE_CHECKING:
     from django.core.files.uploadedfile import UploadedFile
@@ -133,3 +133,36 @@ def public_credential_view(request: HttpRequest, public_id: str) -> HttpResponse
         "credential_url": credential_url,
     }
     return render(request, "dashboard/public_credential.html", context)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def complete_profile_view(request: HttpRequest) -> HttpResponse:
+    """
+    Handle profile completion for social login users.
+
+    Social login users (Google/GitHub) don't provide birth_date during OAuth.
+    This view allows them to complete their profile with required information.
+    """
+    user = cast(User, request.user)
+
+    # If profile is already complete, redirect to dashboard
+    if not user.needs_profile_completion:
+        return redirect("dashboard")
+
+    if request.method == "POST":
+        form = CompleteProfileForm(request.POST, user=user)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, "¡Perfil completado! Bienvenido a la comunidad SaltaDev."
+            )
+            return redirect("dashboard")
+    else:
+        form = CompleteProfileForm(user=user)
+
+    return render(
+        request,
+        "dashboard/complete_profile.html",
+        {"form": form, "user": user},
+    )

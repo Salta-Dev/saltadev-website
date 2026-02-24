@@ -7,4 +7,5 @@ from . import views
 urlpatterns = [
     path("", views.dashboard_view, name="dashboard"),
     path("perfil/editar/", views.profile_edit_view, name="profile_edit"),
+    path("completar-perfil/", views.complete_profile_view, name="complete_profile"),
 ]

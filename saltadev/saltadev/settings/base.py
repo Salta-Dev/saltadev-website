@@ -25,10 +25,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sitemaps",
+    "django.contrib.sites",
     "cloudinary",
     "cloudinary_storage",
     "django_tailwind_cli",
     "notifications",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "home",
     "events",
     "code_of_conduct",
@@ -45,6 +50,8 @@ INSTALLED_APPS = [
     "axes",
 ]
 
+SITE_ID = 1
+
 DJANGO_NOTIFICATIONS_CONFIG = {
     "USE_JSONFIELD": True,
     "SOFT_DELETE": False,
@@ -58,6 +65,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
+    "users.middleware.ProfileCompletionMiddleware",
     "axes.middleware.AxesMiddleware",
 ]
 
@@ -103,6 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesBackend",
     "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 AXES_FAILURE_LIMIT = 5
@@ -190,3 +200,38 @@ SILENCED_SYSTEM_CHECKS = ["django_recaptcha.recaptcha_test_key_error"]
 # source.css is outside static/ to avoid WhiteNoise processing issues
 TAILWIND_CLI_SRC_CSS = "tailwind/source.css"
 TAILWIND_CLI_DIST_CSS = "static/css/tailwind.css"
+
+# Celery configuration (base settings, broker/result backend set per environment)
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TIME_LIMIT = 300  # 5 minutes max per task
+CELERY_RESULT_EXPIRES = 3600  # Results expire after 1 hour
+CELERY_TASK_ACKS_LATE = True  # Re-execute task if worker dies
+
+# django-allauth configuration
+# We use allauth only for social login; traditional auth uses our custom views
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_VERIFICATION = "none"  # We handle verification ourselves
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+ACCOUNT_ADAPTER = "users.adapters.CustomAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "users.adapters.CustomSocialAccountAdapter"
+LOGIN_REDIRECT_URL = "/dashboard/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        "APP": {
+            "client_id": os.getenv("GOOGLE_CLIENT_ID", ""),
+            "secret": os.getenv("GOOGLE_CLIENT_SECRET", ""),
+        },
+    },
+}

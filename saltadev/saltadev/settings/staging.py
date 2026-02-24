@@ -46,6 +46,10 @@ CACHES = {
     }
 }
 
+# Celery: use Redis as broker
+CELERY_BROKER_URL = os.environ["REDIS_URL"]
+CELERY_RESULT_BACKEND = os.environ["REDIS_URL"]
+
 # Security
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 3600

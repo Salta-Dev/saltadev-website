@@ -50,6 +50,10 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
+# Celery: use Redis as broker
+CELERY_BROKER_URL = os.environ["REDIS_URL"]
+CELERY_RESULT_BACKEND = os.environ["REDIS_URL"]
+
 # Security
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 31536000
@@ -73,6 +77,7 @@ CSP_IMG_SRC = (
     "https://res.cloudinary.com",
     "data:",
     "https://api.qrserver.com",
+    "https://lh3.googleusercontent.com",  # Google OAuth avatars
 )
 CSP_CONNECT_SRC = (_CSP_SELF,)
 CSP_FRAME_SRC = ("https://www.google.com",)  # For reCAPTCHA

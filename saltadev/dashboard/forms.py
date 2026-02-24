@@ -1,9 +1,13 @@
 """Forms for the dashboard app."""
 
 import re
+from datetime import date
+from typing import cast
 
 from django import forms
-from users.models import Profile
+from django.forms import ModelChoiceField
+from locations.models import Country, Province
+from users.models import Profile, User
 
 
 class ProfileForm(forms.ModelForm):
@@ -117,3 +121,80 @@ class ProfileForm(forms.ModelForm):
         if commit:
             profile.save()
         return profile
+
+
+class CompleteProfileForm(forms.Form):
+    """
+    Form for completing user profile after social login.
+
+    Social login users (Google/GitHub) must provide birth_date and optionally
+    update their country/province before accessing the dashboard.
+    """
+
+    birth_date = forms.DateField(
+        label="Fecha de nacimiento",
+        widget=forms.DateInput(attrs={"type": "date"}),
+        help_text="Requerido para ser miembro de la comunidad.",
+    )
+    country = forms.ModelChoiceField(
+        queryset=Country.objects.all(),
+        label="País",
+        initial="AR",
+    )
+    province = forms.ModelChoiceField(
+        queryset=Province.objects.none(),
+        label="Provincia",
+        required=False,
+    )
+
+    def __init__(self, *args, user: User | None = None, **kwargs) -> None:
+        """Initialize form with user's current data."""
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+        if user:
+            self.fields["country"].initial = user.country_id
+            self.fields["province"].initial = user.province_id
+
+            # Populate provinces for current country
+            if user.country_id:
+                cast(
+                    ModelChoiceField, self.fields["province"]
+                ).queryset = Province.objects.filter(country_id=user.country_id)
+
+    def clean_birth_date(self) -> date:
+        """Validate birth date is reasonable (user must be at least 13 years old)."""
+        birth_date = self.cleaned_data["birth_date"]
+        today = date.today()
+        age = (
+            today.year
+            - birth_date.year
+            - ((today.month, today.day) < (birth_date.month, birth_date.day))
+        )
+
+        if age < 13:
+            raise forms.ValidationError(
+                "Debes tener al menos 13 años para registrarte."
+            )
+
+        if age > 120:
+            raise forms.ValidationError(
+                "Por favor ingresa una fecha de nacimiento válida."
+            )
+
+        return birth_date
+
+    def save(self) -> User:
+        """Save the user's profile data."""
+        if not self.user:
+            raise ValueError("User is required to save profile")
+
+        self.user.birth_date = self.cleaned_data["birth_date"]
+        self.user.country = self.cleaned_data["country"]
+
+        province = self.cleaned_data.get("province")
+        if province:
+            self.user.province = province
+
+        self.user.save()
+        return self.user

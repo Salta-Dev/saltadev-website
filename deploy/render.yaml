@@ -40,6 +40,8 @@ services:
         value: ".onrender.com,salta.dev"
       - key: CSRF_TRUSTED_ORIGINS
         value: "https://*.onrender.com,https://salta.dev"
+      - key: CELERY_TASK_ALWAYS_EAGER
+        value: "True"
 
       # Python and Gunicorn
       - key: PYTHON_VERSION
@@ -61,7 +63,11 @@ services:
       - key: DEFAULT_FROM_EMAIL
         sync: false
 
-      # Site configuration
+      # Site configuration (for django.contrib.sites)
+      - key: SITE_DOMAIN
+        value: "salta.dev"
+      - key: SITE_NAME
+        value: "SaltaDev"
       - key: SITE_URL
         sync: false
 
@@ -69,4 +75,10 @@ services:
       - key: RECAPTCHA_V2_SITE_KEY
         sync: false
       - key: RECAPTCHA_V2_SECRET
+        sync: false
+
+      # OAuth - Google
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
         sync: false

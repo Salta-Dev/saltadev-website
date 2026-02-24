@@ -22,6 +22,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.urls import include, path
 from django.views.generic import TemplateView
@@ -30,7 +31,9 @@ from .sitemaps import sitemaps
 from .views import health_check
 
 
-def custom_404(request, exception=None, **kwargs):
+def custom_404(
+    request: HttpRequest, exception: Exception | None = None, **kwargs: object
+) -> HttpResponse:
     """Custom 404 error handler."""
     return render(request, "404.html", status=404)
 
@@ -70,6 +73,7 @@ urlpatterns = [
         "inbox/notifications/", include("notifications.urls", namespace="notifications")
     ),
     path("notificaciones/", include("user_notifications.urls")),
+    path("accounts/", include("allauth.urls")),
 ]
 
 if settings.DEBUG:

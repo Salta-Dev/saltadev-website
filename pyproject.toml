@@ -20,10 +20,12 @@ dependencies = [
   "python-dateutil==2.9.0.post0",
   "python-dotenv>=1.2.1",
   "redis==5.2.1",
+  "celery==5.6.2",
   "requests>=2.32.0",
   "whitenoise==6.8.2",
   "django-notifications-hq @ git+https://github.com/django-notifications/django-notifications.git@master",
   "django-csp>=4.0",
+  "django-allauth[socialaccount]>=65.0.0",
 ]
 
 [project.optional-dependencies]
@@ -39,6 +41,7 @@ dev = [
   "ruff==0.15.1",
   "types-python-dateutil==2.9.0.20240906",
   "types-requests==2.32.0.20241016",
+  "celery-types==0.23.0",
 ]
 
 [tool.ruff]
@@ -56,5 +59,6 @@ ignore = ["E501"]
 
 [dependency-groups]
 dev = [
+    "mkdocs-material>=9.7.2",
     "pytest-cov>=7.0.0",
 ]
