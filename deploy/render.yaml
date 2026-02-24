@@ -40,6 +40,8 @@ services:
         value: ".onrender.com,salta.dev"
       - key: CSRF_TRUSTED_ORIGINS
         value: "https://*.onrender.com,https://salta.dev"
+      - key: CELERY_TASK_ALWAYS_EAGER
+        value: "True"
 
       # Python and Gunicorn
       - key: PYTHON_VERSION
