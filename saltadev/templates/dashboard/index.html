@@ -205,10 +205,20 @@
               </div>
 
               <div class="flex flex-col gap-3">
+                {% if profile.dni %}
                 <button onclick="openCredentialModal()" class="w-full py-3 px-4 bg-white text-primary rounded-xl font-bold text-sm hover:bg-white/90 transition-colors shadow-lg flex items-center justify-center gap-2 group/btn">
                   <span class="material-symbols-outlined text-[20px] group-hover/btn:scale-110 transition-transform">visibility</span>
                   Mostrar Credencial
                 </button>
+                {% else %}
+                <button disabled class="w-full py-3 px-4 bg-primary text-white/80 rounded-xl font-bold text-sm cursor-not-allowed shadow-lg flex items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+                  Mostrar Credencial
+                </button>
+                <a href="{% url 'profile_edit' %}" class="text-xs text-white/80 text-center hover:text-white transition-colors inline-flex items-center justify-center gap-1">
+                  <span>Para generar tu credencial, <span class="underline">agregá tu DNI en tu perfil</span></span>
+                </a>
+                {% endif %}
               </div>
             </div>
           </div>
@@ -216,6 +226,7 @@
           <div class="relative z-20 bg-black/20 backdrop-blur-md border-t border-white/10 px-6 py-3 flex items-center justify-between">
             <span class="text-[10px] font-medium text-white/60 uppercase tracking-wide">Acciones</span>
             <div class="flex items-center gap-2">
+              {% if profile.dni %}
               <button onclick="openCredentialModal(); setTimeout(downloadCredential, 500);" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white" title="Descargar PNG">
                 <span class="material-symbols-outlined text-[20px]">download</span>
               </button>
@@ -223,6 +234,15 @@
               <button onclick="shareCredential()" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/80 hover:text-white" title="Compartir">
                 <span class="material-symbols-outlined text-[20px]">share</span>
               </button>
+              {% else %}
+              <button disabled class="p-2 rounded-lg text-white/30 cursor-not-allowed" title="Completá tu DNI para descargar">
+                <span class="material-symbols-outlined text-[20px]">download</span>
+              </button>
+              <div class="h-4 w-px bg-white/20 mx-1"></div>
+              <button disabled class="p-2 rounded-lg text-white/30 cursor-not-allowed" title="Completá tu DNI para compartir">
+                <span class="material-symbols-outlined text-[20px]">share</span>
+              </button>
+              {% endif %}
             </div>
           </div>
         </div>

@@ -124,6 +124,18 @@ def public_credential_view(request: HttpRequest, public_id: str) -> HttpResponse
     user = get_object_or_404(User, public_id=public_id)
     profile, _ = Profile.objects.get_or_create(user=user)
 
+    # Validate that user has DNI before showing credential
+    if not profile.dni:
+        return render(
+            request,
+            "dashboard/credential_unavailable.html",
+            {
+                "message": "Esta credencial no está disponible porque el usuario "
+                "no completó su DNI."
+            },
+            status=403,
+        )
+
     # Build credential URL for sharing
     credential_url = f"{settings.SITE_URL}/credencial/{user.public_id}/"
 
