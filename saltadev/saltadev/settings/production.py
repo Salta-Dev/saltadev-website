@@ -53,6 +53,8 @@ SESSION_CACHE_ALIAS = "default"
 # Celery: use Redis as broker
 CELERY_BROKER_URL = os.environ["REDIS_URL"]
 CELERY_RESULT_BACKEND = os.environ["REDIS_URL"]
+# Execute tasks synchronously since no workers are deployed
+CELERY_TASK_ALWAYS_EAGER = True
 
 # Security
 SECURE_SSL_REDIRECT = True
