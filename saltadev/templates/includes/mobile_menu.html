@@ -1,0 +1,19 @@
+{% load static %}
+<div class="mob" id="mob">
+  <button class="mob-x" id="mobX" aria-label="Cerrar menu">x</button>
+  <a href="{% url 'home' %}">Inicio</a>
+  <a href="{% url 'home' %}#partners">Colaboradores</a>
+  <a href="{% url 'home' %}#community">Comunidad</a>
+  <a href="{% url 'home' %}#staff">Staff</a>
+  <a href="{% url 'events' %}">Eventos</a>
+  <a href="{% url 'code_of_conduct' %}">Reglamento</a>
+  {% if user.is_authenticated %}
+  <a href="{% url 'dashboard' %}" class="btn btn-p" style="margin-top: 1rem;">
+    <span class="material-symbols-outlined ms ms-f">dashboard</span>Dashboard
+  </a>
+  {% else %}
+  <a href="{% url 'login' %}" class="btn btn-p" style="margin-top: 1rem;">
+    <span class="material-symbols-outlined ms ms-f">arrow_forward</span>Iniciar sesion
+  </a>
+  {% endif %}
+</div>

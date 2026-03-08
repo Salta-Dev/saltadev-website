@@ -26,14 +26,48 @@
 
   {% block structured_data %}{% endblock %}
 
-  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+  {# Global CSS #}
+  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
   {% block page_css %}{% endblock %}
 </head>
-<body class="bg-background-light dark:bg-background-dark text-white font-display transition-colors duration-300 antialiased overflow-x-hidden animated-bg">
+<body class="bg-bg text-light font-sans antialiased overflow-x-hidden">
+  {# Custom cursor (desktop only) #}
+  <div id="cr"></div>
+  <div id="crr"></div>
+
+  {# Progress bar #}
+  <div id="pb"></div>
+
+  {# Page transition overlay #}
+  <div id="ov"></div>
+
+  {# Back to top button #}
+  <button class="btt" id="btt" aria-label="Volver arriba">
+    <span class="material-symbols-outlined ms ms-f">north</span>
+  </button>
+
+  {# Toast notification #}
+  <div class="toast" id="toast">
+    <span class="material-symbols-outlined ms ms-f">check_circle</span>
+    <span id="toastTxt">Mensaje enviado</span>
+  </div>
+
+  {# Navigation #}
   {% include "includes/nav.html" %}
+
+  {# Mobile menu #}
+  {% include "includes/mobile_menu.html" %}
+
+  {# Main content #}
   {% block content %}{% endblock %}
+
+  {# Footer #}
   {% include "includes/footer.html" %}
-  {% block page_js %}{% endblock %}
+
+  {# Global JS #}
+  <script src="{% static 'assets/js/main.js' %}"></script>
   <script src="{% static 'assets/js/fingerprint.js' %}"></script>
+  {% block page_js %}{% endblock %}
 </body>
 </html>

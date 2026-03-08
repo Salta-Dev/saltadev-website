@@ -1,3 +1,5 @@
+import json
+
 from content.models import Collaborator, Event, StaffProfile
 from django.core.cache import cache
 from django.http import HttpRequest, HttpResponse
@@ -32,6 +34,20 @@ def home(request: HttpRequest) -> HttpResponse:
         cache.set("home_collaborators", collaborators, 60)
 
     collaborators_count = len(collaborators)
+
+    # Prepare partners JSON for the marquee animation
+    partners_json = json.dumps(
+        [
+            {
+                "n": c.name,
+                "img": c.image if c.image else "",
+                "url": c.link if c.link else "#",
+            }
+            for c in collaborators
+            if c.name and c.image
+        ]
+    )
+
     return render(
         request,
         "home/index.html",
@@ -40,5 +56,6 @@ def home(request: HttpRequest) -> HttpResponse:
             "staff_members": staff_members,
             "collaborators": collaborators,
             "collaborators_count": collaborators_count,
+            "partners_json": partners_json,
         },
     )
