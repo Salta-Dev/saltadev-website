@@ -6,6 +6,9 @@ from django.http import HttpRequest, JsonResponse
 from django.views.decorators.http import require_http_methods
 from loguru import logger
 
+HEALTH_CACHE_KEY = "health_check_result"
+HEALTH_CACHE_TTL = 30  # seconds
+
 
 @require_http_methods(["GET", "HEAD"])
 def health_check(_request: HttpRequest) -> JsonResponse:
@@ -16,8 +19,14 @@ def health_check(_request: HttpRequest) -> JsonResponse:
     - PostgreSQL connection
     - Redis connection
 
+    Result is cached for 30 seconds to prevent DB/Redis flood attacks.
     Errors are logged but not exposed in the API response.
     """
+    # Return cached result if available (protects DB/Redis from flood)
+    cached = cache.get(HEALTH_CACHE_KEY)
+    if cached is not None:
+        return JsonResponse(cached["data"], status=cached["status_code"])
+
     services: dict[str, str] = {
         "django": "ok",
         "postgres": "unknown",
@@ -53,4 +62,7 @@ def health_check(_request: HttpRequest) -> JsonResponse:
         health["status"] = "unhealthy"
 
     status_code = 200 if health["status"] == "healthy" else 503
+    cache.set(
+        HEALTH_CACHE_KEY, {"data": health, "status_code": status_code}, HEALTH_CACHE_TTL
+    )
     return JsonResponse(health, status=status_code)
