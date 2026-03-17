@@ -31,7 +31,7 @@ Guía para migrar SaltaDev Website de Render.com a GCP (VM e2-micro free tier) c
 
 ---
 
-## Fase 1: Preparación (Día 1)
+## Fase 1: Preparación
 
 ### 1.1 Crear cuenta en Neon (PostgreSQL)
 
@@ -80,7 +80,7 @@ Cambiar el TTL del registro DNS de `salta.dev` a **300 segundos** (5 min). Esper
 
 ---
 
-## Fase 2: Provisionar GCP VM (Día 2)
+## Fase 2: Provisionar GCP VM
 
 ### 2.1 Crear proyecto y VM
 
@@ -169,7 +169,7 @@ gcloud compute ssh saltadev-web --zone=us-central1-a
 
 ---
 
-## Fase 3: Deploy (Día 3)
+## Fase 3: Deploy
 
 ### 3.1 Clonar y configurar
 
@@ -211,7 +211,7 @@ curl http://localhost:8000/health/
 
 ---
 
-## Fase 4: SSL y Nginx (Día 3-4)
+## Fase 4: SSL y Nginx
 
 El certificado SSL debe obtenerse antes de levantar nginx en modo producción, ya que `nginx/production.conf` ya referencia los archivos de letsencrypt.
 
@@ -273,7 +273,7 @@ docker compose -f docker/docker-compose.gcp.yml run --rm certbot certonly \
 
 ---
 
-## Fase 5: Cutover DNS (Día 4-5)
+## Fase 5: Cutover DNS
 
 ### 5.1 Transición con base de datos compartida
 
@@ -314,7 +314,7 @@ curl -I https://salta.dev/health/
 
 ---
 
-## Fase 6: Post-migración (Día 5-7+)
+## Fase 6: Post-migración
 
 ### 6.1 Monitoreo con UptimeRobot
 
