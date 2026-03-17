@@ -1,0 +1,65 @@
+# GCP deployment: web + nginx + certbot only (DB and Redis are external services)
+# Usage: docker compose -f docker/docker-compose.gcp.yml up -d
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    user: appuser
+    environment:
+      - DJANGO_SETTINGS_MODULE=saltadev.settings.production
+    env_file:
+      - ../saltadev/.env.production
+    volumes:
+      - static_files:/app/saltadev/staticfiles
+    restart: unless-stopped
+    command: >
+      uv run gunicorn saltadev.wsgi:application
+      --bind 0.0.0.0:8000 --workers 2
+      --worker-tmp-dir /dev/shm --chdir saltadev
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 350M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../nginx/production.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_files:/app/saltadev/staticfiles:ro
+      - certbot_conf:/etc/letsencrypt:ro
+      - certbot_www:/var/www/certbot:ro
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 50M
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+
+volumes:
+  static_files:
+  certbot_conf:
+  certbot_www:

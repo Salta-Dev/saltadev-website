@@ -2,7 +2,7 @@
 Production environment settings.
 
 Uses DATABASE_URL (PostgreSQL), Redis, Cloudinary, DEBUG=False, WARNING logging.
-Deployed on Render.com.
+Supports deployments on Render.com and GCP (via docker-compose.gcp.yml).
 """
 
 import os
@@ -16,6 +16,10 @@ DEBUG = False
 SECRET_KEY = os.environ["SECRET_KEY"]
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "salta.dev").split(",")
+
+_csrf_origins = os.getenv("CSRF_TRUSTED_ORIGINS", "")
+if _csrf_origins:
+    CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_origins.split(",")]
 
 # Database: PostgreSQL via DATABASE_URL (required)
 DATABASES = {
