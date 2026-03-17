@@ -17,7 +17,7 @@ services:
       --bind 0.0.0.0:8000 --workers 2
       --worker-tmp-dir /dev/shm --chdir saltadev
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
+      test: ["CMD", "python", "-c", "import urllib.request; req = urllib.request.Request('http://localhost:8000/health/', headers={'Host': 'salta.dev'}); urllib.request.urlopen(req)"]
       interval: 30s
       timeout: 10s
       retries: 3
