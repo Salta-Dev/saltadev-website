@@ -33,7 +33,8 @@ RUN uv run python saltadev/manage.py tailwind build
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    UV_CACHE_DIR=/app/.uv-cache
 
 WORKDIR /app
 
