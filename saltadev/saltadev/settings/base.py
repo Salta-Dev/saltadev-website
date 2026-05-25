@@ -174,7 +174,7 @@ else:
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", os.getenv("EMAIL_HOST_USER", ""))
 
 SITE_WHATSAPP = os.getenv(
-    "SITE_WHATSAPP", "https://chat.whatsapp.com/Jv02aqrmzXK6wwuRELp9zs"
+    "SITE_WHATSAPP", "https://chat.whatsapp.com/E3pCz7UySrmKiIVO5PA4Cz"
 )
 SITE_DISCORD = os.getenv("SITE_DISCORD", "https://discord.gg/kqzWbStGQ6")
 SITE_GITHUB = os.getenv("SITE_GITHUB", "https://github.com/Salta-Dev")
