@@ -9,7 +9,7 @@
 }
 
 @theme {
-  /* Colors */
+  /* Colors: brand core (values preserved from pre-redesign) */
   --color-primary: #94413d;
   --color-primary-hover: #b04e49;
   --color-background-light: #f7f6f6;
@@ -20,9 +20,22 @@
   --color-text-muted: #c4b5b3;
   --color-alert-red: #ef4444;
 
+  /* Colors: redesign additions (see qa/DECISIONS.md for contrast ratios).
+     Ink ramp gives text 3 levels instead of raw white; primary tints cover
+     accent text on dark surfaces where #94413d alone fails AA contrast. */
+  --color-ink: #f3ece9;
+  --color-ink-faint: #9d8b87;
+  --color-primary-soft: #c0625d;
+  --color-primary-bright: #d98a83;
+  --color-primary-deep: #6e2f2c;
+  --color-surface-raised: #2b2220;
+
   /* Typography */
   --font-display: "Space Grotesk", sans-serif;
   --font-sans: "Space Grotesk", sans-serif;
+
+  /* Motion */
+  --ease-brand: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Border radius */
   --radius: 0.5rem;
