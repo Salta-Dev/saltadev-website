@@ -93,13 +93,16 @@ if (!prefersReducedMotion && window.gsap) {
   // cards. Fine pointers only (no hover on touch), smoothed with quickTo.
   // Bound first so a failure in any scroll system can never disable it.
   safeMotion('tilt', () => {
-    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    // Input capability is decided per event (pointerType), not via media query:
+    // '(hover: hover) and (pointer: fine)' reports false on some real desktop
+    // setups (device emulation, hybrid inputs) and silently disabled the effect.
     document.querySelectorAll('[data-tilt], .bento-cell, .event-card').forEach((card) => {
       gsap.set(card, { transformPerspective: 650 });
       const toRotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
       const toRotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
       const toScale = gsap.quickTo(card, 'scale', { duration: 0.4, ease: 'power2.out' });
       card.addEventListener('pointermove', (e) => {
+        if (e.pointerType === 'touch') return; // taps must not tilt
         const rect = card.getBoundingClientRect();
         const px = (e.clientX - rect.left) / rect.width - 0.5;
         const py = (e.clientY - rect.top) / rect.height - 0.5;
