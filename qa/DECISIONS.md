@@ -71,3 +71,28 @@ Type stays Space Grotesk (brand fidelity; hierarchy comes from scale/weight/colo
 new family; zero extra font downloads keeps LCP budget).
 
 ## Build decisions log (Phase 2, appended per section)
+
+### 1. Nav
+- 64px height (was 80), single line at every viewport. Hamburger now runs through `md`
+  because at 768px the 6 labels + CTA cannot fit on one line without wrapping (QA shot
+  caught the login CTA breaking into two lines).
+- Link ramp: `text-muted -> ink` on hover; CTA uses `primary -> primary-hover` (retired
+  `red-700`). Global `:focus-visible` outline added in base.css.
+- Retired: body-wide `animated-bg` 18s gradient drift (unmotivated motion, mobile GPU cost).
+
+### 2. Hero (asymmetric split, claims stack)
+- Structure follows the reference's claims-hero role but keeps SaltaDev's split layout:
+  7-col claims stack + 5-col real photo. Anti-center rule holds (VARIANCE 6).
+- Claims stack: badge eyebrow "Comunidad salteña" (1 of max 3 eyebrows on the page,
+  pulsing green dot removed: decorative status dot tell), H1 two lines with second line
+  in `primary-soft` (typographic emphasis replaces the hand-drawn SVG squiggle),
+  20-word subtext in `text-muted`, 2 CTAs. Exactly 4 text elements.
+- Photo card: real community photo as `<img>` (was CSS background) with width/height,
+  `loading="lazy"` so the `hidden lg:block` card never downloads on mobile; avatar stack
+  + "+1000 miembros" overlay preserved as social proof ON the visual, not in the text stack.
+- Assets: generated WebP derivatives (hero 3872px/2.1MB -> 960x1200/172KB; avatars
+  728KB jpg -> 4-8KB webp). Mobile LCP element is now the H1 text.
+- Retired: bouncing `code` icon card, cursor-glow, floating scroll stepper buttons
+  (scroll cues), `window scroll` listeners in index.js.
+- Motion: staggered hero entrance (reading order) + scroll reveals via `[data-reveal]`,
+  gated behind `prefers-reduced-motion`.

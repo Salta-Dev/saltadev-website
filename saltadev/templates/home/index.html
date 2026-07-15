@@ -12,57 +12,50 @@
 {% endblock %}
 
 {% block content %}
-<main class="pt-0" id="top">
-  <section class="relative min-h-[calc(100vh-80px)] flex items-center justify-center overflow-hidden pt-24">
-    <div class="absolute inset-0 bg-poncho-pattern opacity-30 z-0 pointer-events-none"></div>
-    <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent z-0 pointer-events-none"></div>
-    <div class="layout-container max-w-[1200px] w-full px-4 sm:px-6 lg:px-8 relative z-10 grid lg:grid-cols-12 gap-12 items-start pt-6 pb-12 md:pt-10">
-      <div class="lg:col-span-7 flex flex-col gap-6 text-center lg:text-left">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-dark border border-border-dark w-fit mx-auto lg:mx-0 hero-badge">
-          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          <span class="text-xs font-medium text-white uppercase tracking-wide">Comunidad salteña</span>
-        </div>
-        <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-white hero-title">
-          El Hub Tech del <br>
-          <span class="text-primary relative inline-block">
-            Norte Argentino
-            <svg class="absolute w-full h-3 -bottom-1 left-0 text-primary opacity-60" fill="none" viewBox="0 0 200 9" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2.00025 6.99997C2.00025 6.99997 23.3283 2.65175 69.2435 2.12642C111.458 1.64326 142.164 4.54452 198.001 2.00002" stroke="currentColor" stroke-linecap="round" stroke-width="3"></path>
-            </svg>
+<main class="pt-16" id="top">
+  <section class="relative overflow-hidden border-b border-border-dark">
+    <div class="absolute inset-0 bg-poncho-pattern opacity-40 pointer-events-none" aria-hidden="true"></div>
+    <div class="absolute top-0 right-0 w-[46%] h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" aria-hidden="true"></div>
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center py-16 md:py-20 lg:py-0 lg:min-h-[calc(100dvh-4rem)] lg:max-h-[900px]">
+        <div class="lg:col-span-7">
+          <span class="inline-flex items-center rounded-full border border-border-dark bg-surface-dark/70 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted" data-hero-item>
+            Comunidad salteña
           </span>
-        </h1>
-        <p class="text-lg text-white max-w-2xl mx-auto lg:mx-0 leading-relaxed hero-subtitle">
-          Conectamos desarrolladores, diseñadores y emprendedores en Salta. Impulsamos el talento local a través de la colaboración, el aprendizaje y eventos.
-        </p>
-        <div class="flex flex-wrap gap-4 justify-center lg:justify-start pt-4">
-          <a class="hero-cta hero-cta-primary text-base px-8 py-3.5 rounded-xl transition-all" href="/whatsapp/">
-            <span class="material-symbols-outlined">rocket_launch</span>
-            Unirse a la comunidad
-          </a>
-          <a class="hero-cta hero-cta-secondary text-base px-8 py-3.5 rounded-xl transition-all" href="/eventos/">
-            <span class="material-symbols-outlined">calendar_month</span>
-            Ver Eventos
-          </a>
+          <h1 class="mt-6 text-[2.7rem] leading-[1.02] sm:text-6xl lg:text-[4.75rem] font-bold tracking-tight text-ink" data-hero-item>
+            El Hub Tech del<br>
+            <span class="text-primary-soft">Norte Argentino</span>
+          </h1>
+          <p class="mt-6 text-base sm:text-lg text-text-muted leading-relaxed max-w-[46ch]" data-hero-item>
+            Conectamos desarrolladores, diseñadores y emprendedores en Salta. Impulsamos el talento local a través de la colaboración, el aprendizaje y eventos.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3" data-hero-item>
+            <a class="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm sm:text-base font-bold text-ink transition-all hover:bg-primary-hover active:scale-[0.98]" href="/whatsapp/">
+              Unirse a la comunidad
+            </a>
+            <a class="inline-flex items-center justify-center rounded-lg border border-border-dark bg-surface-dark/60 px-6 py-3.5 text-sm sm:text-base font-bold text-ink transition-all hover:border-primary-soft active:scale-[0.98]" href="/eventos/">
+              Ver Eventos
+            </a>
+          </div>
         </div>
-      </div>
-      <div class="lg:col-span-5 relative hidden lg:block h-full min-h-[500px] lg:pt-6">
-        <div class="absolute inset-0 flex items-center justify-center">
-          <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden border border-border-dark">
-            <div class="absolute inset-0 bg-cover bg-center" style='background-image: url("{% static 'assets/img/seed-latam-salta.jpg' %}");'></div>
-            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background-dark to-transparent">
+        <div class="lg:col-span-5 hidden lg:block" data-hero-item>
+          <figure class="relative aspect-[4/5] overflow-hidden rounded-xl border border-border-dark shadow-card">
+            <img
+              alt="Encuentro de la comunidad SaltaDev en Salta"
+              class="absolute inset-0 h-full w-full object-cover"
+              src="{% static 'assets/img/seed-latam-salta-960w.webp' %}"
+              width="960" height="1200" loading="lazy" decoding="async">
+            <figcaption class="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-background-dark/95 via-background-dark/40 to-transparent">
               <div class="flex items-center gap-3">
                 <div class="flex -space-x-3">
-                  <img alt="Member Avatar" class="w-10 h-10 rounded-full border-2 border-background-dark" src="{% static 'assets/img/people_1.jpg' %}">
-                  <img alt="Member Avatar" class="w-10 h-10 rounded-full border-2 border-background-dark" src="{% static 'assets/img/people_2.jpg' %}">
-                  <img alt="Member Avatar" class="w-10 h-10 rounded-full border-2 border-background-dark" src="{% static 'assets/img/people_3.jpg' %}">
+                  <img alt="" class="w-10 h-10 rounded-full border-2 border-background-dark" src="{% static 'assets/img/people_1-96w.webp' %}" width="96" height="96" loading="lazy" decoding="async">
+                  <img alt="" class="w-10 h-10 rounded-full border-2 border-background-dark" src="{% static 'assets/img/people_2-96w.webp' %}" width="96" height="96" loading="lazy" decoding="async">
+                  <img alt="" class="w-10 h-10 rounded-full border-2 border-background-dark" src="{% static 'assets/img/people_3-96w.webp' %}" width="96" height="96" loading="lazy" decoding="async">
                 </div>
-                <span class="text-sm font-medium text-white">+1000 miembros</span>
+                <span class="text-sm font-semibold text-ink">+1000 miembros</span>
               </div>
-            </div>
-          </div>
-          <div class="absolute -top-6 -right-6 bg-surface-dark border border-border-dark p-4 rounded-xl shadow-2xl animate-bounce z-20" style="animation-duration: 3s;">
-            <span class="material-symbols-outlined text-white text-3xl">code</span>
-          </div>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </div>
@@ -353,20 +346,6 @@
     </div>
   </section>
 </main>
-
-<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
-<div class="floating-scroll" aria-hidden="true">
-  <button id="scrollUp" type="button" aria-label="Scroll arriba">
-    <span class="material-symbols-outlined">keyboard_arrow_up</span>
-  </button>
-  <button id="scrollTop" type="button" class="floating-scroll-top" aria-label="Volver al inicio">
-    <span class="material-symbols-outlined">north</span>
-    Volver al inicio
-  </button>
-  <button id="scrollDown" type="button" aria-label="Scroll abajo">
-    <span class="material-symbols-outlined">keyboard_arrow_down</span>
-  </button>
-</div>
 
 {% endblock %}
 

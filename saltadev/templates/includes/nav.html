@@ -6,7 +6,7 @@
         <img alt="Logo SaltaDev" class="h-8 w-auto" src="{% static 'assets/img/logo.webp' %}" width="32" height="32">
         <span class="text-lg font-bold tracking-tight text-ink">SaltaDev</span>
       </a>
-      <nav class="hidden md:flex items-center gap-7" aria-label="Principal">
+      <nav class="hidden lg:flex items-center gap-7" aria-label="Principal">
         <a class="text-sm font-medium text-text-muted hover:text-ink transition-colors" href="/">Inicio</a>
         <a class="text-sm font-medium text-text-muted hover:text-ink transition-colors" href="/#partners">Colaboradores</a>
         <a class="text-sm font-medium text-text-muted hover:text-ink transition-colors" href="/#staff">Staff</a>
@@ -16,23 +16,23 @@
       </nav>
       <div class="flex items-center gap-3">
         {% if user.is_authenticated %}
-        <a class="hidden md:inline-flex items-center gap-2 bg-primary hover:bg-primary-hover active:scale-[0.98] text-ink text-sm font-bold px-4 py-2 rounded-lg transition-all" href="/dashboard/">
+        <a class="hidden lg:inline-flex whitespace-nowrap items-center gap-2 bg-primary hover:bg-primary-hover active:scale-[0.98] text-ink text-sm font-bold px-4 py-2 rounded-lg transition-all" href="/dashboard/">
           <span>Volver al dashboard</span>
           <span class="material-symbols-outlined text-[18px]" aria-hidden="true">dashboard</span>
         </a>
         {% else %}
-        <a class="hidden md:inline-flex items-center gap-2 bg-primary hover:bg-primary-hover active:scale-[0.98] text-ink text-sm font-bold px-4 py-2 rounded-lg transition-all" href="/login/">
+        <a class="hidden lg:inline-flex whitespace-nowrap items-center gap-2 bg-primary hover:bg-primary-hover active:scale-[0.98] text-ink text-sm font-bold px-4 py-2 rounded-lg transition-all" href="/login/">
           <span>Iniciar sesión</span>
           <span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
         </a>
         {% endif %}
-        <button class="md:hidden text-ink p-2 rounded-lg" type="button" id="mobileMenuToggle" aria-label="Abrir menu" aria-expanded="false">
+        <button class="lg:hidden text-ink p-2 rounded-lg" type="button" id="mobileMenuToggle" aria-label="Abrir menu" aria-expanded="false">
           <span class="material-symbols-outlined" aria-hidden="true">menu</span>
         </button>
       </div>
     </div>
   </div>
-  <div class="md:hidden absolute top-full left-0 right-0 bg-sidebar-dark border-b border-border-dark overflow-hidden transition-all duration-200 ease-out max-h-0 opacity-0 -translate-y-2 pointer-events-none" id="mobileMenu">
+  <div class="lg:hidden absolute top-full left-0 right-0 bg-sidebar-dark border-b border-border-dark overflow-hidden transition-all duration-200 ease-out max-h-0 opacity-0 -translate-y-2 pointer-events-none" id="mobileMenu">
     <div class="px-6 py-4 flex flex-col">
       <a class="text-sm font-medium text-text-muted py-3 border-b border-border-dark" href="/">Inicio</a>
       <a class="text-sm font-medium text-text-muted py-3 border-b border-border-dark" href="/#partners">Colaboradores</a>
