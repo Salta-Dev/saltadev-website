@@ -77,8 +77,43 @@ if (partnersToggle && partnersGrid && partnersToggleLabel) {
   });
 }
 
+// Run each motion subsystem in isolation: one failure must not kill the rest
+const safeMotion = (label, fn) => {
+  try {
+    fn();
+  } catch (err) {
+    console.warn(`motion subsystem "${label}" skipped:`, err);
+  }
+};
+
 if (!prefersReducedMotion && window.gsap) {
   gsap.registerPlugin(ScrollTrigger);
+
+  // Card tilt: pointer-driven 3D lean on pillar cards, bento cells and event
+  // cards. Fine pointers only (no hover on touch), smoothed with quickTo.
+  // Bound first so a failure in any scroll system can never disable it.
+  safeMotion('tilt', () => {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    document.querySelectorAll('[data-tilt], .bento-cell, .event-card').forEach((card) => {
+      gsap.set(card, { transformPerspective: 650 });
+      const toRotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
+      const toRotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
+      const toScale = gsap.quickTo(card, 'scale', { duration: 0.4, ease: 'power2.out' });
+      card.addEventListener('pointermove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width - 0.5;
+        const py = (e.clientY - rect.top) / rect.height - 0.5;
+        toRotX(py * -7);
+        toRotY(px * 9);
+        toScale(1.015);
+      });
+      card.addEventListener('pointerleave', () => {
+        toRotX(0);
+        toRotY(0);
+        toScale(1);
+      });
+    });
+  });
 
   // Hero entrance: staggered rise, communicates reading order
   gsap.from('[data-hero-item]', {
@@ -138,8 +173,9 @@ if (!prefersReducedMotion && window.gsap) {
   }
 
   // Norte band: the weave and the franja drift at different speeds (parallax)
-  const norteBand = document.querySelector('.norte-band');
-  if (norteBand) {
+  safeMotion('norte-parallax', () => {
+    const norteBand = document.querySelector('.norte-band');
+    if (!norteBand) return;
     gsap.fromTo(
       norteBand,
       { '--weave-y': '-46px', '--franja-y': '36px' },
@@ -150,31 +186,7 @@ if (!prefersReducedMotion && window.gsap) {
         scrollTrigger: { trigger: norteBand, start: 'top bottom', end: 'bottom top', scrub: true },
       }
     );
-  }
-
-  // Card tilt: pointer-driven 3D lean on pillar cards, bento cells and event
-  // cards. Fine pointers only (no hover on touch), smoothed with quickTo.
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    document.querySelectorAll('[data-tilt], .bento-cell, .event-card').forEach((card) => {
-      gsap.set(card, { transformPerspective: 650 });
-      const toRotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
-      const toRotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
-      const toScale = gsap.quickTo(card, 'scale', { duration: 0.4, ease: 'power2.out' });
-      card.addEventListener('pointermove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const px = (e.clientX - rect.left) / rect.width - 0.5;
-        const py = (e.clientY - rect.top) / rect.height - 0.5;
-        toRotX(py * -7);
-        toRotY(px * 9);
-        toScale(1.015);
-      });
-      card.addEventListener('pointerleave', () => {
-        toRotX(0);
-        toRotY(0);
-        toScale(1);
-      });
-    });
-  }
+  });
 
   // Desktop-only depth: hero photo scrolls slower than the page; the contact
   // heading column drifts slightly against the form. Skipped on stacked
