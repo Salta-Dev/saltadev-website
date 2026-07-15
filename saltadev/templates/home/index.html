@@ -9,6 +9,9 @@
 
 {% block page_css %}
   <link rel="stylesheet" href="{% static 'assets/css/index.css' %}">
+  {# Hero photo is the LCP candidate: start the fetch with the HTML #}
+  <link rel="preload" as="image" href="{% static 'assets/img/seed-latam-salta-720x450.webp' %}" media="(max-width: 1023px)">
+  <link rel="preload" as="image" href="{% static 'assets/img/seed-latam-salta-960w.webp' %}" media="(min-width: 1024px)">
 {% endblock %}
 
 {% block content %}
@@ -18,7 +21,7 @@
     <div class="absolute top-0 right-0 w-[46%] h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" aria-hidden="true"></div>
     <div class="absolute inset-0 hidden lg:block pointer-events-none" id="hero3d" aria-hidden="true"></div>
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 relative">
-      <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center py-16 md:py-20 lg:py-0 lg:min-h-[calc(100dvh-4rem)] lg:max-h-[900px]">
+      <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center py-12 md:py-20 lg:py-0 lg:min-h-[calc(100dvh-4rem)] lg:max-h-[900px]">
         <div class="lg:col-span-7">
           <span class="inline-flex items-center rounded-lg border border-border-dark bg-surface-dark/70 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted" data-hero-item>
             Comunidad salteña
@@ -39,13 +42,16 @@
             </a>
           </div>
         </div>
-        <div class="lg:col-span-5 hidden lg:block" data-hero-item>
-          <figure class="relative aspect-[4/5] overflow-hidden rounded-xl border border-border-dark shadow-card" data-hero-photo>
-            <img
-              alt="Encuentro de la comunidad SaltaDev en Salta"
-              class="absolute inset-0 h-full w-full object-cover"
-              src="{% static 'assets/img/seed-latam-salta-960w.webp' %}"
-              width="960" height="1200" loading="lazy" decoding="async">
+        <div class="lg:col-span-5" data-hero-item>
+          <figure class="relative aspect-[16/10] lg:aspect-[4/5] overflow-hidden rounded-xl border border-border-dark shadow-card" data-hero-photo>
+            <picture>
+              <source media="(min-width: 1024px)" srcset="{% static 'assets/img/seed-latam-salta-960w.webp' %}">
+              <img
+                alt="Encuentro de la comunidad SaltaDev en Salta"
+                class="absolute inset-0 h-full w-full object-cover"
+                src="{% static 'assets/img/seed-latam-salta-720x450.webp' %}"
+                width="720" height="450" fetchpriority="high" decoding="async">
+            </picture>
             <figcaption class="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-background-dark/95 via-background-dark/40 to-transparent">
               <div class="flex items-center gap-3">
                 <div class="flex -space-x-3">
@@ -65,15 +71,15 @@
   <section class="relative overflow-hidden isolate bg-aurora border-b border-border-dark bg-surface-dark/40">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border-dark" data-reveal>
-        <div class="py-8 lg:py-10 sm:pr-8">
+        <div class="py-5 sm:py-8 lg:py-10 sm:pr-8">
           <p class="text-4xl lg:text-5xl font-bold text-ink tabular-nums" data-count-to="1000" data-count-prefix="+">+1000</p>
           <p class="mt-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">Miembros activos</p>
         </div>
-        <div class="py-8 lg:py-10 sm:px-8">
+        <div class="py-5 sm:py-8 lg:py-10 sm:px-8">
           <p class="text-4xl lg:text-5xl font-bold text-ink tabular-nums" data-count-to="{{ collaborators_count }}" data-count-prefix="+">+{{ collaborators_count }}</p>
           <p class="mt-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">Organizaciones colaboradoras</p>
         </div>
-        <div class="py-8 lg:py-10 sm:pl-8">
+        <div class="py-5 sm:py-8 lg:py-10 sm:pl-8">
           <p class="text-4xl lg:text-5xl font-bold text-ink tabular-nums" data-count-to="6">6</p>
           <p class="mt-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">Plataformas de comunidad</p>
         </div>
@@ -81,7 +87,7 @@
     </div>
   </section>
 
-  <section class="relative overflow-hidden isolate bg-drift py-20 lg:py-24 border-b border-border-dark">
+  <section class="relative overflow-hidden isolate bg-drift py-14 sm:py-20 lg:py-24 border-b border-border-dark">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5" data-stagger>
         <div class="rounded-lg border border-border-dark bg-surface-dark p-8 lg:p-9" data-tilt>
@@ -112,7 +118,7 @@
     </div>
   </section>
 
-  <section class="py-20 lg:py-24 border-b border-border-dark overflow-hidden bg-gradient-to-b from-surface-dark/25 via-transparent to-transparent" id="partners">
+  <section class="py-14 sm:py-20 lg:py-24 border-b border-border-dark overflow-hidden bg-gradient-to-b from-surface-dark/25 via-transparent to-transparent" id="partners">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-wrap items-end justify-between gap-6 mb-10" data-reveal>
         <div class="max-w-2xl">
@@ -154,7 +160,7 @@
     </div>
   </section>
 
-  <section class="relative overflow-hidden isolate bg-breathe py-20 lg:py-24 border-b border-border-dark" id="community">
+  <section class="relative overflow-hidden isolate bg-breathe py-14 sm:py-20 lg:py-24 border-b border-border-dark" id="community">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12" data-reveal>
         <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-ink">Sumate a la charla</h2>
@@ -221,7 +227,7 @@
     </div>
   </section>
 
-  <section class="relative overflow-hidden isolate bg-sweep py-20 lg:py-24 border-b border-border-dark bg-surface-dark/30" id="events">
+  <section class="relative overflow-hidden isolate bg-sweep py-14 sm:py-20 lg:py-24 border-b border-border-dark bg-surface-dark/30" id="events">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-wrap items-end justify-between gap-6 mb-10" data-reveal>
         <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-ink">Próximos Eventos</h2>
@@ -272,7 +278,7 @@
   </section>
 
   <section class="norte-band border-b border-border-dark">
-    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 relative" data-reveal>
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32 relative" data-reveal>
       <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary-bright">Comunidad de tecnología y desarrollo en Salta</p>
       <p class="mt-5 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] text-ink max-w-[18ch]">
         Impulsando el futuro digital <span class="text-primary-soft">del norte.</span>
@@ -280,7 +286,7 @@
     </div>
   </section>
 
-  <section class="relative isolate bg-corner py-20 lg:py-24 border-b border-border-dark bg-surface-dark/30" id="staff">
+  <section class="relative isolate bg-corner py-14 sm:py-20 lg:py-24 border-b border-border-dark bg-surface-dark/30" id="staff">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid lg:grid-cols-12 gap-10 lg:gap-16">
         <div class="lg:col-span-4" data-reveal>
@@ -352,7 +358,7 @@
     </div>
   </section>
 
-  <section class="py-20 lg:py-24 relative overflow-hidden" id="contact">
+  <section class="py-14 sm:py-20 lg:py-24 relative overflow-hidden" id="contact">
     <div class="absolute inset-0 bg-poncho-pattern contact-breathe pointer-events-none" aria-hidden="true"></div>
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 relative">
       <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">

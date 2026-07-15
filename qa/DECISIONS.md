@@ -339,6 +339,17 @@ Each section gets ONE distinct, motivated scroll behavior (motion-must-be-motiva
   animations are disabled under prefers-reduced-motion (the static gradient state
   remains, so RM users still get depth instead of flat solids).
 
+### Post-audit addition: mobile pass (user-requested, 2026-07-15)
+- Mobile hero was text-only and read flat: the community photo now renders on mobile as
+  a 16:10 card (720x450 WebP, 96KB) below the CTAs, keeping the avatar social proof.
+  Desktop keeps the 4:5 crop via `<picture>` media source.
+- LCP lesson recorded: making the photo visible on mobile with `loading="lazy"` pushed
+  throttled LCP from 1.5s to 5.3s (lazy on an LCP candidate = low priority + late
+  discovery). Fixed with eager load + `fetchpriority="high"` + media-scoped
+  `<link rel="preload">`; re-measured at 2080ms against the 2500ms budget.
+- Mobile rhythm tightened: sections py-14 (was py-20), norte band py-16, stat strip
+  cells py-5; the stacked stat column no longer consumes a full viewport.
+
 ### Known flags left for the owner (data/config, not redesign scope)
 1. "Cultura C3" description en-dash (DB edit).
 2. "Santader Tecnología" typo in staff bio (DB edit).
