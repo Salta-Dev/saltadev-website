@@ -89,7 +89,7 @@ if (!prefersReducedMotion && window.gsap) {
     ease: 'power3.out',
   });
 
-  // Section reveals on scroll
+  // Section reveals on scroll (base rhythm for headers and single blocks)
   document.querySelectorAll('[data-reveal]').forEach((el) => {
     gsap.from(el, {
       scrollTrigger: { trigger: el, start: 'top 85%' },
@@ -98,6 +98,89 @@ if (!prefersReducedMotion && window.gsap) {
       duration: 0.7,
       ease: 'power2.out',
     });
+  });
+
+  // Cascading grids (pillars, bento): children rise in reading order
+  document.querySelectorAll('[data-stagger]').forEach((group) => {
+    gsap.from(group.children, {
+      scrollTrigger: { trigger: group, start: 'top 82%' },
+      y: 30,
+      opacity: 0,
+      duration: 0.65,
+      stagger: 0.12,
+      ease: 'power2.out',
+    });
+  });
+
+  // Staff rows: enter from the left, one by one, like reading down a list
+  document.querySelectorAll('[data-stagger-rows]').forEach((group) => {
+    gsap.from(group.children, {
+      scrollTrigger: { trigger: group, start: 'top 82%' },
+      x: -36,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.15,
+      ease: 'power2.out',
+    });
+  });
+
+  // Event cards: slide in from the right, pointing at the carousel direction
+  const eventTrack = document.querySelector('.event-track');
+  if (eventTrack) {
+    gsap.from(eventTrack.children, {
+      scrollTrigger: { trigger: eventTrack, start: 'top 82%' },
+      x: 64,
+      opacity: 0,
+      duration: 0.7,
+      stagger: 0.1,
+      ease: 'power3.out',
+    });
+  }
+
+  // Norte band: the weave and the franja drift at different speeds (parallax)
+  const norteBand = document.querySelector('.norte-band');
+  if (norteBand) {
+    gsap.fromTo(
+      norteBand,
+      { '--weave-y': '-46px', '--franja-y': '36px' },
+      {
+        '--weave-y': '46px',
+        '--franja-y': '-36px',
+        ease: 'none',
+        scrollTrigger: { trigger: norteBand, start: 'top bottom', end: 'bottom top', scrub: true },
+      }
+    );
+  }
+
+  // Desktop-only depth: hero photo scrolls slower than the page; the contact
+  // heading column drifts slightly against the form. Skipped on stacked
+  // mobile layouts where differential motion reads as misalignment.
+  const mm = gsap.matchMedia();
+  mm.add('(min-width: 1024px)', () => {
+    const heroPhoto = document.querySelector('[data-hero-photo]');
+    if (heroPhoto) {
+      gsap.fromTo(
+        heroPhoto,
+        { yPercent: -3 },
+        {
+          yPercent: 7,
+          ease: 'none',
+          scrollTrigger: { trigger: heroPhoto, start: 'top bottom', end: 'bottom top', scrub: true },
+        }
+      );
+    }
+    const contactSlow = document.querySelector('[data-parallax-slow]');
+    if (contactSlow) {
+      gsap.fromTo(
+        contactSlow,
+        { y: 44 },
+        {
+          y: -28,
+          ease: 'none',
+          scrollTrigger: { trigger: '#contact', start: 'top bottom', end: 'bottom top', scrub: true },
+        }
+      );
+    }
   });
 
   // Stat counters roll up once when the strip enters the viewport.

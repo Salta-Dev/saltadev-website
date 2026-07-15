@@ -155,7 +155,7 @@
 .norte-band::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -60px 0; /* overscan: parallax travel must never expose bare edges */
   pointer-events: none;
   background: repeating-linear-gradient(
     0deg,
@@ -167,15 +167,20 @@
   /* Weave fades out where the manifesto sits, full strength toward the franja */
   mask-image: linear-gradient(to right, transparent 8%, rgba(0, 0, 0, 0.35) 40%, black 78%);
   -webkit-mask-image: linear-gradient(to right, transparent 8%, rgba(0, 0, 0, 0.35) 40%, black 78%);
+  /* Scroll parallax: index.js scrubs --weave-y / --franja-y in opposite directions */
+  transform: translate3d(0, var(--weave-y, 0px), 0);
+  will-change: transform;
 }
 
 /* Vertical franja on the right edge, stronger, fading toward the text */
 .norte-band::after {
   content: '';
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: -50px;
+  bottom: -50px;
   right: 0;
+  transform: translate3d(0, var(--franja-y, 0px), 0);
+  will-change: transform;
   width: min(22vw, 280px);
   pointer-events: none;
   background: repeating-linear-gradient(

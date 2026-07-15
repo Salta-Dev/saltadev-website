@@ -302,6 +302,24 @@ table specifies, not a 5th text element. PASS.
 - Readability: canvas is masked with a 105deg gradient so the copy column stays clean;
   terrain amplitude swells toward the right and the horizon.
 
+### Post-audit addition: per-section scroll signatures (user-requested, 2026-07-15)
+Each section gets ONE distinct, motivated scroll behavior (motion-must-be-motivated rule):
+- Hero: photo card scrubs slower than the page (depth; mid plane between 3D terrain and
+  copy). Desktop only via gsap.matchMedia.
+- Stats: counters remain the signature (data emphasis), no extra layer.
+- Pillars: children cascade left-to-right (reading order), featured cell lands last.
+- Partners: no added motion; the marquee is its signature (no motion stacked on motion).
+- Community bento: cells cascade with the feature cell first (hierarchy).
+- Events: cards enter from the right (affordance: the carousel continues that way).
+- Norte band: weave and franja scrub in opposite directions (fabric materiality);
+  pseudo-elements translate via CSS vars (--weave-y/--franja-y) with 50-60px overscan
+  so travel never exposes edges. transform-only animation.
+- Staff: rows enter from the left one-by-one (reading down a list).
+- Contact: heading column drifts against the form (split depth), desktop only.
+- All of it lives inside the prefers-reduced-motion guard; verified with Playwright
+  reducedMotion:'reduce': no canvas, three.js not even requested, marquee replaced by
+  the static grid, content at full opacity.
+
 ### Known flags left for the owner (data/config, not redesign scope)
 1. "Cultura C3" description en-dash (DB edit).
 2. "Santader Tecnología" typo in staff bio (DB edit).
