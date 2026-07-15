@@ -156,19 +156,22 @@ if (!prefersReducedMotion && window.gsap) {
   // cards. Fine pointers only (no hover on touch), smoothed with quickTo.
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     document.querySelectorAll('[data-tilt], .bento-cell, .event-card').forEach((card) => {
-      gsap.set(card, { transformPerspective: 700 });
-      const toRotX = gsap.quickTo(card, 'rotationX', { duration: 0.45, ease: 'power2.out' });
-      const toRotY = gsap.quickTo(card, 'rotationY', { duration: 0.45, ease: 'power2.out' });
+      gsap.set(card, { transformPerspective: 650 });
+      const toRotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
+      const toRotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
+      const toScale = gsap.quickTo(card, 'scale', { duration: 0.4, ease: 'power2.out' });
       card.addEventListener('pointermove', (e) => {
         const rect = card.getBoundingClientRect();
         const px = (e.clientX - rect.left) / rect.width - 0.5;
         const py = (e.clientY - rect.top) / rect.height - 0.5;
-        toRotX(py * -5);
-        toRotY(px * 6);
+        toRotX(py * -7);
+        toRotY(px * 9);
+        toScale(1.015);
       });
       card.addEventListener('pointerleave', () => {
         toRotX(0);
         toRotY(0);
+        toScale(1);
       });
     });
   }
