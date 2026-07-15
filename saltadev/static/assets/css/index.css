@@ -277,6 +277,31 @@
   }
 }
 
+/* ── Tilt cards: cursor spotlight (specular that sells the 3D lean) ─── */
+
+.tilt-card {
+  position: relative;
+}
+
+.tilt-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease-brand);
+  background: radial-gradient(
+    220px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    color-mix(in srgb, var(--color-primary-soft) 15%, transparent),
+    transparent 70%
+  );
+}
+
+.tilt-card:hover::after {
+  opacity: 1;
+}
+
 /* ── Hero 3D: cerros contour terrain (canvas mounted by hero3d.js) ──── */
 
 #hero3d canvas {

@@ -97,6 +97,7 @@ if (!prefersReducedMotion && window.gsap) {
     // '(hover: hover) and (pointer: fine)' reports false on some real desktop
     // setups (device emulation, hybrid inputs) and silently disabled the effect.
     document.querySelectorAll('[data-tilt], .bento-cell, .event-card').forEach((card) => {
+      card.classList.add('tilt-card'); // enables the cursor spotlight overlay
       gsap.set(card, { transformPerspective: 650 });
       const toRotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
       const toRotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
@@ -104,6 +105,8 @@ if (!prefersReducedMotion && window.gsap) {
       card.addEventListener('pointermove', (e) => {
         if (e.pointerType === 'touch') return; // taps must not tilt
         const rect = card.getBoundingClientRect();
+        card.style.setProperty('--spot-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--spot-y', `${e.clientY - rect.top}px`);
         const px = (e.clientX - rect.left) / rect.width - 0.5;
         const py = (e.clientY - rect.top) / rect.height - 0.5;
         toRotX(py * -7);
