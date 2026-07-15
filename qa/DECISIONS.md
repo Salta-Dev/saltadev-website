@@ -96,3 +96,20 @@ new family; zero extra font downloads keeps LCP budget).
   (scroll cues), `window scroll` listeners in index.js.
 - Motion: staggered hero entrance (reading order) + scroll reveals via `[data-reveal]`,
   gated behind `prefers-reduced-motion`.
+
+### 3. Stat strip
+- 3 sourced metrics only: +1000 miembros (site copy), +N organizaciones (live DB count,
+  renders +20 in production), 6 plataformas (the six community platforms). No invented
+  numbers. Reference's 5-metric bar trimmed to what has a source.
+- Counters roll up once on scroll (GSAP); markup ships the final value so no-JS and
+  reduced-motion users see real numbers. `tabular-nums` prevents digit jitter.
+- Old strip mixed one metric with three category labels at equal visual weight; that
+  hierarchy conflict is what made it read flat. Metrics and pillars are now separate rows
+  (matching the reference rhythm: stat bar, then solution cards).
+
+### 4. Pillars (Empleos / Cursos / Eventos)
+- 3-card grid with the third cell featured (terracotta gradient + poncho pattern +
+  stronger border), mirroring the reference's badge-card asymmetry without inventing a
+  badge metric. Breaks the banned "three identical cards" pattern.
+- Copy verbatim from the old strip. No extra CTA here: /eventos/ is already reachable
+  from the hero and the events section (duplicate-intent rule).

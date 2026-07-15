@@ -41,4 +41,23 @@ if (!prefersReducedMotion && window.gsap) {
       ease: 'power2.out',
     });
   });
+
+  // Stat counters roll up once when the strip enters the viewport.
+  // Markup already contains the final value, so reduced-motion and no-JS
+  // users see the real number without animation.
+  document.querySelectorAll('[data-count-to]').forEach((el) => {
+    const target = parseInt(el.dataset.countTo, 10);
+    if (Number.isNaN(target)) return;
+    const prefix = el.dataset.countPrefix || '';
+    const state = { n: 0 };
+    gsap.to(state, {
+      n: target,
+      duration: 1.4,
+      ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+      onUpdate: () => {
+        el.textContent = prefix + String(Math.round(state.n));
+      },
+    });
+  });
 }
