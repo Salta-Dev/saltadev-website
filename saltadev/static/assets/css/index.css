@@ -126,6 +126,59 @@
   }
 }
 
+/* ── Norte band: poncho-weave manifesto ─────────────────────────────── */
+
+.norte-band {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-sidebar-dark);
+}
+
+/* Horizontal weave: thin paired stripes, like the franjas of a poncho salteño */
+.norte-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 54px,
+    color-mix(in srgb, var(--color-primary) 26%, transparent) 54px 57px,
+    transparent 57px 66px,
+    color-mix(in srgb, var(--color-primary) 14%, transparent) 66px 68px
+  );
+  /* Weave fades out where the manifesto sits, full strength toward the franja */
+  mask-image: linear-gradient(to right, transparent 8%, rgba(0, 0, 0, 0.35) 40%, black 78%);
+  -webkit-mask-image: linear-gradient(to right, transparent 8%, rgba(0, 0, 0, 0.35) 40%, black 78%);
+}
+
+/* Vertical franja on the right edge, stronger, fading toward the text */
+.norte-band::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: min(22vw, 280px);
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 22px,
+    color-mix(in srgb, var(--color-primary) 38%, transparent) 22px 30px,
+    transparent 30px 40px,
+    color-mix(in srgb, var(--color-primary) 20%, transparent) 40px 44px
+  );
+  mask-image: linear-gradient(to left, black 40%, transparent);
+  -webkit-mask-image: linear-gradient(to left, black 40%, transparent);
+}
+
+@media (max-width: 767px) {
+  .norte-band::after {
+    width: 30vw;
+    opacity: 0.7;
+  }
+}
+
 /* ── Community: asymmetric bento (6 items, 6 cells: 4+2 / 2+2+1+1) ──── */
 
 .bento-cell {
