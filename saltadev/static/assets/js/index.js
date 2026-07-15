@@ -12,6 +12,23 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
   });
 });
 
+// Hero 3D background (cerros): desktop only, motion-safe, loaded after the
+// page is done so it never competes with LCP. Static poncho backdrop remains
+// the fallback when WebGL, viewport or motion preferences rule it out.
+const hero3dHost = document.getElementById('hero3d');
+if (
+  hero3dHost &&
+  !prefersReducedMotion &&
+  window.matchMedia('(min-width: 1024px)').matches &&
+  window.WebGLRenderingContext
+) {
+  const bootHero3d = () => {
+    import('./hero3d.js').then((m) => m.mountHero3D(hero3dHost)).catch(() => {});
+  };
+  if (document.readyState === 'complete') setTimeout(bootHero3d, 250);
+  else window.addEventListener('load', () => setTimeout(bootHero3d, 250), { once: true });
+}
+
 // Keep anchored sections clear of the fixed header
 const header = document.querySelector('header');
 const headerOffset = header ? header.offsetHeight + 12 : 76;

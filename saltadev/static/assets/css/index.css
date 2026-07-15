@@ -126,6 +126,23 @@
   }
 }
 
+/* ── Hero 3D: cerros contour terrain (canvas mounted by hero3d.js) ──── */
+
+#hero3d canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease-brand);
+  /* Terrain lives to the right; keep the copy column clean */
+  mask-image: linear-gradient(105deg, transparent 10%, rgba(0, 0, 0, 0.45) 42%, black 70%);
+  -webkit-mask-image: linear-gradient(105deg, transparent 10%, rgba(0, 0, 0, 0.45) 42%, black 70%);
+}
+
+#hero3d canvas.is-ready {
+  opacity: 1;
+}
+
 /* ── Norte band: poncho-weave manifesto ─────────────────────────────── */
 
 .norte-band {

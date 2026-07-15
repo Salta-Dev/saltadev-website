@@ -282,6 +282,26 @@ table specifies, not a 5th text element. PASS.
 - Horizontal overflow: none at any viewport on any page.
 - /eventos/ and /reglamento/ visually verified healthy with the new nav/footer/tokens.
 
+### Post-audit addition: hero 3D background (user-requested, 2026-07-15)
+- Direction chosen by the user from three proposals: "Cerros del norte", wireframe
+  elevation contours of northern ridgelines (the particles-network option was advised
+  against as generic crypto slop, which the brief bans).
+- Implementation: self-hosted Three.js r182 modules (`vendor/three.module.min.js` +
+  `three.core.min.js`, ~720KB raw / ~180KB gzip via WhiteNoise) to avoid adding a CDN
+  origin to the production CSP. Single LineSegments draw call (64 contour rows x 120
+  columns), ridged sin-noise elevation drifting slowly, vertex colors lerp from the
+  page background to terracotta so depth fades without alpha blending, soft pointer
+  parallax lerped inside the same rAF.
+- Performance budget kept: bundle loads via dynamic import only on >=1024px viewports,
+  only when WebGL exists, and only after window load + 250ms, so it never competes
+  with LCP; mobile never downloads it (container is also hidden below lg). DPR capped
+  at 1.5. rAF pauses when the hero leaves the viewport (IntersectionObserver) and when
+  the tab hides.
+- Reduced motion: the JS gate skips mounting entirely; the static poncho backdrop is
+  the fallback (also the WebGL-failure fallback via caught dynamic import).
+- Readability: canvas is masked with a 105deg gradient so the copy column stays clean;
+  terrain amplitude swells toward the right and the horizon.
+
 ### Known flags left for the owner (data/config, not redesign scope)
 1. "Cultura C3" description en-dash (DB edit).
 2. "Santader Tecnología" typo in staff bio (DB edit).
