@@ -1,11 +1,127 @@
 /* Home page styles. Tokens come from the Tailwind theme (tailwind/source.css). */
 
-.partners-collapsed .partner-hidden {
+/* ── Partners: logo marquee + expandable directory grid ─────────────── */
+
+.partner-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 5rem;
+  padding: 0 1.75rem;
+  background: var(--color-surface-dark);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 1rem;
+  transition: border-color 0.3s var(--ease-brand);
+}
+
+.partner-tile:hover,
+.partner-tile:focus-visible {
+  border-color: color-mix(in srgb, var(--color-primary-soft) 50%, transparent);
+}
+
+.partner-logo {
+  max-height: 2.25rem;
+  max-width: 130px;
+  width: auto;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: 0.8;
+  transition: filter 0.3s, opacity 0.3s;
+}
+
+.partner-tile:hover .partner-logo,
+.partner-tile:focus-visible .partner-logo {
+  filter: none;
+  opacity: 1;
+}
+
+/* Directory variant: logo + name, used in the expanded grid */
+.partner-tile-named {
+  flex-direction: column;
+  gap: 0.75rem;
+  height: auto;
+  min-height: 7rem;
+  padding: 1.25rem 1rem;
+}
+
+.partner-name {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.marquee {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Edge fades so logos enter/exit softly */
+.marquee::before,
+.marquee::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6rem;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.marquee::before {
+  left: 0;
+  background: linear-gradient(to right, var(--color-background-dark), transparent);
+}
+
+.marquee::after {
+  right: 0;
+  background: linear-gradient(to left, var(--color-background-dark), transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 45s linear infinite;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-list {
+  display: flex;
+  gap: 1rem;
+  padding-right: 1rem;
+  flex-shrink: 0;
+}
+
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Expanded directory grid: hidden until "Ver todos" */
+.partner-grid {
   display: none;
 }
 
-@media (min-width: 768px) {
-  .partners-collapsed .partner-hidden {
-    display: flex;
+.partner-grid.open {
+  display: grid;
+}
+
+/* Reduced motion: no marquee, directory always visible, toggle pointless */
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    display: none;
+  }
+
+  .partner-grid {
+    display: grid;
+  }
+
+  .partners-toggle {
+    display: none;
   }
 }

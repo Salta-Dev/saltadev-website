@@ -19,6 +19,20 @@ document.querySelectorAll('main section[id]').forEach((section) => {
   section.style.scrollMarginTop = `${headerOffset}px`;
 });
 
+// Partners: toggle the full directory grid under the marquee
+const partnersToggle = document.getElementById('togglePartners');
+const partnersGrid = document.getElementById('partnersGrid');
+const partnersToggleLabel = document.getElementById('togglePartnersLabel');
+if (partnersToggle && partnersGrid && partnersToggleLabel) {
+  partnersToggle.addEventListener('click', () => {
+    const isOpen = partnersGrid.classList.toggle('open');
+    partnersToggle.setAttribute('aria-expanded', String(isOpen));
+    partnersToggleLabel.textContent = isOpen ? 'Ver menos colaboradores' : 'Ver todos los colaboradores';
+    const icon = partnersToggle.querySelector('.material-symbols-outlined');
+    if (icon) icon.textContent = isOpen ? 'expand_less' : 'expand_more';
+  });
+}
+
 if (!prefersReducedMotion && window.gsap) {
   gsap.registerPlugin(ScrollTrigger);
 
