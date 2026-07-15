@@ -19,6 +19,33 @@ document.querySelectorAll('main section[id]').forEach((section) => {
   section.style.scrollMarginTop = `${headerOffset}px`;
 });
 
+// Events carousel: native scroll-snap; buttons only appear when content overflows
+const carousel = document.querySelector('[data-carousel]');
+const carouselControls = document.querySelector('[data-carousel-controls]');
+if (carousel && carouselControls) {
+  const prevBtn = carouselControls.querySelector('[data-carousel-prev]');
+  const nextBtn = carouselControls.querySelector('[data-carousel-next]');
+  const step = () => {
+    const card = carousel.querySelector('.event-card');
+    return card ? card.getBoundingClientRect().width + 20 : 360;
+  };
+  const sync = () => {
+    const overflows = carousel.scrollWidth > carousel.clientWidth + 4;
+    carouselControls.hidden = !overflows;
+    if (!overflows) return;
+    prevBtn.disabled = carousel.scrollLeft <= 4;
+    nextBtn.disabled = carousel.scrollLeft >= carousel.scrollWidth - carousel.clientWidth - 4;
+  };
+  const scrollByStep = (dir) => {
+    carousel.scrollBy({ left: dir * step(), behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  };
+  prevBtn.addEventListener('click', () => scrollByStep(-1));
+  nextBtn.addEventListener('click', () => scrollByStep(1));
+  carousel.addEventListener('scroll', sync, { passive: true });
+  window.addEventListener('resize', sync);
+  sync();
+}
+
 // Partners: toggle the full directory grid under the marquee
 const partnersToggle = document.getElementById('togglePartners');
 const partnersGrid = document.getElementById('partnersGrid');
