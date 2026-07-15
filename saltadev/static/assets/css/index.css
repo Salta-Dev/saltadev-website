@@ -126,6 +126,157 @@
   }
 }
 
+/* ── Ambient section backgrounds ──────────────────────────────────────
+   One distinct field per section, transform/opacity animations only,
+   all disabled under prefers-reduced-motion (static gradients remain). */
+
+/* Stats: a soft terracotta light band drifting slowly behind the numbers */
+.bg-aurora::before {
+  content: '';
+  position: absolute;
+  inset: -20% -30%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    50% 130% at 28% 50%,
+    color-mix(in srgb, var(--color-primary) 10%, transparent),
+    transparent 70%
+  );
+  animation: aurora-drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift {
+  to {
+    transform: translate3d(20%, 0, 0);
+  }
+}
+
+/* Pillars: the poncho weave itself pans diagonally, one tile per loop */
+.bg-drift::before {
+  content: '';
+  position: absolute;
+  inset: -120px;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--background-image-poncho-pattern);
+  opacity: 0.6;
+  animation: weave-pan 22s linear infinite;
+}
+
+@keyframes weave-pan {
+  to {
+    /* exactly one 60px pattern tile: the loop restart is invisible */
+    transform: translate3d(-60px, -60px, 0);
+  }
+}
+
+/* Community: two ember washes breathing in counter-phase (conversation) */
+.bg-breathe::before,
+.bg-breathe::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  width: 55%;
+  height: 75%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-primary) 11%, transparent),
+    transparent
+  );
+  animation: breathe 14s ease-in-out infinite alternate;
+}
+
+.bg-breathe::before {
+  top: -25%;
+  left: -12%;
+}
+
+.bg-breathe::after {
+  bottom: -30%;
+  right: -10%;
+  animation-delay: -7s;
+}
+
+@keyframes breathe {
+  from {
+    opacity: 0.3;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Events: a faint light sweep travelling in the carousel direction */
+.bg-sweep::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -45%;
+  width: 45%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    color-mix(in srgb, var(--color-primary) 7%, transparent),
+    transparent
+  );
+  animation: sweep-x 26s linear infinite;
+}
+
+@keyframes sweep-x {
+  to {
+    transform: translate3d(340%, 0, 0);
+  }
+}
+
+/* Staff: static warm corner light, no animation needed */
+.bg-corner::before {
+  content: '';
+  position: absolute;
+  left: -10%;
+  bottom: -30%;
+  width: 50%;
+  height: 80%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-primary) 8%, transparent),
+    transparent
+  );
+}
+
+/* Contact: the existing poncho pattern breathes gently */
+.contact-breathe {
+  opacity: 0.18;
+  animation: pattern-breathe 16s ease-in-out infinite alternate;
+}
+
+@keyframes pattern-breathe {
+  from {
+    opacity: 0.12;
+  }
+
+  to {
+    opacity: 0.28;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-aurora::before,
+  .bg-drift::before,
+  .bg-breathe::before,
+  .bg-breathe::after,
+  .bg-sweep::before,
+  .contact-breathe {
+    animation: none;
+  }
+}
+
 /* ── Hero 3D: cerros contour terrain (canvas mounted by hero3d.js) ──── */
 
 #hero3d canvas {

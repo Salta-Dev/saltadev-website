@@ -320,6 +320,25 @@ Each section gets ONE distinct, motivated scroll behavior (motion-must-be-motiva
   reducedMotion:'reduce': no canvas, three.js not even requested, marquee replaced by
   the static grid, content at full opacity.
 
+### Post-audit addition: card tilt + ambient section fields (user-requested, 2026-07-15)
+- Card tilt (Parallax Tilt Card): pillar cards, bento cells and event cards lean up to
+  5-6 degrees toward the pointer (GSAP quickTo smoothing, transformPerspective 700).
+  Gated to `(hover: hover) and (pointer: fine)` so touch devices never bind listeners,
+  and to the global reduced-motion guard. Verified via Playwright: computed transform
+  becomes a matrix3d under pointer.
+- Ambient background per section, replacing flat solids while keeping the single dark
+  theme (tints of the same family only). Each has one sentence of intent:
+  stats = terracotta light band drifting (life behind live numbers); pillars = the
+  poncho weave panning one tile per 22s loop (the fabric moves); partners = static
+  gradient (the marquee is the motion); community = two ember washes breathing in
+  counter-phase (conversation); events = light sweep in the carousel direction;
+  norte = existing weave parallax; staff = static corner light; contact = the poncho
+  pattern breathing. Footer stays still (arrival point).
+- All fields are pseudo-elements animated with transform/opacity only (no
+  background-position repaints), z-index -1 under `isolate` sections, and all
+  animations are disabled under prefers-reduced-motion (the static gradient state
+  remains, so RM users still get depth instead of flat solids).
+
 ### Known flags left for the owner (data/config, not redesign scope)
 1. "Cultura C3" description en-dash (DB edit).
 2. "Santader Tecnología" typo in staff bio (DB edit).

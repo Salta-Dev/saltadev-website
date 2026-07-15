@@ -152,6 +152,27 @@ if (!prefersReducedMotion && window.gsap) {
     );
   }
 
+  // Card tilt: pointer-driven 3D lean on pillar cards, bento cells and event
+  // cards. Fine pointers only (no hover on touch), smoothed with quickTo.
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.querySelectorAll('[data-tilt], .bento-cell, .event-card').forEach((card) => {
+      gsap.set(card, { transformPerspective: 700 });
+      const toRotX = gsap.quickTo(card, 'rotationX', { duration: 0.45, ease: 'power2.out' });
+      const toRotY = gsap.quickTo(card, 'rotationY', { duration: 0.45, ease: 'power2.out' });
+      card.addEventListener('pointermove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width - 0.5;
+        const py = (e.clientY - rect.top) / rect.height - 0.5;
+        toRotX(py * -5);
+        toRotY(px * 6);
+      });
+      card.addEventListener('pointerleave', () => {
+        toRotX(0);
+        toRotY(0);
+      });
+    });
+  }
+
   // Desktop-only depth: hero photo scrolls slower than the page; the contact
   // heading column drifts slightly against the form. Skipped on stacked
   // mobile layouts where differential motion reads as misalignment.
