@@ -298,7 +298,7 @@
             {% else %}
               <img alt="{{ member.user.first_name }} {{ member.user.last_name }}" class="w-20 h-20 rounded-lg object-cover border border-border-dark" src="{% static 'assets/img/staff/facundo_padilla.jpg' %}" width="80" height="80" loading="lazy" decoding="async">
             {% endif %}
-            <div class="min-w-0 flex-1">
+            <div class="min-w-0 flex-1 basis-52">
               <h3 class="text-lg font-bold tracking-tight text-ink">{{ member.user.first_name }} {{ member.user.last_name }}</h3>
               {% if member.role %}
                 <p class="text-sm font-semibold text-primary-bright">{{ member.role }}</p>
@@ -307,7 +307,7 @@
                 <p class="mt-1.5 text-sm leading-relaxed text-text-muted">{{ member.bio }}</p>
               {% endif %}
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 w-full sm:w-auto">
               {% if member.linkedin %}
                 <a class="inline-flex w-9 h-9 items-center justify-center rounded-lg border border-border-dark text-text-muted transition-colors hover:text-primary-soft hover:border-primary-soft" href="{{ member.linkedin }}" target="_blank" aria-label="LinkedIn">
                   <svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
