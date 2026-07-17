@@ -1,0 +1,17 @@
+{% load static %}
+{% if collaborator.link %}
+<a class="partner-tile{% if show_name %} partner-tile-named{% endif %}" href="{{ collaborator.link }}" target="_blank" rel="noopener"{% if untabbable %} tabindex="-1"{% endif %}>
+{% else %}
+<span class="partner-tile{% if show_name %} partner-tile-named{% endif %}">
+{% endif %}
+  {% if collaborator.image|slice:":4" == "http" or collaborator.image|slice:":1" == "/" %}
+    <img alt="{{ collaborator.name }}" class="partner-logo" src="{{ collaborator.image }}" loading="lazy" decoding="async">
+  {% else %}
+    <img alt="{{ collaborator.name }}" class="partner-logo" src="{% static collaborator.image %}" loading="lazy" decoding="async">
+  {% endif %}
+  {% if show_name %}<span class="partner-name">{{ collaborator.name }}</span>{% endif %}
+{% if collaborator.link %}
+</a>
+{% else %}
+</span>
+{% endif %}

@@ -1,134 +1,534 @@
-.poncho-accent {
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, #94413d 10px, #94413d 12px);
-  opacity: 0.1;
-}
+/* Home page styles. Tokens come from the Tailwind theme (tailwind/source.css). */
 
-.poncho-border {
-  border-image: repeating-linear-gradient(45deg, #94413d, #181013 20px) 1;
-}
+/* ── Partners: logo marquee + expandable directory grid ─────────────── */
 
-.cursor-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 160px;
-  height: 160px;
-  border-radius: 9999px;
-  background: radial-gradient(circle, rgba(148, 65, 61, 0.2) 0%, rgba(148, 65, 61, 0) 70%);
-  pointer-events: none;
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  mix-blend-mode: screen;
-}
-
-.hero-cta {
-  display: inline-flex;
+.partner-tile {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  font-weight: 700;
-  position: relative;
-  z-index: 20;
-  opacity: 1 !important;
-  transform: none !important;
+  height: 5rem;
+  padding: 0 1.75rem;
+  background: var(--color-surface-dark);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 1rem;
+  transition: border-color 0.3s var(--ease-brand);
 }
 
-.hero-cta-primary {
-  background: #94413d;
-  color: #ffffff;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+.partner-tile:hover,
+.partner-tile:focus-visible {
+  border-color: color-mix(in srgb, var(--color-primary-soft) 50%, transparent);
 }
 
-.hero-cta-primary:hover {
-  background: #7a3431;
-  color: #ffffff;
+.partner-logo {
+  max-height: 2.25rem;
+  max-width: 130px;
+  width: auto;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: 0.8;
+  transition: filter 0.3s, opacity 0.3s;
 }
 
-.hero-cta-secondary {
-  background: #ffffff;
-  color: #181013;
-  border: 1px solid #ffffff;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.3);
+.partner-tile:hover .partner-logo,
+.partner-tile:focus-visible .partner-logo {
+  filter: none;
+  opacity: 1;
 }
 
-.hero-cta-secondary:hover {
-  background: #94413d;
-  color: #ffffff;
-  border-color: #94413d;
-}
-
-.floating-scroll {
-  position: fixed;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  display: flex;
+/* Directory variant: logo + name, used in the expanded grid */
+.partner-tile-named {
   flex-direction: column;
   gap: 0.75rem;
-  z-index: 30;
+  height: auto;
+  min-height: 7rem;
+  padding: 1.25rem 1rem;
 }
 
-.floating-scroll button {
-  width: 44px;
-  height: 44px;
-  border-radius: 9999px;
-  background: #94413d;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
-  animation: float-bob 2.6s ease-in-out infinite;
+.partner-name {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.3;
 }
 
-.floating-scroll button:hover {
-  background: #7a3431;
-  transform: translateY(-2px);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.4);
+.marquee {
+  position: relative;
+  overflow: hidden;
 }
 
-.floating-scroll .floating-scroll-top {
-  width: auto;
-  padding: 0 14px;
-  gap: 0.4rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+/* Edge fades so logos enter/exit softly */
+.marquee::before,
+.marquee::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6rem;
+  z-index: 1;
+  pointer-events: none;
 }
 
-@keyframes float-bob {
-  0%,
-  100% {
-    transform: translateY(0);
+.marquee::before {
+  left: 0;
+  background: linear-gradient(to right, var(--color-background-dark), transparent);
+}
+
+.marquee::after {
+  right: 0;
+  background: linear-gradient(to left, var(--color-background-dark), transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 45s linear infinite;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-list {
+  display: flex;
+  gap: 1rem;
+  padding-right: 1rem;
+  flex-shrink: 0;
+}
+
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
   }
-  50% {
-    transform: translateY(-4px);
-  }
 }
 
-.partners-collapsed .partner-hidden {
+/* Expanded directory grid: hidden until "Ver todos" */
+.partner-grid {
   display: none;
 }
 
-@media (min-width: 768px) {
-  .partners-collapsed .partner-hidden {
-    display: flex;
-  }
+.partner-grid.open {
+  display: grid;
 }
 
-@media (max-width: 767px) {
-  .cursor-glow {
+/* Reduced motion: no marquee, directory always visible, toggle pointless */
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
     display: none;
   }
 
-  .floating-scroll .floating-scroll-top {
-    display: none !important;
+  .partner-grid {
+    display: grid;
   }
+
+  .partners-toggle {
+    display: none;
+  }
+}
+
+/* ── Ambient section backgrounds ──────────────────────────────────────
+   One distinct field per section, transform/opacity animations only,
+   all disabled under prefers-reduced-motion (static gradients remain). */
+
+/* Stats: a soft terracotta light band drifting slowly behind the numbers */
+.bg-aurora::before {
+  content: '';
+  position: absolute;
+  inset: -20% -30%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    50% 130% at 28% 50%,
+    color-mix(in srgb, var(--color-primary) 10%, transparent),
+    transparent 70%
+  );
+  animation: aurora-drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift {
+  to {
+    transform: translate3d(20%, 0, 0);
+  }
+}
+
+/* Pillars: the poncho weave itself pans diagonally, one tile per loop */
+.bg-drift::before {
+  content: '';
+  position: absolute;
+  inset: -120px;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--background-image-poncho-pattern);
+  opacity: 0.6;
+  animation: weave-pan 22s linear infinite;
+}
+
+@keyframes weave-pan {
+  to {
+    /* exactly one 60px pattern tile: the loop restart is invisible */
+    transform: translate3d(-60px, -60px, 0);
+  }
+}
+
+/* Community: two ember washes breathing in counter-phase (conversation) */
+.bg-breathe::before,
+.bg-breathe::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  width: 55%;
+  height: 75%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-primary) 11%, transparent),
+    transparent
+  );
+  animation: breathe 14s ease-in-out infinite alternate;
+}
+
+.bg-breathe::before {
+  top: -25%;
+  left: -12%;
+}
+
+.bg-breathe::after {
+  bottom: -30%;
+  right: -10%;
+  animation-delay: -7s;
+}
+
+@keyframes breathe {
+  from {
+    opacity: 0.3;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Events: a faint light sweep travelling in the carousel direction */
+.bg-sweep::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -45%;
+  width: 45%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    color-mix(in srgb, var(--color-primary) 7%, transparent),
+    transparent
+  );
+  animation: sweep-x 26s linear infinite;
+}
+
+@keyframes sweep-x {
+  to {
+    transform: translate3d(340%, 0, 0);
+  }
+}
+
+/* Staff: static warm corner light, no animation needed */
+.bg-corner::before {
+  content: '';
+  position: absolute;
+  left: -10%;
+  bottom: -30%;
+  width: 50%;
+  height: 80%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-primary) 8%, transparent),
+    transparent
+  );
+}
+
+/* Contact: the existing poncho pattern breathes gently */
+.contact-breathe {
+  opacity: 0.18;
+  animation: pattern-breathe 16s ease-in-out infinite alternate;
+}
+
+@keyframes pattern-breathe {
+  from {
+    opacity: 0.12;
+  }
+
+  to {
+    opacity: 0.28;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-aurora::before,
+  .bg-drift::before,
+  .bg-breathe::before,
+  .bg-breathe::after,
+  .bg-sweep::before,
+  .contact-breathe {
+    animation: none;
+  }
+}
+
+/* ── Tilt cards: cursor spotlight (specular that sells the 3D lean) ─── */
+
+.tilt-card {
+  position: relative;
+}
+
+.tilt-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease-brand);
+  background: radial-gradient(
+    220px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    color-mix(in srgb, var(--color-primary-soft) 15%, transparent),
+    transparent 70%
+  );
+}
+
+.tilt-card:hover::after {
+  opacity: 1;
+}
+
+/* ── Hero 3D: cerros contour terrain (canvas mounted by hero3d.js) ──── */
+
+#hero3d canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease-brand);
+  /* Terrain lives to the right; keep the copy column clean */
+  mask-image: linear-gradient(105deg, transparent 10%, rgba(0, 0, 0, 0.45) 42%, black 70%);
+  -webkit-mask-image: linear-gradient(105deg, transparent 10%, rgba(0, 0, 0, 0.45) 42%, black 70%);
+}
+
+#hero3d canvas.is-ready {
+  opacity: 1;
+}
+
+/* ── Norte band: poncho-weave manifesto ─────────────────────────────── */
+
+.norte-band {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-sidebar-dark);
+}
+
+/* Horizontal weave: thin paired stripes, like the franjas of a poncho salteño */
+.norte-band::before {
+  content: '';
+  position: absolute;
+  inset: -60px 0; /* overscan: parallax travel must never expose bare edges */
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 54px,
+    color-mix(in srgb, var(--color-primary) 26%, transparent) 54px 57px,
+    transparent 57px 66px,
+    color-mix(in srgb, var(--color-primary) 14%, transparent) 66px 68px
+  );
+  /* Weave fades out where the manifesto sits, full strength toward the franja */
+  mask-image: linear-gradient(to right, transparent 8%, rgba(0, 0, 0, 0.35) 40%, black 78%);
+  -webkit-mask-image: linear-gradient(to right, transparent 8%, rgba(0, 0, 0, 0.35) 40%, black 78%);
+  /* Scroll parallax: index.js scrubs --weave-y / --franja-y in opposite directions */
+  transform: translate3d(0, var(--weave-y, 0px), 0);
+  will-change: transform;
+}
+
+/* Vertical franja on the right edge, stronger, fading toward the text */
+.norte-band::after {
+  content: '';
+  position: absolute;
+  top: -50px;
+  bottom: -50px;
+  right: 0;
+  transform: translate3d(0, var(--franja-y, 0px), 0);
+  will-change: transform;
+  width: min(22vw, 280px);
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 22px,
+    color-mix(in srgb, var(--color-primary) 38%, transparent) 22px 30px,
+    transparent 30px 40px,
+    color-mix(in srgb, var(--color-primary) 20%, transparent) 40px 44px
+  );
+  mask-image: linear-gradient(to left, black 40%, transparent);
+  -webkit-mask-image: linear-gradient(to left, black 40%, transparent);
+}
+
+@media (max-width: 767px) {
+  .norte-band::after {
+    width: 30vw;
+    opacity: 0.7;
+  }
+}
+
+/* ── Community: asymmetric bento (6 items, 6 cells: 4+2 / 2+2+1+1) ──── */
+
+.bento-cell {
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+  background: var(--color-surface-dark);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 1rem;
+  transition: border-color 0.3s var(--ease-brand);
+}
+
+.bento-cell:hover {
+  border-color: var(--color-primary-soft);
+}
+
+.bento-cell h3 {
+  margin-top: 1rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+.bento-cell p {
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.bento-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-text-muted);
+  transition: color 0.3s var(--ease-brand);
+}
+
+.bento-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.bento-cell:hover .bento-icon {
+  color: var(--color-primary-soft);
+}
+
+/* Featured cell (Discord): terracotta wash anchored to the top-left corner */
+.bento-feature {
+  background:
+    radial-gradient(
+      120% 140% at 0% 0%,
+      color-mix(in srgb, var(--color-primary) 18%, var(--color-surface-dark)) 0%,
+      var(--color-surface-dark) 60%
+    );
+}
+
+.bento-feature .bento-icon {
+  width: 3.25rem;
+  height: 3.25rem;
+  flex-shrink: 0;
+}
+
+.bento-feature .bento-icon svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* Wide feature cell earns its span with a horizontal composition */
+.bento-feature .bento-text h3 {
+  margin-top: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .bento-feature {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem 2.25rem;
+  }
+
+  .bento-feature .bento-text h3 {
+    margin-top: 0;
+    font-size: 1.5rem;
+  }
+
+  .bento-feature .bento-text p {
+    font-size: 1rem;
+    max-width: 46ch;
+  }
+}
+
+.bento-raised {
+  background: var(--color-surface-raised);
+}
+
+/* ── Events: native scroll-snap carousel ────────────────────────────── */
+
+.event-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(85vw, 340px);
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 4px; /* keep card borders/focus outline unclipped */
+  margin: -4px;
+}
+
+.event-track::-webkit-scrollbar {
+  display: none;
+}
+
+.event-card {
+  scroll-snap-align: start;
+}
+
+@media (min-width: 1024px) {
+  .event-track {
+    grid-auto-columns: calc((100% - 2.5rem - 8px) / 3);
+  }
+}
+
+.carousel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--color-border-dark);
+  background: var(--color-surface-dark);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease-brand), transform 0.15s;
+}
+
+.carousel-btn:hover {
+  border-color: var(--color-primary-soft);
+}
+
+.carousel-btn:active {
+  transform: scale(0.95);
+}
+
+.carousel-btn[disabled] {
+  opacity: 0.35;
+  cursor: default;
 }
