@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from content.models import Event
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -13,6 +14,9 @@ from .forms import EventForm, ImageSourceChoices
 
 # Template paths
 _TEMPLATE_FORM = "events/form.html"
+
+# Public events list page size
+_EVENTS_PER_PAGE = 3
 
 if TYPE_CHECKING:
     from users.models import User
@@ -84,15 +88,18 @@ def can_approve_events(user: "User") -> bool:
 
 @require_GET
 def events_list(request: HttpRequest) -> HttpResponse:
-    """Render the events page with all approved events sorted by date."""
+    """Render the events page with approved events, paginated and sorted by date."""
     events = (
         Event.objects.filter(status=Event.Status.APPROVED)
         .select_related("creator")
         .order_by("-event_start_date")
     )
     latest_event = events.first()
+    page_obj = Paginator(events, _EVENTS_PER_PAGE).get_page(request.GET.get("page"))
     return render(
-        request, "events/index.html", {"events": events, "latest_event": latest_event}
+        request,
+        "events/index.html",
+        {"events": page_obj, "page_obj": page_obj, "latest_event": latest_event},
     )
 
 

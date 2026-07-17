@@ -64,11 +64,15 @@ class TestEventsView:
         assert "events/index.html" in [t.name for t in response.templates]
 
     @pytest.mark.django_db
-    def test_events_contains_all_events(self, client, multiple_events):
-        """Events page should contain all events."""
+    def test_events_paginates_all_events(self, client, multiple_events):
+        """Events page should paginate events while exposing the full count."""
+        from events.views import _EVENTS_PER_PAGE
+
         response = client.get(reverse("events"))
         assert "events" in response.context
-        assert len(response.context["events"]) == len(multiple_events)
+        page = response.context["events"]
+        assert len(page) == min(_EVENTS_PER_PAGE, len(multiple_events))
+        assert page.paginator.count == len(multiple_events)
 
     @pytest.mark.django_db
     def test_events_contains_latest_event(self, client, event):
