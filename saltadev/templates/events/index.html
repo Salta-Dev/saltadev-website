@@ -71,10 +71,21 @@
               {% endif %}
             </div>
             <h2 class="text-2xl md:text-3xl font-bold text-white">{% if latest_event %}{{ latest_event.title }}{% endif %}</h2>
-            <p class="text-white leading-relaxed">{% if latest_event %}{{ latest_event.description|linebreaksbr }}{% endif %}</p>
+            {% if latest_event.location %}
+              <p class="flex items-center gap-2 text-white/80 text-sm">
+                <span class="material-symbols-outlined text-base" aria-hidden="true">location_on</span>
+                <span>{{ latest_event.location }}</span>
+              </p>
+            {% endif %}
+            {% if latest_event.description %}
+              <div class="event-hero-description event-body text-white leading-relaxed">{{ latest_event.description|urlize|linebreaksbr }}</div>
+            {% endif %}
             {% if latest_event %}
               <div class="flex flex-wrap gap-3">
-                <a class="bg-primary hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-primary/20 transition-all" href="{% url 'event_detail' latest_event.slug %}">Inscribirse</a>
+                {% if latest_event.link %}
+                  <a class="bg-primary hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-primary/20 transition-all" href="{{ latest_event.link }}" target="_blank" rel="noopener">Inscribirse</a>
+                {% endif %}
+                <a class="{% if latest_event.link %}border border-white/60 text-white hover:border-primary hover:text-primary{% else %}bg-primary hover:bg-red-700 text-white shadow-lg shadow-primary/20{% endif %} font-bold px-6 py-3 rounded-lg transition-all" href="{% url 'event_detail' latest_event.slug %}">Ver detalle</a>
                 <a class="border border-white/60 text-white font-bold px-6 py-3 rounded-lg hover:border-primary hover:text-primary transition-all" href="#events-grid">Ver más eventos</a>
               </div>
             {% endif %}
@@ -83,20 +94,20 @@
 
         {% if latest_event %}
           <div class="lg:col-span-5">
-            <div class="group relative rounded-2xl bg-surface-dark border border-border-dark overflow-hidden shadow-2xl hover:border-primary/50 transition-all duration-300">
+            <a class="group relative block rounded-2xl bg-surface-dark border border-border-dark overflow-hidden shadow-2xl hover:border-primary/50 transition-all duration-300" href="{% url 'event_detail' latest_event.slug %}" aria-label="Ver detalle de {{ latest_event.title }}">
               <div class="absolute top-0 right-0 w-36 h-36 bg-primary/20 blur-[70px] rounded-full pointer-events-none"></div>
-              <div class="h-56 bg-cover bg-center relative" style="background-image: url('{% if latest_event.photo %}{% if latest_event.photo|slice:":4" == "http" or latest_event.photo|slice:":1" == "/" %}{{ latest_event.photo }}{% else %}/{{ latest_event.photo }}{% endif %}{% else %}{% static "assets/img/seed-latam-salta-960w.webp" %}{% endif %}');">
-                <div class="absolute inset-0 bg-gradient-to-t from-surface-dark via-transparent to-transparent"></div>
+              <img
+                alt="Afiche de {{ latest_event.title }}"
+                class="w-full aspect-video object-cover border-b border-border-dark"
+                src="{% if latest_event.photo %}{% if latest_event.photo|slice:':4' == 'http' or latest_event.photo|slice:':1' == '/' %}{{ latest_event.photo }}{% else %}/{{ latest_event.photo }}{% endif %}{% else %}{% static 'assets/img/seed-latam-salta-960w.webp' %}{% endif %}"
+                width="1200"
+                height="675"
+                loading="eager"
+                decoding="async">
+              <div class="p-5 md:p-6">
+                <p class="text-lg font-bold text-white group-hover:text-primary transition-colors">{{ latest_event.title }}</p>
               </div>
-              <div class="p-6 md:p-7 flex flex-col gap-4">
-                <div class="flex items-center gap-2 text-white text-sm">
-                  <span class="material-symbols-outlined text-base">location_on</span>
-                  <span>{{ latest_event.location }}</span>
-                </div>
-                <h3 class="text-2xl font-bold text-white group-hover:text-primary transition-colors">{{ latest_event.title }}</h3>
-                <p class="text-white leading-relaxed">{{ latest_event.description|linebreaksbr }}</p>
-              </div>
-            </div>
+            </a>
           </div>
         {% endif %}
       </div>
@@ -142,7 +153,9 @@
                 <p class="mt-1.5 flex items-center gap-1.5 text-sm text-ink-faint"><span class="material-symbols-outlined text-base" aria-hidden="true">location_on</span>{{ event.location }}</p>
                 {% endif %}
                 <h3 class="mt-3 text-xl font-bold tracking-tight text-ink">{{ event.title }}</h3>
-                <p class="mt-2 mb-6 text-sm leading-relaxed text-text-muted line-clamp-3">{{ event.description|linebreaksbr }}</p>
+                {% if event.description %}
+                <p class="mt-2 mb-6 text-sm leading-relaxed text-text-muted line-clamp-3">{{ event.description|truncatechars:160 }}</p>
+                {% endif %}
                 <a class="mt-auto inline-flex h-11 w-full items-center justify-center gap-1 rounded-lg border border-border-dark font-bold text-ink transition-all hover:border-primary-soft active:scale-[0.98]" href="{% url 'event_detail' event.slug %}">Ver más<span class="material-symbols-outlined text-base" aria-hidden="true">chevron_right</span></a>
               </div>
             </article>

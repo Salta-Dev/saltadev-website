@@ -221,13 +221,38 @@ class TestEventDetailInboundLinks:
         assert 'href="https://example.com/register" target="_blank"' not in html
 
     def test_events_list_goes_to_detail(self, client, meetup_salta):
-        """List Inscribirse and Ver más go to the public detail URL."""
+        """Hero keeps detail links; Inscribirse opens the registration URL when set."""
         response = client.get(reverse("events"))
         html = response.content.decode()
         assert response.status_code == 200
         assert reverse("events") == "/eventos/"
         assert html.count("/eventos/meetup-salta/") >= 2
-        assert 'href="https://example.com/register" target="_blank"' not in html
+        assert 'href="https://example.com/register" target="_blank"' in html
+        assert "Ver detalle" in html
+
+    def test_events_detail_urlizes_links_in_description(self, client, db):
+        """URLs inside the event description become clickable anchors."""
+        Event.objects.create(
+            title="Meetup con link",
+            description="Inscribite acá: https://luma.com/cursor-sh4i",
+            location="Salta",
+            link="https://luma.com/cursor-sh4i",
+            slug="meetup-con-link",
+            status=Event.Status.APPROVED,
+            event_start_date=timezone.now() + timedelta(days=5),
+            event_date_display="16 de Septiembre",
+            event_time_display="18:00",
+        )
+        html = client.get(_detail_url("meetup-con-link")).content.decode()
+        assert 'href="https://luma.com/cursor-sh4i"' in html
+        assert "event-body" in html
+
+    def test_events_hero_description_only_on_left(self, client, meetup_salta):
+        """Full description stays on the left; the right card is photo + title only."""
+        html = client.get(reverse("events")).content.decode()
+        assert "event-hero-description" in html
+        assert meetup_salta.description in html
+        assert html.count("event-hero-description") == 1
 
     def test_dashboard_row_goes_to_detail(self, client, meetup_salta, member_user):
         """Dashboard upcoming row links to the public detail URL."""

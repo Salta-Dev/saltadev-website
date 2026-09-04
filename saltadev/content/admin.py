@@ -103,16 +103,32 @@ class LearningResourceAdmin(admin.ModelAdmin):
     list_display = (
         "title",
         "track",
+        "status",
+        "creator",
         "duration",
         "instructor",
         "source",
         "order",
         "is_published",
     )
-    list_filter = ("track", "is_published")
+    list_filter = ("track", "status", "is_published")
     list_editable = ("order", "is_published")
     search_fields = ("title", "tip", "source")
+    raw_id_fields = ("creator", "approved_by")
+    actions = ("approve_entries",)
     ordering = ("track", "order", "created_at")
+
+    @admin.action(description="Aprobar ítems seleccionados")
+    def approve_entries(
+        self, request: HttpRequest, queryset: QuerySet[LearningResource]
+    ) -> None:
+        """Publish pending community course submissions."""
+        if not request.user.is_authenticated or request.user.pk is None:
+            return
+        approver = User.objects.get(pk=request.user.pk)
+        pending = queryset.filter(status=LearningResource.Status.PENDING)
+        for entry in pending:
+            entry.approve(approver)
 
     def has_module_permission(self, request: HttpRequest) -> bool:
         """Hide the module from staff who are not administrators."""
