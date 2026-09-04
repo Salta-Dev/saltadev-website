@@ -1,0 +1,12 @@
+{% if event.get_kind_display %}
+<span class="inline-flex items-center gap-1 rounded-lg border border-border-dark bg-background-dark/60 px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-primary-bright">
+  <span class="material-symbols-outlined text-sm" aria-hidden="true">{{ event.kind_icon }}</span>
+  {{ event.get_kind_display }}
+</span>
+{% endif %}
+{% if event.modality_label %}
+<span class="inline-flex items-center gap-1 rounded-lg border border-border-dark bg-background-dark/40 px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-faint">
+  <span class="material-symbols-outlined text-sm" aria-hidden="true">{% if event.is_online %}videocam{% else %}location_on{% endif %}</span>
+  {{ event.modality_label }}
+</span>
+{% endif %}

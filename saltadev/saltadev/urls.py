@@ -26,6 +26,11 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.urls import include, path
 from django.views.generic import TemplateView
+from events.api import (
+    internal_events_collection,
+    latest_internal_event,
+    update_internal_event,
+)
 
 from .sitemaps import sitemaps
 from .views import health_check
@@ -42,6 +47,21 @@ handler404 = custom_404
 
 urlpatterns = [
     path("health/", health_check, name="health_check"),
+    path(
+        "api/internal/events/",
+        internal_events_collection,
+        name="internal_create_event",
+    ),
+    path(
+        "api/internal/events/latest/",
+        latest_internal_event,
+        name="internal_latest_event",
+    ),
+    path(
+        "api/internal/events/<int:pk>/",
+        update_internal_event,
+        name="internal_update_event",
+    ),
     path("admin/", admin.site.urls),
     path(
         "robots.txt",

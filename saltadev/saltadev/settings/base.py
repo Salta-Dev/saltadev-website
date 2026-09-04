@@ -183,6 +183,9 @@ SITE_TWITTER = os.getenv("SITE_TWITTER", "https://x.com/SaltaDevAr")
 SITE_INSTAGRAM = os.getenv("SITE_INSTAGRAM", "https://www.instagram.com/salta.dev.ar/")
 SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")
 
+# Bearer token for POST /api/internal/events/ (Telegram ingest bot).
+SALTADEV_INGEST_TOKEN = os.getenv("SALTADEV_INGEST_TOKEN", "")
+
 # reCAPTCHA configuration
 RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_V2_SECRET", "tu-secret-key")
 RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_V2_SITE_KEY", "tu-site-key")

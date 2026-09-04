@@ -26,7 +26,9 @@
   object-fit: contain;
   filter: grayscale(1);
   opacity: 0.8;
-  transition: filter 0.3s, opacity 0.3s;
+  transition:
+    filter 0.3s,
+    opacity 0.3s;
 }
 
 .partner-tile:hover .partner-logo,
@@ -179,11 +181,7 @@
   pointer-events: none;
   width: 55%;
   height: 75%;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-primary) 11%, transparent),
-    transparent
-  );
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-primary) 11%, transparent), transparent);
   animation: breathe 14s ease-in-out infinite alternate;
 }
 
@@ -243,11 +241,7 @@
   height: 80%;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-primary) 8%, transparent),
-    transparent
-  );
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-primary) 8%, transparent), transparent);
 }
 
 /* Contact: the existing poncho pattern breathes gently */
@@ -431,12 +425,11 @@
 
 /* Featured cell (Discord): terracotta wash anchored to the top-left corner */
 .bento-feature {
-  background:
-    radial-gradient(
-      120% 140% at 0% 0%,
-      color-mix(in srgb, var(--color-primary) 18%, var(--color-surface-dark)) 0%,
-      var(--color-surface-dark) 60%
-    );
+  background: radial-gradient(
+    120% 140% at 0% 0%,
+    color-mix(in srgb, var(--color-primary) 18%, var(--color-surface-dark)) 0%,
+    var(--color-surface-dark) 60%
+  );
 }
 
 .bento-feature .bento-icon {
@@ -517,7 +510,9 @@
   background: var(--color-surface-dark);
   color: var(--color-ink);
   cursor: pointer;
-  transition: border-color 0.3s var(--ease-brand), transform 0.15s;
+  transition:
+    border-color 0.3s var(--ease-brand),
+    transform 0.15s;
 }
 
 .carousel-btn:hover {

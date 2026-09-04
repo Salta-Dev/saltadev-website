@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SaltaDev - Mis Eventos</title>
+  <title>SaltaDev - Eventos</title>
   {% include "includes/head.html" %}
   <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
 </head>
@@ -44,8 +44,8 @@
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 class="text-2xl lg:text-3xl font-bold text-white">Mis Eventos</h1>
-          <p class="text-[#6b605f] text-sm mt-0.5">Eventos que creaste</p>
+          <h1 class="text-2xl lg:text-3xl font-bold text-white">{% if can_approve %}Eventos{% else %}Mis Eventos{% endif %}</h1>
+          <p class="text-[#6b605f] text-sm mt-0.5">{% if can_approve %}Todos los eventos, incluidos los cargados por el bot{% else %}Eventos que creaste{% endif %}</p>
         </div>
         <div class="flex gap-3">
           {% if can_approve %}
@@ -98,6 +98,19 @@
                             Rechazado
                           </span>
                         {% endif %}
+                        {% if not event.creator %}
+                          <span class="px-2 py-0.5 rounded-full bg-sky-600/20 text-sky-300 text-xs font-medium border border-sky-600/30">
+                            Bot
+                          </span>
+                        {% endif %}
+                        <span class="px-2 py-0.5 rounded-full bg-primary/15 text-primary-bright text-xs font-medium border border-primary/25">
+                          {{ event.get_kind_display }}
+                        </span>
+                        {% if event.modality_label %}
+                          <span class="px-2 py-0.5 rounded-full bg-[#2a2424] text-[#a09090] text-xs font-medium border border-[#3d2f2f]">
+                            {{ event.modality_label }}
+                          </span>
+                        {% endif %}
                         {% if event.event_date_display %}
                           <span class="text-xs text-[#a09090]">{{ event.event_date_display }}</span>
                         {% endif %}
@@ -114,6 +127,12 @@
                       <span class="material-symbols-outlined text-sm">edit</span>
                       Editar
                     </a>
+                    {% if event.status == 'approved' and event.slug %}
+                      <a href="{% url 'event_detail' slug=event.slug %}" class="text-xs text-[#a09090] hover:text-white font-medium transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">visibility</span>
+                        Ver ficha
+                      </a>
+                    {% endif %}
                     <a href="{% url 'event_delete' pk=event.pk %}" class="text-xs text-red-400 hover:text-red-300 font-medium transition-colors flex items-center gap-1">
                       <span class="material-symbols-outlined text-sm">delete</span>
                       Eliminar
@@ -136,7 +155,7 @@
             </div>
             <h3 class="text-lg font-bold text-white mb-2">Sin eventos</h3>
             <p class="text-[#6b605f] text-sm max-w-sm mx-auto mb-4">
-              Todavía no creaste ningún evento.
+              {% if can_approve %}Todavía no hay eventos cargados.{% else %}Todavía no creaste ningún evento.{% endif %}
             </p>
             <a href="{% url 'event_create' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg text-sm font-medium transition-all">
               <span class="material-symbols-outlined text-lg">add</span>

@@ -11,4 +11,5 @@ urlpatterns = [
     path("<int:pk>/eliminar/", views.event_delete, name="event_delete"),
     path("<int:pk>/aprobar/", views.event_approve, name="event_approve"),
     path("<int:pk>/rechazar/", views.event_reject, name="event_reject"),
+    path("<slug:slug>/", views.event_detail, name="event_detail"),
 ]
