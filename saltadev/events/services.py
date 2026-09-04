@@ -16,11 +16,7 @@ from django.utils.text import slugify
 HOME_EVENTS_CACHE_KEY = "home_latest_events"
 _DUPLICATE_SCAN_LIMIT = 200
 _EMOJI_RE = re.compile(
-    "["
-    "\U0001f300-\U0001faff"
-    "\U00002700-\U000027bf"
-    "\U0001f1e0-\U0001f1ff"
-    "]+",
+    "[\U0001f300-\U0001faff\U00002700-\U000027bf\U0001f1e0-\U0001f1ff]+",
     flags=re.UNICODE,
 )
 
