@@ -77,6 +77,12 @@
             </div>
 
             <div>
+              <label for="id_kind" class="block text-sm font-medium text-white mb-2">Tipo de evento</label>
+              {{ form.kind }}
+              <p class="mt-1 text-xs text-[#6b605f]">Si lo dejás en Meetup, inferimos Charla / Taller / Hackatón / Social según el título.</p>
+            </div>
+
+            <div>
               <label for="id_description" class="block text-sm font-medium text-white mb-2">Descripción</label>
               {{ form.description }}
             </div>

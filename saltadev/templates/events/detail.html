@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ event.title }} - SaltaDev{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{% if event.description %}{{ event.description|truncatechars:160 }}{% else %}Evento de la comunidad SaltaDev en Salta, Argentina.{% endif %}">
+{% endblock %}
+
+{% block canonical %}
+<link rel="canonical" href="https://salta.dev{% url 'event_detail' event.slug %}">
+{% endblock %}
+
+{% block og_title %}{{ event.title }} - SaltaDev{% endblock %}
+{% block og_description %}{% if event.description %}{{ event.description|truncatechars:160 }}{% else %}Evento de la comunidad SaltaDev.{% endif %}{% endblock %}
+{% block twitter_title %}{{ event.title }} - SaltaDev{% endblock %}
+{% block twitter_description %}{% if event.description %}{{ event.description|truncatechars:160 }}{% else %}Evento de la comunidad SaltaDev.{% endif %}{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{% static 'assets/css/index.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/css/events.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="pt-24" id="top">
+  <section class="py-6 lg:py-10">
+    <div class="max-w-md mx-auto px-6 sm:px-10">
+      <a class="mb-3 inline-flex items-center gap-1 text-sm font-bold text-primary-bright hover:text-primary-soft transition-colors" href="{% url 'events' %}">
+        <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_back</span>
+        Volver a eventos
+      </a>
+      <article class="event-detail-card rounded-xl border border-border-dark bg-surface-dark overflow-hidden">
+        <div class="event-detail-cover">
+          <img alt="Afiche de {{ event.title }}"
+               src="{% if event.photo %}{% if event.photo|slice:':4' == 'http' or event.photo|slice:':1' == '/' %}{{ event.photo }}{% else %}/{{ event.photo }}{% endif %}{% else %}{% static 'assets/img/seed-latam-salta-960w.webp' %}{% endif %}"
+               width="480" height="360">
+        </div>
+        <div class="p-5 flex flex-col gap-3">
+          <div class="flex flex-wrap gap-2">
+            {% include "events/includes/event_badges.html" %}
+          </div>
+          <p class="text-sm font-bold text-primary-bright">
+            <time>
+              {% if event.event_date_display %}
+                {{ event.event_date_display }}
+              {% elif event.event_start_date %}
+                {{ event.event_start_date|date }}
+              {% endif %}
+            </time>
+            {% if event.event_time_display %}
+              · {{ event.event_time_display }}
+            {% elif event.event_start_date %}
+              · {{ event.event_start_date|date:"H:i" }}
+            {% endif %}
+          </p>
+          {% if event.location %}
+          <p class="flex items-center gap-1.5 text-sm text-ink-faint">
+            <span class="material-symbols-outlined text-base" aria-hidden="true">location_on</span>
+            {{ event.location }}
+          </p>
+          {% endif %}
+          <h1 class="text-2xl font-bold tracking-tight text-ink">{{ event.title }}</h1>
+          {% if event.description %}
+          <p class="text-base leading-relaxed text-text-muted">{{ event.description|linebreaksbr }}</p>
+          {% endif %}
+          {% if event.link %}
+          <a class="mt-1 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-primary px-5 text-base font-bold text-ink transition-all hover:bg-primary-hover active:scale-[0.98]"
+             href="{{ event.link }}" target="_blank" rel="noopener">Inscribirse</a>
+          {% endif %}
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+{% endblock %}

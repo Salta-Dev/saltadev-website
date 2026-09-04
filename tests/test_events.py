@@ -34,6 +34,20 @@ def approved_event(db, collaborator_user, user_event_data):
 
 
 @pytest.fixture
+def bot_event(db, user_event_data):
+    """Create and return an approved event ingested without a creator."""
+    data = user_event_data.copy()
+    data["title"] = "Evento del bot"
+    return Event.objects.create(
+        **data,
+        slug="evento-del-bot",
+        creator=None,
+        status=Event.Status.APPROVED,
+        event_start_date=timezone.now() + timedelta(days=3),
+    )
+
+
+@pytest.fixture
 def user_pending_event(db, collaborator_user, user_event_data):
     """Create and return a pending event with creator."""
     data = user_event_data.copy()
@@ -261,7 +275,33 @@ class TestEventViews:
         response = client.get(reverse("events"))
         assert response.status_code == 200
 
-    def test_events_list_only_approved(self, client, approved_event, user_pending_event):
+    def test_countdown_uses_next_upcoming_event(self, client, db, user_event_data):
+        """The hero countdown should use the soonest future event, not the first created."""
+        Event.objects.create(
+            **{**user_event_data, "title": "Ya pasó"},
+            slug="ya-paso",
+            status=Event.Status.APPROVED,
+            event_start_date=timezone.now() - timedelta(days=2),
+        )
+        Event.objects.create(
+            **{**user_event_data, "title": "Lejos"},
+            slug="lejos",
+            status=Event.Status.APPROVED,
+            event_start_date=timezone.now() + timedelta(days=40),
+        )
+        Event.objects.create(
+            **{**user_event_data, "title": "El más próximo"},
+            slug="el-mas-proximo",
+            status=Event.Status.APPROVED,
+            event_start_date=timezone.now() + timedelta(days=4),
+        )
+        response = client.get(reverse("events"))
+        assert response.status_code == 200
+        assert response.context["latest_event"].title == "El más próximo"
+
+    def test_events_list_only_approved(
+        self, client, approved_event, user_pending_event
+    ):
         """Test events list shows only approved events."""
         response = client.get(reverse("events"))
         assert approved_event.title in response.content.decode()
@@ -278,12 +318,42 @@ class TestEventViews:
         response = client.get(reverse("my_events"))
         assert response.status_code == 302
 
-    def test_my_events_shows_own_events(self, client, collaborator_user, approved_event):
+    def test_my_events_shows_own_events(
+        self, client, collaborator_user, approved_event
+    ):
         """Test my events shows user's own events."""
         client.force_login(collaborator_user)
         response = client.get(reverse("my_events"))
         assert response.status_code == 200
         assert approved_event.title in response.content.decode()
+
+    def test_my_events_hides_bot_events_from_collaborator(
+        self, client, collaborator_user, bot_event
+    ):
+        """Collaborators should not see events ingested without a creator."""
+        client.force_login(collaborator_user)
+        response = client.get(reverse("my_events"))
+        assert response.status_code == 200
+        assert bot_event.title not in response.content.decode()
+
+    def test_my_events_shows_bot_events_to_admin(self, client, admin_user, bot_event):
+        """Admins should see events created by the Telegram bot."""
+        client.force_login(admin_user)
+        response = client.get(reverse("my_events"))
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert bot_event.title in html
+        assert "Bot" in html
+        assert reverse("event_edit", kwargs={"pk": bot_event.pk}) in html
+
+    def test_my_events_shows_bot_events_to_moderator(
+        self, client, moderator_user, bot_event
+    ):
+        """Moderators should see events created by the Telegram bot."""
+        client.force_login(moderator_user)
+        response = client.get(reverse("my_events"))
+        assert response.status_code == 200
+        assert bot_event.title in response.content.decode()
 
     def test_pending_events_requires_login(self, client):
         """Test pending events requires authentication."""
@@ -401,6 +471,22 @@ class TestEventViews:
         approved_event.refresh_from_db()
         assert approved_event.title == "Updated Event"
 
+    def test_edit_bot_event_by_admin(self, client, admin_user, bot_event):
+        """Admins can edit events ingested without a creator."""
+        client.force_login(admin_user)
+        response = client.post(
+            reverse("event_edit", kwargs={"pk": bot_event.pk}),
+            {
+                "title": "Evento corregido",
+                "description": bot_event.description,
+                "location": bot_event.location,
+                "photo": bot_event.photo,
+            },
+        )
+        assert response.status_code == 302
+        bot_event.refresh_from_db()
+        assert bot_event.title == "Evento corregido"
+
     def test_delete_requires_login(self, client, approved_event):
         """Test delete requires authentication."""
         response = client.get(reverse("event_delete", kwargs={"pk": approved_event.pk}))
@@ -423,28 +509,42 @@ class TestEventViews:
     def test_delete_forbidden_for_others(self, client, member_user, approved_event):
         """Test delete is forbidden for non-owners."""
         client.force_login(member_user)
-        response = client.post(reverse("event_delete", kwargs={"pk": approved_event.pk}))
+        response = client.post(
+            reverse("event_delete", kwargs={"pk": approved_event.pk})
+        )
         assert response.status_code == 302
         assert Event.objects.filter(pk=approved_event.pk).exists()
 
     def test_approve_requires_login(self, client, user_pending_event):
         """Test approve requires authentication."""
-        response = client.get(reverse("event_approve", kwargs={"pk": user_pending_event.pk}))
+        response = client.get(
+            reverse("event_approve", kwargs={"pk": user_pending_event.pk})
+        )
         assert response.status_code == 302
 
-    def test_approve_requires_admin(self, client, collaborator_user, user_pending_event):
+    def test_approve_requires_admin(
+        self, client, collaborator_user, user_pending_event
+    ):
         """Test collaborator cannot approve events."""
         client.force_login(collaborator_user)
-        response = client.get(reverse("event_approve", kwargs={"pk": user_pending_event.pk}))
+        response = client.get(
+            reverse("event_approve", kwargs={"pk": user_pending_event.pk})
+        )
         assert response.status_code == 302
 
-    def test_approve_confirmation_page(self, client, moderator_user, user_pending_event):
+    def test_approve_confirmation_page(
+        self, client, moderator_user, user_pending_event
+    ):
         """Test approve GET shows confirmation page."""
         client.force_login(moderator_user)
-        response = client.get(reverse("event_approve", kwargs={"pk": user_pending_event.pk}))
+        response = client.get(
+            reverse("event_approve", kwargs={"pk": user_pending_event.pk})
+        )
         assert response.status_code == 200
 
-    def test_approve_sets_status_approved(self, client, moderator_user, user_pending_event):
+    def test_approve_sets_status_approved(
+        self, client, moderator_user, user_pending_event
+    ):
         """Test approve POST sets status to APPROVED."""
         client.force_login(moderator_user)
         response = client.post(
@@ -470,25 +570,35 @@ class TestEventViews:
 
     def test_reject_requires_login(self, client, user_pending_event):
         """Test reject requires authentication."""
-        response = client.get(reverse("event_reject", kwargs={"pk": user_pending_event.pk}))
+        response = client.get(
+            reverse("event_reject", kwargs={"pk": user_pending_event.pk})
+        )
         assert response.status_code == 302
 
     def test_reject_requires_admin(self, client, collaborator_user, user_pending_event):
         """Test collaborator cannot reject events."""
         client.force_login(collaborator_user)
-        response = client.get(reverse("event_reject", kwargs={"pk": user_pending_event.pk}))
+        response = client.get(
+            reverse("event_reject", kwargs={"pk": user_pending_event.pk})
+        )
         assert response.status_code == 302
 
     def test_reject_confirmation_page(self, client, moderator_user, user_pending_event):
         """Test reject GET shows confirmation page."""
         client.force_login(moderator_user)
-        response = client.get(reverse("event_reject", kwargs={"pk": user_pending_event.pk}))
+        response = client.get(
+            reverse("event_reject", kwargs={"pk": user_pending_event.pk})
+        )
         assert response.status_code == 200
 
-    def test_reject_sets_status_rejected(self, client, moderator_user, user_pending_event):
+    def test_reject_sets_status_rejected(
+        self, client, moderator_user, user_pending_event
+    ):
         """Test reject POST sets status to REJECTED."""
         client.force_login(moderator_user)
-        response = client.post(reverse("event_reject", kwargs={"pk": user_pending_event.pk}))
+        response = client.post(
+            reverse("event_reject", kwargs={"pk": user_pending_event.pk})
+        )
         assert response.status_code == 302
         user_pending_event.refresh_from_db()
         assert user_pending_event.status == Event.Status.REJECTED

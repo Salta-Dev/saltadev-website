@@ -5,24 +5,14 @@ from typing import Any
 
 from content.models import Event
 from django import forms
-from django.utils.text import slugify
-from saltadev.form_widgets import DATE_TIME_CLASS, INPUT_CLASS, TEXTAREA_CLASS
+from saltadev.form_widgets import (
+    DATE_TIME_CLASS,
+    INPUT_CLASS,
+    SELECT_CLASS,
+    TEXTAREA_CLASS,
+)
 
-MONTHS_ES = [
-    "",
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-]
+from events.services import prepare_event_for_save
 
 
 class ImageSourceChoices:
@@ -88,6 +78,7 @@ class EventForm(forms.ModelForm):
         model = Event
         fields = [
             "title",
+            "kind",
             "description",
             "photo",
             "location",
@@ -99,6 +90,7 @@ class EventForm(forms.ModelForm):
             "title": forms.TextInput(
                 attrs={"class": INPUT_CLASS, "placeholder": "Título del evento"}
             ),
+            "kind": forms.Select(attrs={"class": SELECT_CLASS}),
             "description": forms.Textarea(
                 attrs={
                     "class": TEXTAREA_CLASS,
@@ -136,6 +128,8 @@ class EventForm(forms.ModelForm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize form and populate separate date/time fields."""
         super().__init__(*args, **kwargs)
+        self.fields["kind"].required = False
+        self.fields["kind"].initial = Event.Kind.MEETUP
         instance: Event | None = kwargs.get("instance")
         if instance:
             if instance.event_start_date:
@@ -151,6 +145,10 @@ class EventForm(forms.ModelForm):
         if not title:
             raise forms.ValidationError("El título es requerido.")
         return title
+
+    def clean_kind(self) -> str:
+        """Default to meetup when the organizer leaves the type blank."""
+        return self.cleaned_data.get("kind") or Event.Kind.MEETUP
 
     def clean(self) -> dict[str, object]:
         """Validate form data and combine date/time fields."""
@@ -199,26 +197,7 @@ class EventForm(forms.ModelForm):
         start_datetime = self.cleaned_data.get("event_start_date")
         event.event_start_date = start_datetime
         event.event_end_date = self.cleaned_data.get("event_end_date")
-
-        # Auto-generate display fields from start date if not provided
-        if start_datetime:
-            if not event.event_date_display:
-                day = start_datetime.day
-                month = MONTHS_ES[start_datetime.month]
-                event.event_date_display = f"{day} de {month}"
-
-            if not event.event_time_display:
-                event.event_time_display = start_datetime.strftime("%H:%M hs")
-
-        # Generate slug if not set
-        if not event.slug:
-            base_slug = slugify(event.title)
-            slug = base_slug
-            counter = 1
-            while Event.objects.filter(slug=slug).exclude(pk=event.pk).exists():
-                slug = f"{base_slug}-{counter}"
-                counter += 1
-            event.slug = slug
+        prepare_event_for_save(event)
 
         if commit:
             event.save()

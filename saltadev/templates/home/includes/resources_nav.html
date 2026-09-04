@@ -1,0 +1,35 @@
+<nav aria-label="Secciones de recursos" class="mb-10 lg:mb-0 lg:sticky lg:top-28">
+  <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-faint">Recursos</p>
+  <ul class="mt-4 flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0">
+    <li class="shrink-0">
+      <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors {% if resources_section == 'cursos' %}bg-primary/15 text-primary-bright ring-1 ring-primary/30{% else %}text-text-muted hover:bg-surface-dark hover:text-ink{% endif %}" href="{% url 'resources' %}" {% if resources_section == 'cursos' %}aria-current="page"{% endif %}>
+        <span class="material-symbols-outlined text-lg" aria-hidden="true">school</span>
+        Cursos
+      </a>
+    </li>
+    <li class="shrink-0">
+      <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors {% if resources_section == 'lectura' %}bg-primary/15 text-primary-bright ring-1 ring-primary/30{% else %}text-text-muted hover:bg-surface-dark hover:text-ink{% endif %}" href="{% url 'resource_reading' %}" {% if resources_section == 'lectura' %}aria-current="page"{% endif %}>
+        <span class="material-symbols-outlined text-lg" aria-hidden="true">menu_book</span>
+        Lectura
+      </a>
+    </li>
+    <li class="shrink-0">
+      <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors {% if resources_section == 'especialidades' %}bg-primary/15 text-primary-bright ring-1 ring-primary/30{% else %}text-text-muted hover:bg-surface-dark hover:text-ink{% endif %}" href="{% url 'resource_specialties' %}" {% if resources_section == 'especialidades' %}aria-current="page"{% endif %}>
+        <span class="material-symbols-outlined text-lg" aria-hidden="true">layers</span>
+        Especialidades
+      </a>
+    </li>
+    <li class="shrink-0">
+      <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors {% if resources_section == 'herramientas' %}bg-primary/15 text-primary-bright ring-1 ring-primary/30{% else %}text-text-muted hover:bg-surface-dark hover:text-ink{% endif %}" href="{% url 'resource_tools' %}" {% if resources_section == 'herramientas' %}aria-current="page"{% endif %}>
+        <span class="material-symbols-outlined text-lg" aria-hidden="true">build</span>
+        Herramientas
+      </a>
+    </li>
+    <li class="shrink-0">
+      <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors {% if resources_section == 'proyectos' %}bg-primary/15 text-primary-bright ring-1 ring-primary/30{% else %}text-text-muted hover:bg-surface-dark hover:text-ink{% endif %}" href="{% url 'resource_projects' %}" {% if resources_section == 'proyectos' %}aria-current="page"{% endif %}>
+        <span class="material-symbols-outlined text-lg" aria-hidden="true">rocket_launch</span>
+        Proyectos
+      </a>
+    </li>
+  </ul>
+</nav>

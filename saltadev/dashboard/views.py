@@ -60,7 +60,8 @@ def dashboard_view(request: HttpRequest) -> HttpResponse:
 
     # Get upcoming events (next 5 events from today)
     upcoming_events = Event.objects.filter(
-        event_start_date__gte=timezone.now()
+        status=Event.Status.APPROVED,
+        event_start_date__gte=timezone.now(),
     ).order_by("event_start_date")[:5]
 
     # Get active, non-expired benefits (latest 6)

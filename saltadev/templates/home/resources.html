@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cursos y tips - SaltaDev{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="Cursos y documentación para developers y vibecoders de la comunidad SaltaDev.">
+{% endblock %}
+
+{% block canonical %}
+<link rel="canonical" href="https://salta.dev/recursos/">
+{% endblock %}
+
+{% block og_title %}Cursos y tips - SaltaDev{% endblock %}
+{% block og_description %}Recursos para developers y vibecoders de la comunidad SaltaDev.{% endblock %}
+{% block twitter_title %}Cursos y tips - SaltaDev{% endblock %}
+{% block twitter_description %}Recursos para developers y vibecoders de la comunidad SaltaDev.{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{% static 'assets/css/index.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="pt-24" id="top">
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-20">
+    <div class="lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-14 lg:items-start">
+      {% include "home/includes/resources_nav.html" %}
+      <div>
+        <header class="max-w-2xl border-b border-border-dark pb-10" data-reveal>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary-bright">Aprendizaje</p>
+          <h1 class="mt-3 text-3xl md:text-5xl font-bold tracking-tight text-ink">Cursos y tips</h1>
+          <p class="mt-4 text-lg text-text-muted leading-relaxed">
+            Cursos, tutoriales y documentación para developers y para quien trabaja con agentes de IA.
+          </p>
+          {% if tracks %}
+          <div class="mt-6 flex flex-wrap gap-3">
+            {% for track in tracks %}
+            <a class="inline-flex items-center gap-2 rounded-lg border border-border-dark bg-surface-dark/60 px-4 py-2.5 text-sm font-bold text-ink transition-all hover:border-primary-soft" href="#{{ track.slug }}">
+              <span class="material-symbols-outlined text-base text-primary-soft" aria-hidden="true">{{ track.icon }}</span>
+              {{ track.label }}
+            </a>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="mt-6 text-base text-text-muted">Todavía no hay cursos publicados. Un administrador los carga desde el panel.</p>
+          {% endif %}
+        </header>
+
+        {% for track in tracks %}
+        <section class="py-12 border-b border-border-dark last:border-b-0" id="{{ track.slug }}">
+          <div class="mb-8 max-w-2xl" data-reveal>
+            <div class="inline-flex items-center gap-2 rounded-lg border border-border-dark bg-background-dark/50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-primary-bright">
+              <span class="material-symbols-outlined text-sm" aria-hidden="true">{{ track.icon }}</span>
+              {{ track.label }}
+            </div>
+            <h2 class="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-ink">{{ track.label }}</h2>
+            <p class="mt-3 text-lg text-text-muted">{{ track.blurb }}</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5" data-stagger>
+            {% for item in track.resources %}
+            <article class="rounded-lg border border-border-dark bg-surface-dark p-6 flex flex-col">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
+                {{ item.source }}{% if item.duration %} · {{ item.duration }}{% endif %}
+              </p>
+              <h3 class="mt-2 text-xl font-bold tracking-tight text-ink">{{ item.title }}</h3>
+              <p class="mt-2.5 text-[15px] leading-relaxed text-text-muted flex-1">{{ item.tip }}</p>
+              {% if item.instructor %}
+              <p class="mt-3 text-sm text-text-muted">Dictado por {{ item.instructor }}</p>
+              {% endif %}
+              <a class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-primary-bright hover:text-primary-soft transition-colors" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">
+                Abrir recurso
+                <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_outward</span>
+              </a>
+            </article>
+            {% endfor %}
+          </div>
+        </section>
+        {% endfor %}
+
+        <section class="pt-12">
+          <div class="relative overflow-hidden rounded-lg border border-primary/40 bg-gradient-to-br from-primary/20 via-surface-dark to-surface-dark p-8 lg:p-10" data-reveal>
+            <div class="absolute inset-0 bg-poncho-pattern opacity-50" aria-hidden="true"></div>
+            <div class="relative">
+              <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-ink">Proponer un curso</h2>
+              <p class="mt-2 text-lg text-text-muted">Se puede enviar un enlace y una descripción. Un administrador lo revisa y lo publica.</p>
+              <a class="mt-6 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm sm:text-base font-bold text-ink transition-all hover:bg-primary-hover active:scale-[0.98]" href="mailto:comusaltadev@gmail.com?subject=Recurso%20para%20salta.dev">Proponer un recurso</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block page_js %}
+  <script src="{% static 'assets/js/index.js' %}"></script>
+{% endblock %}

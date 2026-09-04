@@ -124,6 +124,27 @@
   pointer-events: none;
 }
 
+.event-detail-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-detail-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 16rem;
+  background: #140e10;
+  overflow: hidden;
+  border-bottom: 1px solid #3a2a2d;
+}
+
+.event-detail-cover img {
+  width: 100%;
+  max-height: 16rem;
+  object-fit: contain;
+}
+
 .events-expanded {
   max-height: none;
 }

@@ -205,6 +205,9 @@ RECAPTCHA_V2_SECRET=tu-secret-key
 
 # URL del sitio
 SITE_URL=http://localhost:8000
+
+# Token para POST /api/internal/events/ (bot de Telegram)
+# SALTADEV_INGEST_TOKEN=change-me
 ```
 
 ### Entornos Disponibles
@@ -328,6 +331,8 @@ Los eventos tienen un workflow de aprobación con tres estados:
 2. Staff/Admin revisa en el admin
 3. Al aprobar/rechazar → se envía notificación automática al creador
 
+**Ingesta desde Telegram:** `POST /api/internal/events/` con `Authorization: Bearer <SALTADEV_INGEST_TOKEN>`. Lo usa el bot en `saltadev-telegram-bot/` (auto-publish al recibir un anuncio completo). El evento entra `APPROVED`, invalida el cache del home y la respuesta `201` incluye `url` de `/eventos/<slug>/`.
+
 ## Despliegue
 
 ### Render.com (Recomendado)
@@ -361,6 +366,7 @@ Las siguientes requieren configuración manual:
 - `RESEND_API_KEY`, `DEFAULT_FROM_EMAIL`
 - `RECAPTCHA_V2_SITE_KEY`, `RECAPTCHA_V2_SECRET`
 - `SITE_URL`
+- `SALTADEV_INGEST_TOKEN` (bot de Telegram → `POST /api/internal/events/`)
 
 #### Script de build
 

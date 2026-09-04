@@ -190,7 +190,7 @@ if (!prefersReducedMotion && window.gsap) {
         '--franja-y': '-36px',
         ease: 'none',
         scrollTrigger: { trigger: norteBand, start: 'top bottom', end: 'bottom top', scrub: true },
-      }
+      },
     );
   });
 
@@ -208,7 +208,7 @@ if (!prefersReducedMotion && window.gsap) {
           yPercent: 7,
           ease: 'none',
           scrollTrigger: { trigger: heroPhoto, start: 'top bottom', end: 'bottom top', scrub: true },
-        }
+        },
       );
     }
     const contactSlow = document.querySelector('[data-parallax-slow]');
@@ -220,7 +220,7 @@ if (!prefersReducedMotion && window.gsap) {
           y: -28,
           ease: 'none',
           scrollTrigger: { trigger: '#contact', start: 'top bottom', end: 'bottom top', scrub: true },
-        }
+        },
       );
     }
   });

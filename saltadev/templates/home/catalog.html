@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ catalog_title }} - SaltaDev{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ catalog_meta }}">
+{% endblock %}
+
+{% block canonical %}
+<link rel="canonical" href="https://salta.dev{% if resources_section == 'lectura' %}/recursos/lectura/{% elif resources_section == 'herramientas' %}/recursos/herramientas/{% else %}/recursos/proyectos/{% endif %}">
+{% endblock %}
+
+{% block og_title %}{{ catalog_title }} - SaltaDev{% endblock %}
+{% block og_description %}{{ catalog_meta }}{% endblock %}
+{% block twitter_title %}{{ catalog_title }} - SaltaDev{% endblock %}
+{% block twitter_description %}{{ catalog_meta }}{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{% static 'assets/css/index.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="pt-24" id="top">
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-20">
+    <div class="lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-14 lg:items-start">
+      {% include "home/includes/resources_nav.html" %}
+      <div>
+        <header class="max-w-2xl border-b border-border-dark pb-10" data-reveal>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary-bright">{{ catalog_kicker }}</p>
+          <h1 class="mt-3 text-3xl md:text-5xl font-bold tracking-tight text-ink">{{ catalog_title }}</h1>
+          <p class="mt-4 text-lg text-text-muted leading-relaxed">{{ catalog_blurb }}</p>
+          {% if resources_section == "proyectos" %}
+            {% if not entries %}
+            <p class="mt-6 text-base text-text-muted">Todavía no hay proyectos publicados.</p>
+            {% endif %}
+          {% elif not entries %}
+          <p class="mt-6 text-base text-text-muted">Todavía no hay ítems publicados. Un administrador los carga desde el panel.</p>
+          {% endif %}
+        </header>
+
+        {% if messages %}
+        <div class="mt-8 space-y-2">
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-400">check_circle</span>
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="mt-10 grid grid-cols-1 gap-5" data-stagger>
+          {% for item in entries %}
+          <article class="rounded-lg border border-border-dark bg-surface-dark p-6 sm:p-7">
+            <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
+              {% if item.category %}<span>{{ item.category }}</span>{% endif %}
+              {% if item.pricing %}<span class="rounded-md border border-border-dark px-2 py-0.5 text-ink">{{ item.pricing }}</span>{% endif %}
+              {% if item.extra %}<span class="rounded-md border border-primary/40 bg-primary/10 px-2 py-0.5 text-primary-bright">{{ item.extra }}</span>{% endif %}
+            </div>
+            <h2 class="mt-3 text-xl font-bold tracking-tight text-ink">{{ item.title }}</h2>
+            {% if item.authors or item.year %}
+            <p class="mt-1 text-sm text-text-muted">{% if item.authors %}{{ item.authors }}{% endif %}{% if item.authors and item.year %} · {% endif %}{% if item.year %}{{ item.year }}{% endif %}</p>
+            {% endif %}
+            <p class="mt-3 text-[15px] leading-relaxed text-text-muted">{{ item.summary }}</p>
+            {% if item.tag_items or item.stack_items %}
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {% for tag in item.tag_items %}
+              <li class="rounded-md border border-border-dark bg-background-dark/60 px-2.5 py-1 text-xs font-semibold text-ink">{{ tag }}</li>
+              {% endfor %}
+              {% for tech in item.stack_items %}
+              <li class="rounded-md border border-border-dark bg-background-dark/60 px-2.5 py-1 text-xs font-semibold text-ink">{{ tech }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if item.url %}
+            <a class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-primary-bright hover:text-primary-soft transition-colors" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">
+              {{ catalog_cta }}
+              <span class="material-symbols-outlined text-base" aria-hidden="true">arrow_outward</span>
+            </a>
+            {% endif %}
+          </article>
+          {% endfor %}
+        </div>
+
+        {% if submit_form %}
+        <section class="mt-12 rounded-lg border border-primary/40 bg-gradient-to-br from-primary/20 via-surface-dark to-surface-dark p-8" id="agregar">
+          <h2 class="text-2xl font-bold tracking-tight text-ink">{{ submit_heading }}</h2>
+          <p class="mt-2 text-text-muted">{{ submit_blurb }}</p>
+          {% if user.is_authenticated %}
+          <form method="post" class="mt-6 space-y-5">
+            {% csrf_token %}
+            {% if submit_form.errors %}
+            <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+              Corregí los campos marcados.
+            </div>
+            {% endif %}
+            {% for field in submit_form %}
+            <div>
+              <label for="{{ field.id_for_label }}" class="mb-2 block text-sm font-medium text-ink">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+              {{ field }}
+              {% if field.help_text %}
+              <p class="mt-1 text-xs text-text-muted">{{ field.help_text }}</p>
+              {% endif %}
+              {{ field.errors }}
+            </div>
+            {% endfor %}
+            <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover">Enviar a revisión</button>
+          </form>
+          {% else %}
+          <a class="mt-6 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover" href="{% url 'login' %}?next={% url submit_login_name %}%23agregar">Iniciar sesión para publicar</a>
+          {% endif %}
+        </section>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block page_js %}
+  <script src="{% static 'assets/js/index.js' %}"></script>
+{% endblock %}

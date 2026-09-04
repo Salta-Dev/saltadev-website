@@ -4,6 +4,7 @@ from content.models import Event
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -11,6 +12,7 @@ from django.views.decorators.http import require_GET, require_http_methods
 from users.image_service import ImageUploadResult, upload_event_image
 
 from .forms import EventForm, ImageSourceChoices
+from .services import invalidate_home_events_cache, next_upcoming_event
 
 # Template paths
 _TEMPLATE_FORM = "events/form.html"
@@ -87,6 +89,13 @@ def can_approve_events(user: "User") -> bool:
 
 
 @require_GET
+def event_detail(request: HttpRequest, slug: str) -> HttpResponse:
+    """Render the public detail page for an approved event."""
+    event = get_object_or_404(Event, slug=slug, status=Event.Status.APPROVED)
+    return render(request, "events/detail.html", {"event": event})
+
+
+@require_GET
 def events_list(request: HttpRequest) -> HttpResponse:
     """Render the events page with approved events, paginated and sorted by date."""
     events = (
@@ -94,31 +103,46 @@ def events_list(request: HttpRequest) -> HttpResponse:
         .select_related("creator")
         .order_by("-event_start_date")
     )
-    latest_event = events.first()
+    selected_kind = (request.GET.get("tipo") or "").strip()
+    if selected_kind in Event.Kind.values:
+        events = events.filter(kind=selected_kind)
+    latest_event = next_upcoming_event()
     page_obj = Paginator(events, _EVENTS_PER_PAGE).get_page(request.GET.get("page"))
     return render(
         request,
         "events/index.html",
-        {"events": page_obj, "page_obj": page_obj, "latest_event": latest_event},
+        {
+            "events": page_obj,
+            "page_obj": page_obj,
+            "latest_event": latest_event,
+            "event_kinds": Event.Kind,
+            "selected_kind": selected_kind,
+        },
     )
+
+
+def _dashboard_events(user: "User") -> QuerySet[Event]:
+    """Return events visible in the dashboard for the given user."""
+    events = Event.objects.select_related("creator").order_by("-created_at")
+    if can_approve_events(user):
+        return events
+    return events.filter(creator=user)
 
 
 @login_required
 @require_GET
 def my_events(request: HttpRequest) -> HttpResponse:
-    """Display events created by the current user."""
+    """Display events the user can manage, including bot ingest for staff."""
     user = _get_user(request)
     if not can_manage_events(user):
         messages.error(request, "No tenés permisos para acceder a esta sección.")
         return redirect("events")
 
-    events = Event.objects.filter(creator=user).order_by("-created_at")
-
     return render(
         request,
         "events/my_events.html",
         {
-            "events": events,
+            "events": _dashboard_events(user),
             "can_approve": can_approve_events(user),
         },
     )
@@ -200,6 +224,7 @@ def event_edit(request: HttpRequest, pk: int) -> HttpResponse:
                     )
 
             updated_event.save()
+            invalidate_home_events_cache()
             messages.success(request, "Evento actualizado exitosamente.")
             return redirect("my_events")
     else:
@@ -229,6 +254,7 @@ def event_delete(request: HttpRequest, pk: int) -> HttpResponse:
 
     if request.method == "POST":
         event.delete()
+        invalidate_home_events_cache()
         messages.success(request, "Evento eliminado exitosamente.")
         return redirect("my_events")
 

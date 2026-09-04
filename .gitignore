@@ -246,9 +246,16 @@ semgrep-report.json
 .claude/
 .agents/
 
+# SDD / ATL local artifacts (skill registry, testing capabilities)
+.atl/
+
 # Render
 .render/
 
 # Database backups
 *.backup-*
 db.sqlite3.backup-*
+
+# Local context / sibling services (not part of the public website)
+plan.md
+saltadev-telegram-bot/
