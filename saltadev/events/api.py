@@ -20,7 +20,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from users.image_service import upload_event_image
 
-from events.services import invalidate_home_events_cache, prepare_event_for_save
+from events.services import (
+    find_duplicate_event,
+    invalidate_home_events_cache,
+    prepare_event_for_save,
+)
 
 _MAX_JSON_BYTES = 16_384
 _MAX_PHOTO_BYTES = 8 * 1024 * 1024
@@ -135,6 +139,7 @@ def _event_payload(event: Event) -> dict[str, Any]:
         "slug": event.slug,
         "title": event.title,
         "kind": event.kind,
+        "link": event.link,
         "event_date_display": event.event_date_display,
         "url": f"{site_url}{event.get_absolute_url()}",
     }
@@ -238,6 +243,22 @@ def create_internal_event(request: HttpRequest) -> JsonResponse:
     status = _optional_str(payload, "status") or Event.Status.APPROVED
     if status not in {Event.Status.APPROVED, Event.Status.PENDING}:
         return JsonResponse({"error": "status must be approved or pending"}, status=400)
+
+    duplicate = find_duplicate_event(
+        title=title,
+        link=link,
+        event_start_date=start,
+        event_date_display=date_display,
+    )
+    if duplicate is not None:
+        return JsonResponse(
+            {
+                "error": "duplicate",
+                "message": "An event with the same link or title and date already exists",
+                "event": _event_payload(duplicate),
+            },
+            status=409,
+        )
 
     event = Event(
         title=title,
