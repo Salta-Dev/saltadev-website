@@ -42,9 +42,27 @@
             {% endfor %}
           </div>
           {% else %}
-          <p class="mt-6 text-base text-text-muted">Todavía no hay cursos publicados. Un administrador los carga desde el panel.</p>
+          <p class="mt-6 text-base text-text-muted">Todavía no hay cursos publicados.</p>
           {% endif %}
         </header>
+
+        {% if messages %}
+        <div class="mt-8 space-y-2">
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-400">check_circle</span>
+                {{ message }}
+              </div>
+            {% elif message.tags == 'error' %}
+              <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-400">error</span>
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
 
         {% for track in tracks %}
         <section class="py-12 border-b border-border-dark last:border-b-0" id="{{ track.slug }}">
@@ -77,16 +95,37 @@
         </section>
         {% endfor %}
 
-        <section class="pt-12">
-          <div class="relative overflow-hidden rounded-lg border border-primary/40 bg-gradient-to-br from-primary/20 via-surface-dark to-surface-dark p-8 lg:p-10" data-reveal>
-            <div class="absolute inset-0 bg-poncho-pattern opacity-50" aria-hidden="true"></div>
-            <div class="relative">
-              <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-ink">Proponer un curso</h2>
-              <p class="mt-2 text-lg text-text-muted">Se puede enviar un enlace y una descripción. Un administrador lo revisa y lo publica.</p>
-              <a class="mt-6 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm sm:text-base font-bold text-ink transition-all hover:bg-primary-hover active:scale-[0.98]" href="mailto:comusaltadev@gmail.com?subject=Recurso%20para%20salta.dev">Proponer un recurso</a>
-            </div>
+        {% if submit_form %}
+        <section class="pt-12" id="agregar">
+          <div class="rounded-lg border border-primary/40 bg-gradient-to-br from-primary/20 via-surface-dark to-surface-dark p-8">
+            <h2 class="text-2xl font-bold tracking-tight text-ink">{{ submit_heading }}</h2>
+            <p class="mt-2 text-text-muted">{{ submit_blurb }}</p>
+            {% if user.is_authenticated %}
+            <form method="post" class="mt-6 space-y-5">
+              {% csrf_token %}
+              {% if submit_form.errors %}
+              <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+                Corregí los campos marcados.
+              </div>
+              {% endif %}
+              {% for field in submit_form %}
+              <div>
+                <label for="{{ field.id_for_label }}" class="mb-2 block text-sm font-medium text-ink">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <p class="mt-1 text-xs text-text-muted">{{ field.help_text }}</p>
+                {% endif %}
+                {{ field.errors }}
+              </div>
+              {% endfor %}
+              <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover">Enviar a revisión</button>
+            </form>
+            {% else %}
+            <a class="mt-6 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover" href="{% url 'login' %}?next={% url submit_login_name %}%23agregar">Iniciar sesión para publicar</a>
+            {% endif %}
           </div>
         </section>
+        {% endif %}
       </div>
     </div>
   </div>

@@ -35,7 +35,7 @@
             <p class="mt-6 text-base text-text-muted">Todavía no hay proyectos publicados.</p>
             {% endif %}
           {% elif not entries %}
-          <p class="mt-6 text-base text-text-muted">Todavía no hay ítems publicados. Un administrador los carga desde el panel.</p>
+          <p class="mt-6 text-base text-text-muted">Todavía no hay ítems publicados.</p>
           {% endif %}
         </header>
 
@@ -45,6 +45,11 @@
             {% if message.tags == 'success' %}
               <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-300 flex items-center gap-3">
                 <span class="material-symbols-outlined text-green-400">check_circle</span>
+                {{ message }}
+              </div>
+            {% elif message.tags == 'error' %}
+              <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-400">error</span>
                 {{ message }}
               </div>
             {% endif %}

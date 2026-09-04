@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaltaDev - Mis propuestas</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex overflow-x-hidden selection:bg-primary selection:text-white font-display">
+
+  {% include "dashboard/includes/sidebar.html" %}
+  {% include "dashboard/includes/mobile_menu.html" %}
+
+  <main class="flex-1 lg:ml-72 flex flex-col min-h-screen overflow-y-auto relative bg-background-dark">
+    {% include "dashboard/includes/header.html" %}
+
+    <div class="p-4 lg:p-8 max-w-[1600px] mx-auto w-full flex flex-col gap-6 lg:gap-8 pb-20">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl lg:text-3xl font-bold text-white">Mis propuestas</h1>
+          <p class="text-[#6b605f] text-sm mt-0.5">Recursos que enviaste a revisión</p>
+        </div>
+        {% if can_review %}
+        <a href="{% url 'pending_resource_proposals' %}" class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-ink hover:bg-primary-hover">
+          Cola de revisión
+        </a>
+        {% endif %}
+      </div>
+
+      <div class="bg-surface-dark rounded-2xl border border-[#2a2424] overflow-hidden">
+        {% if proposals %}
+          <div class="divide-y divide-[#2a2424]">
+            {% for item in proposals %}
+              <div class="p-4 lg:p-5">
+                <div class="flex flex-wrap items-center gap-2 text-xs text-[#6b605f]">
+                  <span class="uppercase tracking-wide">{{ item.kind_label }}</span>
+                  <span>·</span>
+                  <span class="{% if item.status == 'approved' %}text-green-400{% elif item.status == 'rejected' %}text-red-400{% else %}text-amber-400{% endif %}">{{ item.status_label }}</span>
+                </div>
+                <h3 class="mt-2 font-bold text-white text-lg">{{ item.title }}</h3>
+                <p class="text-sm text-[#8e8584] mt-1 line-clamp-2">{{ item.summary }}</p>
+                {% if item.rejection_reason %}
+                <p class="mt-2 text-sm text-red-300">Motivo: {{ item.rejection_reason }}</p>
+                {% endif %}
+                {% if item.url %}
+                <a class="mt-3 inline-flex text-sm text-primary-bright hover:underline" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.url }}</a>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="p-12 text-center">
+            <h3 class="text-lg font-bold text-white mb-2">Todavía no enviaste propuestas</h3>
+            <p class="text-[#6b605f] text-sm max-w-sm mx-auto">Podés proponer libros, herramientas, proyectos o cursos desde Recursos.</p>
+            <a href="{% url 'resources' %}" class="mt-6 inline-flex rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-ink">Ir a Recursos</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+</body>
+</html>

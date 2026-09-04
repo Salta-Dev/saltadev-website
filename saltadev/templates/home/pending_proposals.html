@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaltaDev - Propuestas pendientes</title>
+  {% include "includes/head.html" %}
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex overflow-x-hidden selection:bg-primary selection:text-white font-display">
+
+  {% include "dashboard/includes/sidebar.html" %}
+  {% include "dashboard/includes/mobile_menu.html" %}
+
+  <main class="flex-1 lg:ml-72 flex flex-col min-h-screen overflow-y-auto relative bg-background-dark">
+    {% include "dashboard/includes/header.html" %}
+
+    <div class="p-4 lg:p-8 max-w-[1600px] mx-auto w-full flex flex-col gap-6 lg:gap-8 pb-20">
+      {% if messages %}
+        <div class="space-y-2">
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-400">check_circle</span>
+                {{ message }}
+              </div>
+            {% elif message.tags == 'error' %}
+              <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-400">error</span>
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <a href="{% url 'my_resource_proposals' %}" class="size-10 rounded-lg bg-[#1d1919] border border-[#2a2424] flex items-center justify-center text-[#8e8584] hover:text-white hover:border-primary/50 transition-all">
+            <span class="material-symbols-outlined text-xl leading-none">arrow_back</span>
+          </a>
+          <div>
+            <h1 class="text-2xl lg:text-3xl font-bold text-white">Propuestas pendientes</h1>
+            <p class="text-[#6b605f] text-sm mt-0.5">Cola de revisión de Recursos</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-surface-dark rounded-2xl border border-[#2a2424] overflow-hidden">
+        {% if proposals %}
+          <div class="divide-y divide-[#2a2424]">
+            {% for item in proposals %}
+              <div class="p-4 lg:p-5 flex flex-col gap-4">
+                <div>
+                  <div class="flex flex-wrap items-center gap-2 text-xs text-[#6b605f]">
+                    <span class="uppercase tracking-wide">{{ item.kind_label }}</span>
+                    <span>·</span>
+                    <span>{{ item.creator_label }}</span>
+                  </div>
+                  <h3 class="mt-2 font-bold text-white text-lg">{{ item.title }}</h3>
+                  <p class="text-sm text-[#8e8584] mt-1">{{ item.summary }}</p>
+                  {% if item.url %}
+                  <a class="mt-2 inline-flex text-sm text-primary-bright hover:underline" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.url }}</a>
+                  {% endif %}
+                </div>
+                <div class="flex items-center gap-3">
+                  {% if item.object_type == 'course' %}
+                  <a href="{% url 'course_proposal_approve' pk=item.pk %}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-all">Aprobar</a>
+                  <a href="{% url 'course_proposal_reject' pk=item.pk %}" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-all">Rechazar</a>
+                  {% else %}
+                  <a href="{% url 'catalog_proposal_approve' pk=item.pk %}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-all">Aprobar</a>
+                  <a href="{% url 'catalog_proposal_reject' pk=item.pk %}" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-all">Rechazar</a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="p-12 text-center">
+            <h3 class="text-lg font-bold text-white mb-2">Sin propuestas pendientes</h3>
+            <p class="text-[#6b605f] text-sm">No hay recursos esperando revisión.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+</body>
+</html>

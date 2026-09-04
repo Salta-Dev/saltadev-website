@@ -34,6 +34,11 @@
       <span class="font-medium tracking-wide">Eventos</span>
     </a>
     {% endif %}
+    <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl {% if current_url == 'my_resource_proposals' or current_url == 'pending_resource_proposals' %}bg-[#2a2424] border border-[#3d2f2f] text-white shadow-lg shadow-black/20 relative overflow-hidden{% else %}hover:bg-[#2a2424] text-[#8e8584] hover:text-white{% endif %} transition-all duration-200" href="{% url 'my_resource_proposals' %}">
+      {% if current_url == 'my_resource_proposals' or current_url == 'pending_resource_proposals' %}<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>{% endif %}
+      <span class="material-symbols-outlined {% if current_url == 'my_resource_proposals' or current_url == 'pending_resource_proposals' %}text-primary{% else %}group-hover:text-primary transition-colors{% endif %}">menu_book</span>
+      <span class="font-medium tracking-wide">Recursos</span>
+    </a>
     <a class="group flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-[#2a2424] text-[#8e8584] hover:text-white transition-all duration-200" href="{% url 'home' %}">
       <span class="material-symbols-outlined group-hover:text-primary transition-colors">home</span>
       <span class="font-medium tracking-wide">Ir al sitio</span>

@@ -145,6 +145,17 @@
   object-fit: contain;
 }
 
+.event-body a {
+  color: #ff6b6b;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  word-break: break-word;
+}
+
+.event-body a:hover {
+  color: #ff8f8f;
+}
+
 .events-expanded {
   max-height: none;
 }
