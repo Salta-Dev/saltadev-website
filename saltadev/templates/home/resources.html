@@ -25,10 +25,10 @@
   <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-20">
     <div class="lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-14 lg:items-start">
       {% include "home/includes/resources_nav.html" %}
-      <div>
+      <div class="min-w-0">
         <header class="max-w-2xl border-b border-border-dark pb-10" data-reveal>
           <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary-bright">Aprendizaje</p>
-          <h1 class="mt-3 text-3xl md:text-5xl font-bold tracking-tight text-ink">Cursos y tips</h1>
+          <h1 class="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-ink break-words">Cursos y tips</h1>
           <p class="mt-4 text-lg text-text-muted leading-relaxed">
             Cursos, tutoriales y documentación para developers y para quien trabaja con agentes de IA.
           </p>
@@ -74,14 +74,14 @@
             <h2 class="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-ink">{{ track.label }}</h2>
             <p class="mt-3 text-lg text-text-muted">{{ track.blurb }}</p>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5" data-stagger>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5" data-stagger>
             {% for item in track.resources %}
-            <article class="rounded-lg border border-border-dark bg-surface-dark p-6 flex flex-col">
+            <article class="rounded-lg border border-border-dark bg-surface-dark p-4 sm:p-6 flex flex-col min-w-0">
               <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
                 {{ item.source }}{% if item.duration %} · {{ item.duration }}{% endif %}
               </p>
-              <h3 class="mt-2 text-xl font-bold tracking-tight text-ink">{{ item.title }}</h3>
-              <p class="mt-2.5 text-[15px] leading-relaxed text-text-muted flex-1">{{ item.tip }}</p>
+              <h3 class="mt-2 text-xl font-bold tracking-tight text-ink break-words">{{ item.title }}</h3>
+              <p class="mt-2.5 text-[15px] leading-relaxed text-text-muted flex-1 break-words">{{ item.tip }}</p>
               {% if item.instructor %}
               <p class="mt-3 text-sm text-text-muted">Dictado por {{ item.instructor }}</p>
               {% endif %}
@@ -97,8 +97,8 @@
 
         {% if submit_form %}
         <section class="pt-12" id="agregar">
-          <div class="rounded-lg border border-primary/40 bg-gradient-to-br from-primary/20 via-surface-dark to-surface-dark p-8">
-            <h2 class="text-2xl font-bold tracking-tight text-ink">{{ submit_heading }}</h2>
+          <div class="rounded-lg border border-primary/40 bg-gradient-to-br from-primary/20 via-surface-dark to-surface-dark p-4 sm:p-6 lg:p-8">
+            <h2 class="text-2xl font-bold tracking-tight text-ink break-words">{{ submit_heading }}</h2>
             <p class="mt-2 text-text-muted">{{ submit_blurb }}</p>
             {% if user.is_authenticated %}
             <form method="post" class="mt-6 space-y-5">
@@ -109,7 +109,7 @@
               </div>
               {% endif %}
               {% for field in submit_form %}
-              <div>
+              <div class="min-w-0">
                 <label for="{{ field.id_for_label }}" class="mb-2 block text-sm font-medium text-ink">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
                 {{ field }}
                 {% if field.help_text %}
@@ -118,10 +118,10 @@
                 {{ field.errors }}
               </div>
               {% endfor %}
-              <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover">Enviar a revisión</button>
+              <button type="submit" class="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover">Enviar a revisión</button>
             </form>
             {% else %}
-            <a class="mt-6 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover" href="{% url 'login' %}?next={% url submit_login_name %}%23agregar">Iniciar sesión para publicar</a>
+            <a class="mt-6 inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover" href="{% url 'login' %}?next={% url submit_login_name %}%23agregar">Iniciar sesión para publicar</a>
             {% endif %}
           </div>
         </section>

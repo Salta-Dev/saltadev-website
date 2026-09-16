@@ -25,10 +25,10 @@
   <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-20">
     <div class="lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-14 lg:items-start">
       {% include "home/includes/resources_nav.html" %}
-      <div>
+      <div class="min-w-0">
         <header class="max-w-2xl border-b border-border-dark pb-10" data-reveal>
           <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary-bright">{{ catalog_kicker }}</p>
-          <h1 class="mt-3 text-3xl md:text-5xl font-bold tracking-tight text-ink">{{ catalog_title }}</h1>
+          <h1 class="mt-3 text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-ink break-words">{{ catalog_title }}</h1>
           <p class="mt-4 text-lg text-text-muted leading-relaxed">{{ catalog_blurb }}</p>
           {% if resources_section == "proyectos" %}
             {% if not entries %}
@@ -59,17 +59,17 @@
 
         <div class="mt-10 grid grid-cols-1 gap-5" data-stagger>
           {% for item in entries %}
-          <article class="rounded-lg border border-border-dark bg-surface-dark p-6 sm:p-7">
+          <article class="rounded-lg border border-border-dark bg-surface-dark p-4 sm:p-6 lg:p-7 min-w-0">
             <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint">
               {% if item.category %}<span>{{ item.category }}</span>{% endif %}
               {% if item.pricing %}<span class="rounded-md border border-border-dark px-2 py-0.5 text-ink">{{ item.pricing }}</span>{% endif %}
               {% if item.extra %}<span class="rounded-md border border-primary/40 bg-primary/10 px-2 py-0.5 text-primary-bright">{{ item.extra }}</span>{% endif %}
             </div>
-            <h2 class="mt-3 text-xl font-bold tracking-tight text-ink">{{ item.title }}</h2>
+            <h2 class="mt-3 text-xl font-bold tracking-tight text-ink break-words">{{ item.title }}</h2>
             {% if item.authors or item.year %}
-            <p class="mt-1 text-sm text-text-muted">{% if item.authors %}{{ item.authors }}{% endif %}{% if item.authors and item.year %} · {% endif %}{% if item.year %}{{ item.year }}{% endif %}</p>
+            <p class="mt-1 text-sm text-text-muted break-words">{% if item.authors %}{{ item.authors }}{% endif %}{% if item.authors and item.year %} · {% endif %}{% if item.year %}{{ item.year }}{% endif %}</p>
             {% endif %}
-            <p class="mt-3 text-[15px] leading-relaxed text-text-muted">{{ item.summary }}</p>
+            <p class="mt-3 text-[15px] leading-relaxed text-text-muted break-words">{{ item.summary }}</p>
             {% if item.tag_items or item.stack_items %}
             <ul class="mt-4 flex flex-wrap gap-2">
               {% for tag in item.tag_items %}
@@ -91,8 +91,8 @@
         </div>
 
         {% if submit_form %}
-        <section class="mt-12 rounded-lg border border-primary/40 bg-gradient-to-br from-primary/20 via-surface-dark to-surface-dark p-8" id="agregar">
-          <h2 class="text-2xl font-bold tracking-tight text-ink">{{ submit_heading }}</h2>
+        <section class="mt-12 rounded-lg border border-primary/40 bg-gradient-to-br from-primary/20 via-surface-dark to-surface-dark p-4 sm:p-6 lg:p-8" id="agregar">
+          <h2 class="text-2xl font-bold tracking-tight text-ink break-words">{{ submit_heading }}</h2>
           <p class="mt-2 text-text-muted">{{ submit_blurb }}</p>
           {% if user.is_authenticated %}
           <form method="post" class="mt-6 space-y-5">
@@ -103,7 +103,7 @@
             </div>
             {% endif %}
             {% for field in submit_form %}
-            <div>
+            <div class="min-w-0">
               <label for="{{ field.id_for_label }}" class="mb-2 block text-sm font-medium text-ink">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
               {{ field }}
               {% if field.help_text %}
@@ -112,10 +112,10 @@
               {{ field.errors }}
             </div>
             {% endfor %}
-            <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover">Enviar a revisión</button>
+            <button type="submit" class="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover">Enviar a revisión</button>
           </form>
           {% else %}
-          <a class="mt-6 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover" href="{% url 'login' %}?next={% url submit_login_name %}%23agregar">Iniciar sesión para publicar</a>
+          <a class="mt-6 inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-primary px-6 py-3.5 text-sm font-bold text-ink transition-all hover:bg-primary-hover" href="{% url 'login' %}?next={% url submit_login_name %}%23agregar">Iniciar sesión para publicar</a>
           {% endif %}
         </section>
         {% endif %}
