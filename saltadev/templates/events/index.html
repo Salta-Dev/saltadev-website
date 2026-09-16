@@ -28,7 +28,26 @@
   <section class="py-8 lg:py-14">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid lg:grid-cols-12 gap-10 items-start">
-        <div class="lg:col-span-7">
+        {% if latest_event %}
+          <div class="order-1 lg:order-2 lg:col-span-5">
+            <a class="group relative block rounded-2xl bg-surface-dark border border-border-dark overflow-hidden shadow-2xl hover:border-primary/50 transition-all duration-300" href="{% url 'event_detail' latest_event.slug %}" aria-label="Ver detalle de {{ latest_event.title }}">
+              <div class="absolute top-0 right-0 w-36 h-36 bg-primary/20 blur-[70px] rounded-full pointer-events-none"></div>
+              <img
+                alt="Afiche de {{ latest_event.title }}"
+                class="w-full aspect-video object-cover border-b border-border-dark"
+                src="{% if latest_event.photo %}{% if latest_event.photo|slice:':4' == 'http' or latest_event.photo|slice:':1' == '/' %}{{ latest_event.photo }}{% else %}/{{ latest_event.photo }}{% endif %}{% else %}{% static 'assets/img/seed-latam-salta-960w.webp' %}{% endif %}"
+                width="1200"
+                height="675"
+                loading="eager"
+                decoding="async">
+              <div class="p-5 md:p-6">
+                <p class="text-lg font-bold text-white group-hover:text-primary transition-colors">{{ latest_event.title }}</p>
+              </div>
+            </a>
+          </div>
+        {% endif %}
+
+        <div class="order-2 lg:order-1 lg:col-span-7">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-dark border border-border-dark mb-6">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             <span class="text-xs font-medium text-white uppercase tracking-wide">Agenda SaltaDev</span>
@@ -91,25 +110,6 @@
             {% endif %}
           </div>
         </div>
-
-        {% if latest_event %}
-          <div class="lg:col-span-5">
-            <a class="group relative block rounded-2xl bg-surface-dark border border-border-dark overflow-hidden shadow-2xl hover:border-primary/50 transition-all duration-300" href="{% url 'event_detail' latest_event.slug %}" aria-label="Ver detalle de {{ latest_event.title }}">
-              <div class="absolute top-0 right-0 w-36 h-36 bg-primary/20 blur-[70px] rounded-full pointer-events-none"></div>
-              <img
-                alt="Afiche de {{ latest_event.title }}"
-                class="w-full aspect-video object-cover border-b border-border-dark"
-                src="{% if latest_event.photo %}{% if latest_event.photo|slice:':4' == 'http' or latest_event.photo|slice:':1' == '/' %}{{ latest_event.photo }}{% else %}/{{ latest_event.photo }}{% endif %}{% else %}{% static 'assets/img/seed-latam-salta-960w.webp' %}{% endif %}"
-                width="1200"
-                height="675"
-                loading="eager"
-                decoding="async">
-              <div class="p-5 md:p-6">
-                <p class="text-lg font-bold text-white group-hover:text-primary transition-colors">{{ latest_event.title }}</p>
-              </div>
-            </a>
-          </div>
-        {% endif %}
       </div>
     </div>
   </section>
