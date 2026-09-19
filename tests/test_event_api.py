@@ -113,7 +113,7 @@ class TestInternalCreateEvent:
         assert response.status_code == 400
 
     def test_duplicate_slug_gets_suffix(self, client, settings):
-        """A colliding title should get a unique slug suffix."""
+        """A colliding title without link/date match should get a unique slug suffix."""
         settings.SALTADEV_INGEST_TOKEN = INGEST_TOKEN
         Event.objects.create(title="PunaTech 2026", slug="punatech-2026")
         response = client.post(
@@ -124,6 +124,50 @@ class TestInternalCreateEvent:
         )
         assert response.status_code == 201
         assert response.json()["slug"] == "punatech-2026-1"
+
+    def test_duplicate_link_returns_409(self, client, settings):
+        """Re-ingesting the same registration link should not create another event."""
+        settings.SALTADEV_INGEST_TOKEN = INGEST_TOKEN
+        existing = Event.objects.create(
+            title="Otro título",
+            slug="otro-titulo",
+            link="https://www.punatech.ar/",
+            status=Event.Status.APPROVED,
+        )
+        response = client.post(
+            INGEST_URL,
+            data=VALID_PAYLOAD,
+            content_type="application/json",
+            headers=_auth_headers(),
+        )
+        assert response.status_code == 409
+        body = response.json()
+        assert body["error"] == "duplicate"
+        assert body["event"]["id"] == existing.pk
+        assert Event.objects.count() == 1
+
+    def test_duplicate_title_and_date_returns_409(self, client, settings):
+        """Same title and start day should be rejected even with a different link."""
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        settings.SALTADEV_INGEST_TOKEN = INGEST_TOKEN
+        existing = Event.objects.create(
+            title="¡PunaTech 2026! 🚀",
+            slug="punatech-emoji",
+            link="https://example.com/other",
+            event_start_date=datetime(2026, 5, 28, 12, 0, tzinfo=ZoneInfo("America/Argentina/Buenos_Aires")),
+            status=Event.Status.APPROVED,
+        )
+        response = client.post(
+            INGEST_URL,
+            data=VALID_PAYLOAD,
+            content_type="application/json",
+            headers=_auth_headers(),
+        )
+        assert response.status_code == 409
+        assert response.json()["event"]["id"] == existing.pk
+        assert Event.objects.count() == 1
 
     def test_invalidates_home_cache_and_shows_on_home(self, client, settings):
         """A newly ingested event should appear on the homepage immediately."""

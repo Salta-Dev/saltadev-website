@@ -238,6 +238,13 @@ class LearningResource(models.Model):
         DEVELOPERS = "developers", "Developers"
         VIBECODERS = "vibecoders", "Vibecoders"
 
+    class Status(models.TextChoices):
+        """Moderation state for community-submitted courses."""
+
+        PENDING = "pending", "Pendiente"
+        APPROVED = "approved", "Aprobado"
+        REJECTED = "rejected", "Rechazado"
+
     title = models.CharField(max_length=200, verbose_name="título")
     tip = models.TextField(verbose_name="tip")
     url = models.URLField(verbose_name="enlace")
@@ -251,6 +258,32 @@ class LearningResource(models.Model):
         choices=Track.choices,
         verbose_name="pista",
     )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.APPROVED,
+        verbose_name="estado",
+    )
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="learning_resources",
+        verbose_name="creador",
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_learning_resources",
+        verbose_name="aprobado por",
+    )
+    approved_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="fecha de aprobación"
+    )
+    rejection_reason = models.TextField(blank=True, verbose_name="motivo de rechazo")
     order = models.PositiveIntegerField(default=0, verbose_name="orden")
     is_published = models.BooleanField(default=True, verbose_name="publicado")
     created_at = models.DateTimeField(default=timezone.now)
@@ -261,10 +294,50 @@ class LearningResource(models.Model):
         ordering = ("track", "order", "created_at")
         indexes = [
             models.Index(fields=["is_published", "track", "order"]),
+            models.Index(fields=["status", "is_published"]),
         ]
 
     def __str__(self) -> str:
         return self.title
+
+    @property
+    def is_pending(self) -> bool:
+        """Return True when the course waits for reviewer action."""
+        return self.status == self.Status.PENDING
+
+    def approve(self, user: "User") -> None:
+        """Mark a submitted course as public."""
+        self.status = self.Status.APPROVED
+        self.is_published = True
+        self.approved_by = user
+        self.approved_at = timezone.now()
+        self.rejection_reason = ""
+        self.save(
+            update_fields=[
+                "status",
+                "is_published",
+                "approved_by",
+                "approved_at",
+                "rejection_reason",
+            ]
+        )
+
+    def reject(self, user: "User", reason: str = "") -> None:
+        """Decline a submitted course without deleting it."""
+        self.status = self.Status.REJECTED
+        self.is_published = False
+        self.approved_by = user
+        self.approved_at = timezone.now()
+        self.rejection_reason = reason.strip()
+        self.save(
+            update_fields=[
+                "status",
+                "is_published",
+                "approved_by",
+                "approved_at",
+                "rejection_reason",
+            ]
+        )
 
 
 class TechSpecialty(models.Model):
@@ -402,6 +475,7 @@ class CatalogEntry(models.Model):
     approved_at = models.DateTimeField(
         null=True, blank=True, verbose_name="fecha de aprobación"
     )
+    rejection_reason = models.TextField(blank=True, verbose_name="motivo de rechazo")
     order = models.PositiveIntegerField(default=0, verbose_name="orden")
     is_published = models.BooleanField(default=True, verbose_name="publicado")
     created_at = models.DateTimeField(default=timezone.now)
@@ -429,12 +503,31 @@ class CatalogEntry(models.Model):
         self.is_published = True
         self.approved_by = user
         self.approved_at = timezone.now()
+        self.rejection_reason = ""
         self.save(
             update_fields=[
                 "status",
                 "is_published",
                 "approved_by",
                 "approved_at",
+                "rejection_reason",
+            ]
+        )
+
+    def reject(self, user: "User", reason: str = "") -> None:
+        """Decline a submitted catalog entry without deleting it."""
+        self.status = self.Status.REJECTED
+        self.is_published = False
+        self.approved_by = user
+        self.approved_at = timezone.now()
+        self.rejection_reason = reason.strip()
+        self.save(
+            update_fields=[
+                "status",
+                "is_published",
+                "approved_by",
+                "approved_at",
+                "rejection_reason",
             ]
         )
 

@@ -44,11 +44,12 @@ TRACKS = (
 
 
 def tracks_for_page() -> list[ResourceTrack]:
-    """Return tracks that currently have at least one published resource."""
+    """Return tracks that currently have at least one published approved course."""
     published = list(
-        LearningResource.objects.filter(is_published=True).order_by(
-            "order", "created_at", "pk"
-        )
+        LearningResource.objects.filter(
+            is_published=True,
+            status=LearningResource.Status.APPROVED,
+        ).order_by("order", "created_at", "pk")
     )
     grouped: dict[str, list[LearningResource]] = {}
     for resource in published:
